@@ -64,7 +64,7 @@ To explain the idea behind ReactiveCollections, let's look at this completely fi
 
 <b>Bob</b> ...yes...
 
-<b>Allice</b> ...and await it...
+<b>Alice</b> ...and await it...
 
 <b>Bob</b> ...absolutely.
 
@@ -76,7 +76,7 @@ To explain the idea behind ReactiveCollections, let's look at this completely fi
 
 <b>Bob:</b> You can!
 
-Alice: So, that's all good, but at the end of the day, I have to display my filtered, projected and sorted collection in my cool new app. But my UI only can bind to a good old ObservableCollection.
+<b>Alice</b>: So, that's all good, but at the end of the day, I have to display my filtered, projected and sorted collection in my cool new app. But my UI only can bind to a good old ObservableCollection.
 
 <b>Bob:</b> Just call
     
