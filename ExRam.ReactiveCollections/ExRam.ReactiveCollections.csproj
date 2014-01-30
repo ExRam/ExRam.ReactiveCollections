@@ -111,7 +111,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\ExRam.Extensions\ExRam.Extensions\System\Reactive\Linq\ObservableExtensions %28ToWeakObservable%29.cs">
-      <Link>ObservableExtensions %28ToWeakObservable%29.cs</Link>
+      <Link>Extensions\ObservableExtensions %28ToWeakObservable%29.cs</Link>
     </Compile>
     <Compile Include="Extensions\ReactiveCollectionExtensions %28ObserveOn%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28WithChanges%29.cs" />
