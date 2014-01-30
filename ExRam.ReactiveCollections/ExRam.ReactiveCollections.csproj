@@ -110,10 +110,11 @@
     <AssemblyOriginatorKeyFile>ExRam.ReactiveCollections.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Extensions\ReactiveCollectionExtensions %28ObserveOn%29.cs" />
+    <Compile Include="Extensions\ReactiveCollectionExtensions %28WithChanges%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28ToObservableCollection%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28GetValueObservable%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28GetCurrent%29.cs" />
-    <Compile Include="Extensions\ReactiveCollectionExtensions %28ObserveOn%29.cs" />
     <Compile Include="ReactiveCollectionSources\SortedListReactiveCollectionSource.cs" />
     <Compile Include="ReactiveCollectionSources\SortedSetReactiveCollectionSource.cs" />
     <Compile Include="ReactiveCollectionSources\ReactiveCollectionSource.cs" />
