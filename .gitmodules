@@ -1,0 +1,3 @@
+[submodule "ExRam.Extensions"]
+	path = ExRam.Extensions
+	url = https://github.com/ExRam/ExRam.Extensions.git
