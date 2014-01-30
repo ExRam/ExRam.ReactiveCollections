@@ -110,6 +110,9 @@
     <AssemblyOriginatorKeyFile>ExRam.ReactiveCollections.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\ExRam.Extensions\ExRam.Extensions\System\Reactive\Linq\ObservableExtensions %28ToWeakObservable%29.cs">
+      <Link>ObservableExtensions %28ToWeakObservable%29.cs</Link>
+    </Compile>
     <Compile Include="Extensions\ReactiveCollectionExtensions %28ObserveOn%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28WithChanges%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28ToObservableCollection%29.cs" />
@@ -122,7 +125,6 @@
     <Compile Include="Extensions\ComparisonExtensions.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28AsReactiveCollection%29.cs" />
     <Compile Include="Extensions\ObservableExtensions %28ToReactiveCollection%29.cs" />
-    <Compile Include="Extensions\ObservableExtensions %28ToWeakObservable%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28Sort%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28Where%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28ToWeakReactiveCollection%29.cs" />
