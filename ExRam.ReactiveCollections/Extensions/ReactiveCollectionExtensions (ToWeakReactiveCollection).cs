@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 using System.Reactive.Linq;
-using System.Threading;
 
 namespace ExRam.ReactiveCollections
 {

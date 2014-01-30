@@ -9,7 +9,6 @@ namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        
         #region SelectListReactiveCollection
         private sealed class SelectListReactiveCollection<TSource, TResult> : IReactiveCollection<ListChangedNotification<TResult>, TResult>
         {
@@ -205,6 +204,7 @@ namespace ExRam.ReactiveCollections
             }
         }
         #endregion
+
         public static IReactiveCollection<ListChangedNotification<TResult>, TResult> Select<TSource, TResult>(this IReactiveCollection<ICollectionChangedNotification<TSource>, TSource> source, Func<TSource, TResult> selector)
         {
             Contract.Requires(source != null);
@@ -219,9 +219,9 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(selector != null);
             Contract.Requires(equalityComparer != null);
 
-            
             return new SelectListReactiveCollection<TSource, TResult>(source.Changes, selector, equalityComparer);
         }
+
         public static IReactiveCollection<DictionaryChangedNotification<TKey, TResult>, KeyValuePair<TKey, TResult>> Select<TKey, TSource, TResult>(this IReactiveCollection<DictionaryChangedNotification<TKey, TSource>, KeyValuePair<TKey, TSource>> source, Func<TSource, TResult> selector)
         {
             Contract.Requires(source != null);
