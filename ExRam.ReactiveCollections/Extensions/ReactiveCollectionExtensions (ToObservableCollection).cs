@@ -2,7 +2,9 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics.Contracts;
+using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 
 namespace ExRam.ReactiveCollections
 {
@@ -11,88 +13,119 @@ namespace ExRam.ReactiveCollections
         #region ReactiveReadOnlyObservableCollection
         private sealed class ReactiveReadOnlyObservableCollection<T> : ReadOnlyObservableCollection<T>
         {
-            // ReSharper disable NotAccessedField.Local
-            private readonly IDisposable _subscription;
-            // ReSharper restore NotAccessedField.Local
-
-            private readonly IObservable<ListChangedNotification<T>> _source;
-
-            public ReactiveReadOnlyObservableCollection(IObservable<ListChangedNotification<T>> source)
-                : base(new ObservableCollection<T>())
+            #region ConnectableObservableImpl
+            private sealed class ConnectableObservableImpl : IConnectableObservable<NotifyCollectionChangedEventArgs>
             {
-                Contract.Requires(source != null);
+                private readonly IObservable<ListChangedNotification<T>> _source;
+                private readonly ReactiveReadOnlyObservableCollection<T> _collection;
 
-                this._source = source;
+                public ConnectableObservableImpl(ReactiveReadOnlyObservableCollection<T> collection, IObservable<ListChangedNotification<T>> source)
+                {
+                    Contract.Requires(collection != null);
+                    Contract.Requires(source != null);
 
-                this._subscription = source
-                    .ToWeakObservable()
-                    .Subscribe((notification) =>
+                    this._source = source;
+                    this._collection = collection;
+                }
+
+                public IDisposable Connect()
+                {
+                    return this._source.Subscribe((notification) =>
                     {
                         switch (notification.Action)
                         {
                             case (NotifyCollectionChangedAction.Add):
+                            {
+                                // ReSharper disable PossibleInvalidOperationException
+                                var index = notification.Index.Value;
+                                // ReSharper restore PossibleInvalidOperationException
+
+                                for (var i = 0; i < notification.NewItems.Count; i++)
                                 {
-                                    // ReSharper disable PossibleInvalidOperationException
-                                    var index = notification.Index.Value;
-                                    // ReSharper restore PossibleInvalidOperationException
-
-                                    for (var i = 0; i < notification.NewItems.Count; i++)
-                                    {
-                                        base.Items.Insert((i + index), notification.NewItems[i]);
-                                    }
-
-                                    break;
+                                    this._collection.Items.Insert((i + index), notification.NewItems[i]);
                                 }
+
+                                break;
+                            }
 
                             case (NotifyCollectionChangedAction.Remove):
+                            {
+                                // ReSharper disable PossibleInvalidOperationException
+                                var index = notification.Index.Value;
+                                // ReSharper restore PossibleInvalidOperationException
+
+                                for (var i = 0; i < notification.OldItems.Count; i++)
                                 {
-                                    // ReSharper disable PossibleInvalidOperationException
-                                    var index = notification.Index.Value;
-                                    // ReSharper restore PossibleInvalidOperationException
-
-                                    for (var i = 0; i < notification.OldItems.Count; i++)
-                                    {
-                                        base.Items.RemoveAt(i + index);
-                                    }
-
-                                    break;
+                                    this._collection.Items.RemoveAt(i + index);
                                 }
+
+                                break;
+                            }
 
                             case (NotifyCollectionChangedAction.Replace):
+                            {
+                                // ReSharper disable PossibleInvalidOperationException
+                                var index = notification.Index.Value;
+                                // ReSharper restore PossibleInvalidOperationException
+
+                                for (var i = 0; i < notification.OldItems.Count; i++)
                                 {
-                                    // ReSharper disable PossibleInvalidOperationException
-                                    var index = notification.Index.Value;
-                                    // ReSharper restore PossibleInvalidOperationException
-
-                                    for (var i = 0; i < notification.OldItems.Count; i++)
-                                    {
-                                        base.Items[i + index] = notification.NewItems[i];
-                                    }
-
-                                    break;
+                                    this._collection.Items[i + index] = notification.NewItems[i];
                                 }
+
+                                break;
+                            }
 
                             default:
+                            {
+                                if (this._collection.Count > 0)
+                                    this._collection.Items.Clear();
+
+                                foreach (var item in notification.Current)
                                 {
-                                    this.Items.Clear();
-
-                                    foreach (var item in notification.Current)
-                                    {
-                                        this.Items.Add(item);
-                                    }
-
-                                    break;
+                                    this._collection.Items.Add(item);
                                 }
+
+                                break;
+                            }
                         }
                     });
+                }
+
+                public IDisposable Subscribe(IObserver<NotifyCollectionChangedEventArgs> observer)
+                {
+                    return this._collection._baseCollectionChangedEvents
+                        .Subscribe(observer);
+                }
+            }
+            #endregion
+
+            protected override event NotifyCollectionChangedEventHandler CollectionChanged
+            {
+                add
+                {
+                    this._collectionChanged.CollectionChanged += value;
+                }
+
+                remove
+                {
+                    this._collectionChanged.CollectionChanged -= value;
+                }
             }
 
-            public IObservable<ListChangedNotification<T>> Source
+            private readonly INotifyCollectionChanged _collectionChanged;
+            private readonly IObservable<NotifyCollectionChangedEventArgs> _baseCollectionChangedEvents;
+
+            public ReactiveReadOnlyObservableCollection(IObservable<ListChangedNotification<T>> source) : base(new ObservableCollection<T>())
             {
-                get
-                {
-                    return this._source;
-                }
+                Contract.Requires(source != null);
+
+                this._collectionChanged = new ConnectableObservableImpl(this, source)
+                    .RefCount()
+                    .ToNotifyCollectionChangedEventPattern(this);
+
+                this._baseCollectionChangedEvents = Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>((eh) => base.CollectionChanged += eh, (eh) => base.CollectionChanged -= eh)
+                    .Select(x => x.EventArgs);
             }
         }
         #endregion
