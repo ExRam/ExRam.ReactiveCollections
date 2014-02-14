@@ -85,7 +85,7 @@ namespace ExRam.ReactiveCollections
                     .SelectMany(x => x.ReactiveCollection.Changes)
                     .Replay(1)
                     .RefCount()
-                    .Normalize<ListChangedNotification<TSource>, TSource>();//list => new ListChangedNotification<TSource>(list, NotifyCollectionChangedAction.Reset, ImmutableList<TSource>.Empty, ImmutableList<TSource>.Empty, null));
+                    .Normalize<ListChangedNotification<TSource>, TSource>();
             }
 
             public IObservable<ListChangedNotification<TSource>> Changes
