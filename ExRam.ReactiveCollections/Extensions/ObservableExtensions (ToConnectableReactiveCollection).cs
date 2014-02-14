@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Reactive.Subjects;
 using ExRam.ReactiveCollections;
 
 namespace System.Reactive.Linq
@@ -45,6 +46,14 @@ namespace System.Reactive.Linq
             Contract.Requires(connectFunction != null);
 
             return new ToConnectableReactiveCollectionImpl<TNotification, T>(changesObservable, connectFunction);
+        }
+
+        public static IConnectableReactiveCollection<TNotification, T> ToConnectableReactiveCollection<TNotification, T>(this IConnectableObservable<TNotification> changesObservable)
+           where TNotification : ICollectionChangedNotification<T>
+        {
+            Contract.Requires(changesObservable != null);
+
+            return new ToConnectableReactiveCollectionImpl<TNotification, T>(changesObservable, changesObservable.Connect);
         }
     }
 }
