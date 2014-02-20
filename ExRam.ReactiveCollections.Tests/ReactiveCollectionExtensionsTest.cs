@@ -1047,6 +1047,41 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
+        #region Replace_in_sorted_dictionary
+        [TestMethod]
+        public async Task Replace_in_sorted_dictionary()
+        {
+            var list = new DictionaryReactiveCollectionSource<string, int>();
+
+            var projectedList = list.ReactiveCollection
+                .Sort();
+
+            var notificationsTask = projectedList.Changes
+                .Skip(4)
+                .Take(2)
+                .ToArray()
+                .ToTask();
+
+            list.Add("Key1", 1);
+            list.Add("Key2", 2);
+            list.Add("Key3", 3);
+
+            list["Key2"] = 4;
+
+            var notifications = await notificationsTask;
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[0].Action);
+            CollectionAssert.AreEqual(new[] { 2 }, notifications[0].OldItems.ToArray());
+            Assert.AreEqual(1, notifications[0].Index);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
+            CollectionAssert.AreEqual(new[] { 4 }, notifications[1].NewItems.ToArray());
+            Assert.AreEqual(2, notifications[1].Index);
+
+            CollectionAssert.AreEqual(new[] { 1, 3, 4 }, notifications[1].Current);
+        }
+        #endregion
+
         #region ToObservableCollection_Add
         [TestMethod]
         public async Task ToObservableCollection_Add()
