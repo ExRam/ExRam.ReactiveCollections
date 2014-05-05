@@ -264,7 +264,7 @@ namespace ExRam.ReactiveCollections
         {
             get
             {
-                return true;
+                return this;
             }
         }
         #endregion
