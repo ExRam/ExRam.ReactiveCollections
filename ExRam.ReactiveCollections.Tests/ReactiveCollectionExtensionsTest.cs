@@ -907,6 +907,34 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
+        #region Remove_in_sorted_dictionary
+        [TestMethod]
+        public async Task Remove_in_sorted_dictionary()
+        {
+            var list = new DictionaryReactiveCollectionSource<string, int>();
+
+            var projectedList = list.ReactiveCollection
+                .Sort();
+
+            var notificationTask = projectedList.Changes
+                .Skip(3)
+                .FirstAsync()
+                .ToTask();
+
+            list.Add("Key1", 1);
+            list.Add("Key2", 2);
+            list.Remove("Key1");
+
+            var notification = await notificationTask;
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
+            CollectionAssert.AreEqual(new[] { 1 }, notification.OldItems.ToArray());
+            Assert.AreEqual(0, notification.Index);
+
+            CollectionAssert.AreEqual(new[] { 2 }, notification.Current);
+        }
+        #endregion
+
         #region Remove_from_sorted_list_with_Changes
         [TestMethod]
         public async Task Remove_from_sorted_list_with_Changes()
