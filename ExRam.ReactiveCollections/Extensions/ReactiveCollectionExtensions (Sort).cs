@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 
 namespace ExRam.ReactiveCollections
@@ -99,68 +100,82 @@ namespace ExRam.ReactiveCollections
         #region SortedFromDictionaryReactiveSortedList
         private sealed class SortedFromDictionaryReactiveSortedList<TKey, TValue> : IReactiveCollection<ListChangedNotification<TValue>, TValue>
         {
-            private readonly IObservable<ListChangedNotification<TValue>> _changes;
+            #region KeyValuePairEqualityComparer
+            private sealed class KeyValuePairEqualityComparer : IEqualityComparer<KeyValuePair<TKey, TValue>>
+            {
+                public bool Equals(KeyValuePair<TKey, TValue> x, KeyValuePair<TKey, TValue> y)
+                {
+                    return x.Key.Equals(y.Key);
+                }
 
+                public int GetHashCode(KeyValuePair<TKey, TValue> obj)
+                {
+                    return obj.Key.GetHashCode();
+                }
+            }
+            #endregion
+
+            private static readonly KeyValuePairEqualityComparer EqualityComparer = new KeyValuePairEqualityComparer();
+
+            private readonly object _syncRoot = new object();
+            private readonly IObservable<ListChangedNotification<TValue>> _changes;
+            private readonly SortedListReactiveCollectionSource<KeyValuePair<TKey, TValue>> _resultList;
+ 
             public SortedFromDictionaryReactiveSortedList(IObservable<DictionaryChangedNotification<TKey, TValue>> source, IComparer<TValue> comparer)
             {
                 Contract.Requires(source != null);
                 Contract.Requires(comparer != null);
 
+                this._resultList = new SortedListReactiveCollectionSource<KeyValuePair<TKey, TValue>>(new Comparison<KeyValuePair<TKey, TValue>>((x, y) => comparer.Compare(x.Value, y.Value)).ToComparer());
+                
                 this._changes = Observable
-                    .Create<SortedListReactiveCollectionSource<TValue>>(observer =>
-                    {
-                        var syncRoot = new object();
-                        var resultList = new SortedListReactiveCollectionSource<TValue>(comparer);
-
-                        observer.OnNext(resultList);
-
-                        return source.Subscribe(
-                            (notification) =>
+                    .Using(() => source.Subscribe(
+                        (notification) =>
+                        {
+                            lock (_syncRoot)
                             {
-                                lock (syncRoot)
+                                switch (notification.Action)
                                 {
-                                    switch (notification.Action)
+                                    case (NotifyCollectionChangedAction.Add):
                                     {
-                                        case (NotifyCollectionChangedAction.Add):
-                                        {
-                                            resultList.AddRange(notification.NewItems.Select(x => x.Value));
+                                        this._resultList.AddRange(notification.NewItems);
 
-                                            break;
+                                        break;
+                                    }
+
+                                    case (NotifyCollectionChangedAction.Remove):
+                                    {
+                                        this._resultList.RemoveRange(notification.OldItems, EqualityComparer);
+
+                                        break;
+                                    }
+
+                                    case (NotifyCollectionChangedAction.Replace):
+                                    {
+                                        if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
+                                            this._resultList.Replace(notification.OldItems[0], notification.NewItems[0], EqualityComparer);
+                                        else
+                                        {
+                                            //TODO: Performance
+                                            this._resultList.RemoveRange(notification.OldItems, EqualityComparer);
+                                            this._resultList.AddRange(notification.NewItems);
                                         }
 
-                                        case (NotifyCollectionChangedAction.Remove):
-                                        {
-                                            resultList.RemoveRange(notification.OldItems.Select(x => x.Value));
+                                        break;
+                                    }
 
-                                            break;
-                                        }
-
-                                        case (NotifyCollectionChangedAction.Replace):
-                                        {
-                                            if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
-                                                resultList.Replace(notification.OldItems[0].Value, notification.NewItems[0].Value);
-                                            else
-                                            {
-                                                //TODO: Performance
-                                                resultList.RemoveRange(notification.OldItems.Select(x => x.Value));
-                                                resultList.AddRange(notification.NewItems.Select(x => x.Value));
-                                            }
-
-                                            break;
-                                        }
-
-                                        default:
-                                        {
-                                            resultList.Clear();
-                                            resultList.AddRange(notification.Current.Select(x => x.Value));
+                                    default:
+                                    {
+                                        this._resultList.Clear();
+                                        this._resultList.AddRange(notification.Current);
                                             
-                                            break;
-                                        }
+                                        break;
                                     }
                                 }
-                            });
-                    })
-                    .SelectMany(x => x.ReactiveCollection.Changes)
+                            }
+                        }),
+                        _ => Observable.Return(Unit.Default).Concat(Observable.Never<Unit>()))
+                    .SelectMany(_ => this._resultList.ReactiveCollection.Select(y => y.Value).Changes)
                     .Replay(1)
                     .RefCount()
                     .Normalize<ListChangedNotification<TValue>, TValue>();
