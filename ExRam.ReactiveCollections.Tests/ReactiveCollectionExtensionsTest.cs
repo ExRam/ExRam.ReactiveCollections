@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
@@ -1161,6 +1162,25 @@ namespace ExRam.ReactiveCollections.Tests
             Assert.AreEqual(NotifyCollectionChangedAction.Add, events[0].Action);
             Assert.AreEqual(NotifyCollectionChangedAction.Add, events[1].Action);
             Assert.AreEqual(NotifyCollectionChangedAction.Remove, events[2].Action);
+        }
+        #endregion
+
+        #region ToObservableCollection_Remove_multiple
+        [TestMethod]
+        public async Task ToObservableCollection_Remove_multiple()
+        {
+            var list = new ListReactiveCollectionSource<int>();
+            var observableCollection = list.ReactiveCollection.ToObservableCollection();
+
+            using (Observable
+                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>((eh) => ((INotifyCollectionChanged)observableCollection).CollectionChanged += eh, (eh) => ((INotifyCollectionChanged)observableCollection).CollectionChanged -= eh)
+                .Subscribe())
+            {
+                list.AddRange(new[] { 1, 2, 3, 4, 5, 6, 7 });
+                list.RemoveRange(2, 3);
+
+                CollectionAssert.AreEqual(new[] { 1, 2, 6, 7 }, observableCollection.ToArray());
+            }
         }
         #endregion
 

@@ -56,7 +56,7 @@ namespace ExRam.ReactiveCollections
 
                                 for (var i = 0; i < notification.OldItems.Count; i++)
                                 {
-                                    this._collection.Items.RemoveAt(i + index);
+                                    this._collection.Items.RemoveAt(index);
                                 }
 
                                 break;
