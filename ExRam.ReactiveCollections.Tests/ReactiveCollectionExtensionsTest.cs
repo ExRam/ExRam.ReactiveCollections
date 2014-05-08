@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new ListReactiveCollectionSource<int>();
 
             var projectedList = list.ReactiveCollection
-                .Select(x => x.ToString());
+                .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
             var notificationsTask = projectedList.Changes
                 .Take(4)
@@ -64,7 +65,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new SortedSetReactiveCollectionSource<int>();
 
             var projectedList = list.ReactiveCollection
-                .Select(x => x.ToString());
+                .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
             var notificationsTask = projectedList.Changes
                 .Take(4)
@@ -107,7 +108,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new DictionaryReactiveCollectionSource<string, int>();
 
             var projectedList = list.ReactiveCollection
-                .Select(x => x.ToString());
+                .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
             var notificationsTask = projectedList.Changes
                 .Take(4)
@@ -147,7 +148,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new ListReactiveCollectionSource<int>();
 
             var projectedList = list.ReactiveCollection
-                .Select(x => x.ToString());
+                .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
             var notificationTask = projectedList.Changes
                 .Skip(2)
@@ -176,7 +177,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new SortedSetReactiveCollectionSource<int>();
 
             var projectedList = list.ReactiveCollection
-                .Select(x => x.ToString());
+                .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
             var notificationTask = projectedList.Changes
                 .Skip(4)
@@ -207,7 +208,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new DictionaryReactiveCollectionSource<string, int>();
 
             var projectedList = list.ReactiveCollection
-                .Select(x => x.ToString());
+                .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
             var notificationTask = projectedList.Changes
                 .Skip(4)
@@ -237,7 +238,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new ListReactiveCollectionSource<int>();
 
             var projectedList = list.ReactiveCollection
-                .Select(x => x.ToString());
+                .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
             var notificationTask = projectedList.Changes
                 .Skip(2)
@@ -268,12 +269,12 @@ namespace ExRam.ReactiveCollections.Tests
                 {
                     new ListChangedNotification<int>(ImmutableList<int>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<int>.Empty, ImmutableList<int>.Empty, null),
                     new ListChangedNotification<int>(ImmutableList.Create(1, 2), NotifyCollectionChangedAction.Add, ImmutableList<int>.Empty, ImmutableList.Create(1, 2), 0),
-                    new ListChangedNotification<int>(ImmutableList.Create(3, 4), NotifyCollectionChangedAction.Replace, ImmutableList.Create(1, 2), ImmutableList.Create(3, 4), 0),
+                    new ListChangedNotification<int>(ImmutableList.Create(3, 4), NotifyCollectionChangedAction.Replace, ImmutableList.Create(1, 2), ImmutableList.Create(3, 4), 0)
                 }
                 .ToObservable()
                 .ToReactiveCollection<ListChangedNotification<int>, int>();
 
-            var projectedList = observable.Select(x => x.ToString());
+            var projectedList = observable.Select(x => x.ToString(CultureInfo.InvariantCulture));
 
             var notificationsTask = projectedList.Changes
                 .Skip(2)
@@ -307,12 +308,12 @@ namespace ExRam.ReactiveCollections.Tests
                 {
                     new SortedSetChangedNotification<int>(ImmutableSortedSet<int>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<int>.Empty, ImmutableList<int>.Empty),
                     new SortedSetChangedNotification<int>(ImmutableSortedSet.Create(1, 2), NotifyCollectionChangedAction.Add, ImmutableList<int>.Empty, ImmutableList.Create(1, 2)),
-                    new SortedSetChangedNotification<int>(ImmutableSortedSet.Create(3, 4), NotifyCollectionChangedAction.Replace, ImmutableList.Create(1, 2), ImmutableList.Create(3, 4)),
+                    new SortedSetChangedNotification<int>(ImmutableSortedSet.Create(3, 4), NotifyCollectionChangedAction.Replace, ImmutableList.Create(1, 2), ImmutableList.Create(3, 4))
                 }
                 .ToObservable()
                 .ToReactiveCollection<SortedSetChangedNotification<int>, int>();
 
-            var projectedList = observable.Select(x => x.ToString());
+            var projectedList = observable.Select(x => x.ToString(CultureInfo.InvariantCulture));
 
             var notificationsTask = projectedList.Changes
                 .Skip(2)
@@ -343,7 +344,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new DictionaryReactiveCollectionSource<string, int>();
 
             var projectedList = list.ReactiveCollection
-                .Select(x => x.ToString());
+                .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
             var notificationsTask = projectedList.Changes
                 .Skip(4)
@@ -763,7 +764,7 @@ namespace ExRam.ReactiveCollections.Tests
                 {
                     new ListChangedNotification<int>(ImmutableList<int>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<int>.Empty, ImmutableList<int>.Empty, null),
                     new ListChangedNotification<int>(ImmutableList.Create(1, 2), NotifyCollectionChangedAction.Add, ImmutableList<int>.Empty, ImmutableList.Create(1, 2), 0),
-                    new ListChangedNotification<int>(ImmutableList.Create(3, 4), NotifyCollectionChangedAction.Replace, ImmutableList.Create(1, 2), ImmutableList.Create(3, 4), 0),
+                    new ListChangedNotification<int>(ImmutableList.Create(3, 4), NotifyCollectionChangedAction.Replace, ImmutableList.Create(1, 2), ImmutableList.Create(3, 4), 0)
                 }
             .ToObservable()
             .ToReactiveCollection<ListChangedNotification<int>, int>();
@@ -818,35 +819,34 @@ namespace ExRam.ReactiveCollections.Tests
             Assert.AreEqual(1, notification.NewItems.Count);
             CollectionAssert.AreEqual(new[] { 2 }, notification.NewItems.ToArray());
             CollectionAssert.AreEqual(new[] { 1, 2, 3 }, notification.Current);
-
         }
         #endregion
 
         #region Add_to_sorted_dictionary
-        //[TestMethod]
-        //public async Task Add_to_sorted_dictionary()
-        //{
-        //    var list = new DictionaryReactiveCollectionSource<string, int>();
+        [TestMethod]
+        public async Task Add_to_sorted_dictionary()
+        {
+            var list = new DictionaryReactiveCollectionSource<string, int>();
 
-        //    var projectedList = list.ToSorted();
+            var projectedList = list.ReactiveCollection.Sort();
 
-        //    var notificationTask = projectedList.Changes
-        //        .Skip(3)
-        //        .FirstAsync()
-        //        .ToTask();
+            var notificationTask = projectedList.Changes
+                .Skip(3)
+                .FirstAsync()
+                .ToTask();
 
-        //    list.Add("Key3", 3);
-        //    list.Add("Key1", 1);
-        //    list.Add("Key2", 2);
+            list.Add("Key3", 3);
+            list.Add("Key1", 1);
+            list.Add("Key2", 2);
 
-        //    var notification = await notificationTask;
+            var notification = await notificationTask;
 
-        //    Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
 
-        //    Assert.AreEqual(1, notification.NewItems.Count);
-        //    CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notification.NewItems);
-        //    CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key2", 2), new KeyValuePair<string, int>("Key3", 3) }, notification.Current);
-        //}
+            Assert.AreEqual(1, notification.NewItems.Count);
+            CollectionAssert.AreEqual(new[] { 2 }, notification.NewItems.ToArray());
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, notification.Current);
+        }
         #endregion
 
         #region Add_to_sorted_list_with_Changes
@@ -875,7 +875,6 @@ namespace ExRam.ReactiveCollections.Tests
             Assert.AreEqual(1, notification.NewItems.Count);
             CollectionAssert.AreEqual(new[] { 2 }, notification.NewItems.ToArray());
             CollectionAssert.AreEqual(new[] { 1, 2, 3 }, notification.Current);
-
         }
         #endregion
 
@@ -1037,7 +1036,7 @@ namespace ExRam.ReactiveCollections.Tests
                 {
                     new ListChangedNotification<int>(ImmutableList<int>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<int>.Empty, ImmutableList<int>.Empty, null),
                     new ListChangedNotification<int>(ImmutableList.Create(1, 2), NotifyCollectionChangedAction.Add, ImmutableList<int>.Empty, ImmutableList.Create(1, 2), 0),
-                    new ListChangedNotification<int>(ImmutableList.Create(3, 4), NotifyCollectionChangedAction.Replace, ImmutableList.Create(1, 2), ImmutableList.Create(3, 4), 0),
+                    new ListChangedNotification<int>(ImmutableList.Create(3, 4), NotifyCollectionChangedAction.Replace, ImmutableList.Create(1, 2), ImmutableList.Create(3, 4), 0)
                 }
                 .ToObservable()
                 .ToReactiveCollection<ListChangedNotification<int>, int>();
@@ -1141,7 +1140,7 @@ namespace ExRam.ReactiveCollections.Tests
 
         #region ToObservableCollection_Add_multiple
         [TestMethod]
-        public async Task ToObservableCollection_Add_multiple()
+        public void ToObservableCollection_Add_multiple()
         {
             var list = new ListReactiveCollectionSource<int>();
             var observableCollection = list.ReactiveCollection.ToObservableCollection();
@@ -1187,7 +1186,7 @@ namespace ExRam.ReactiveCollections.Tests
 
         #region ToObservableCollection_Remove_multiple
         [TestMethod]
-        public async Task ToObservableCollection_Remove_multiple()
+        public void ToObservableCollection_Remove_multiple()
         {
             var list = new ListReactiveCollectionSource<int>();
             var observableCollection = list.ReactiveCollection.ToObservableCollection();

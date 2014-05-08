@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace ExRam.ReactiveCollections.Tests
         [TestMethod]
         public async Task DictionaryPerformanceTest()
         {
-            var count = 10000;
+            const int count = 10000;
             var dict = new DictionaryReactiveCollectionSource<string, int>();
 
             var stopWatch = new Stopwatch();
@@ -30,15 +31,15 @@ namespace ExRam.ReactiveCollections.Tests
 
             for (var i = 0; i < count; i++)
             {
-                dict.Add(i.ToString(), i);
+                dict.Add(i.ToString(CultureInfo.InvariantCulture), i);
             }
 
             for (var i = count - 1; i >= 0; i--)
             {
-                dict.Remove(i.ToString());
+                dict.Remove(i.ToString(CultureInfo.InvariantCulture));
             }
 
-            var last = await lastTask;
+            await lastTask;
 
             stopWatch.Stop();
             Console.WriteLine(stopWatch.Elapsed);

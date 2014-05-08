@@ -116,11 +116,12 @@ namespace ExRam.ReactiveCollections.Tests
 
         #region Contains
         [TestMethod]
-        public async Task Contains()
+        public void Contains()
         {
-            var list = new SortedListReactiveCollectionSource<int>();
-
-            list.Add(1);
+            var list = new SortedListReactiveCollectionSource<int>
+            {
+                1
+            };
 
             Assert.IsTrue(list.Contains(1));
             Assert.IsFalse(list.Contains(2));
@@ -139,7 +140,7 @@ namespace ExRam.ReactiveCollections.Tests
             var target = new int[5];
             list.CopyTo(target, 2);
 
-            CollectionAssert.AreEqual(new []{ 0, 0, 1, 2, 3 }, target);
+            CollectionAssert.AreEqual(new[] { 0, 0, 1, 2, 3 }, target);
         }
         #endregion
 
@@ -427,7 +428,7 @@ namespace ExRam.ReactiveCollections.Tests
         #region Sort_with_comparison
         [TestMethod]
         [ExpectedException(typeof(NotSupportedException))]
-        public async Task Sort_with_comparison()
+        public void Sort_with_comparison()
         {
             var list = new SortedListReactiveCollectionSource<int>();
 

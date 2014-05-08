@@ -109,11 +109,12 @@ namespace ExRam.ReactiveCollections.Tests
 
         #region Contains
         [TestMethod]
-        public async Task Contains()
+        public void Contains()
         {
-            var list = new ListReactiveCollectionSource<int>();
-
-            list.Add(1);
+            var list = new ListReactiveCollectionSource<int>
+            {
+                1
+            };
 
             Assert.IsTrue(list.Contains(1));
             Assert.IsFalse(list.Contains(2));
@@ -132,7 +133,7 @@ namespace ExRam.ReactiveCollections.Tests
             var target = new int[5];
             list.CopyTo(target, 2);
 
-            CollectionAssert.AreEqual(new []{ 0, 0, 1, 2, 3 }, target);
+            CollectionAssert.AreEqual(new[] { 0, 0, 1, 2, 3 }, target);
         }
         #endregion
 
@@ -224,7 +225,7 @@ namespace ExRam.ReactiveCollections.Tests
             Assert.AreEqual(0, notification.OldItems.Count);
 
             CollectionAssert.AreEqual(range, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new[]{1,1,2,3}, notification.Current);
+            CollectionAssert.AreEqual(new[] { 1, 1, 2, 3 }, notification.Current);
         }
         #endregion
 

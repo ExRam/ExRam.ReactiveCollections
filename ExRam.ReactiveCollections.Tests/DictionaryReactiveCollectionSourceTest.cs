@@ -56,13 +56,17 @@ namespace ExRam.ReactiveCollections.Tests
         #region Add
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task Adding_existing_key_throws()
+        public void Adding_existing_key_throws()
         {
-            var list = new DictionaryReactiveCollectionSource<string, int>();
-
-            list.Add("Key", 1);
-            list.Add("Key", 2);
+            // ReSharper disable ObjectCreationAsStatement
+            new DictionaryReactiveCollectionSource<string, int>
+            {
+                { "Key", 1 },
+                { "Key", 2 }
+            };
+            // ReSharper restore ObjectCreationAsStatement
         }
+
         #endregion
 
         #region AddRange
@@ -76,7 +80,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .FirstAsync()
                 .ToTask();
 
-            var range = new []
+            var range = new[]
             {
                 new KeyValuePair<string, int>("Key1", 1),
                 new KeyValuePair<string, int>("Key2", 2),
@@ -125,9 +129,10 @@ namespace ExRam.ReactiveCollections.Tests
         [TestMethod]
         public void Contains()
         {
-            var dict = new DictionaryReactiveCollectionSource<string, int>();
-
-            dict.Add("Key", 1);
+            var dict = new DictionaryReactiveCollectionSource<string, int>
+            {
+                { "Key", 1 }
+            };
 
             Assert.IsTrue(dict.Contains(new KeyValuePair<string, int>("Key", 1)));
             Assert.IsFalse(dict.Contains(new KeyValuePair<string, int>("Key", 2)));
@@ -183,7 +188,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.RemoveRange(new[]
             {
                 "Key1",
-                "Key2",
+                "Key2"
             });
 
             var notifications = await notificationsTask;
@@ -194,7 +199,7 @@ namespace ExRam.ReactiveCollections.Tests
             Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[1].Action);
             CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notifications[1].OldItems.ToArray());
 
-            CollectionAssert.AreEqual(new []{ new KeyValuePair<string, int>("Key3", 3) }, notifications[1].Current);
+            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key3", 3) }, notifications[1].Current);
         }
         #endregion
 
@@ -209,7 +214,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .FirstAsync()
                 .ToTask();
 
-            var range = new []
+            var range = new[]
             {
                 new KeyValuePair<string, int>("Key1", 1),
                 new KeyValuePair<string, int>("Key2", 2),
@@ -226,7 +231,7 @@ namespace ExRam.ReactiveCollections.Tests
             CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notification.OldItems.ToArray());
             CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 3) }, notification.NewItems.ToArray());
 
-            CollectionAssert.AreEquivalent(new []
+            CollectionAssert.AreEquivalent(new[]
             {
                 new KeyValuePair<string, int>("Key1", 1),
                 new KeyValuePair<string, int>("Key2", 3),
@@ -273,13 +278,14 @@ namespace ExRam.ReactiveCollections.Tests
 
         #region TryGetValue
         [TestMethod]
-        public async Task TryGetValue()
+        public void TryGetValue()
         {
-            var list = new DictionaryReactiveCollectionSource<string, int>();
+            var list = new DictionaryReactiveCollectionSource<string, int>
+                {
+                { "Key1", 1 }
+            };
 
-            list.Add("Key1", 1);
-
-            int value = 0;
+            int value;
             Assert.IsTrue(list.TryGetValue("Key1", out value));
             Assert.AreEqual(1, value);
 
@@ -289,11 +295,12 @@ namespace ExRam.ReactiveCollections.Tests
 
         #region Item
         [TestMethod]
-        public async Task Item()
+        public void Item()
         {
-            var list = new DictionaryReactiveCollectionSource<string, int>();
-
-            list.Add("Key1", 1);
+            var list = new DictionaryReactiveCollectionSource<string, int>
+                {
+                { "Key1", 1 }
+            };
 
             Assert.AreEqual(1, list["Key1"]);
 
@@ -305,22 +312,25 @@ namespace ExRam.ReactiveCollections.Tests
         #region Item2
         [TestMethod]
         [ExpectedException(typeof(KeyNotFoundException))]
-        public async Task Item2()
+        public void Item2()
         {
-            var list = new DictionaryReactiveCollectionSource<string, int>();
+            var list = new DictionaryReactiveCollectionSource<string, int>
+            {
+                { "Key1", 1 }
+            };
 
-            list.Add("Key1", 1);
             Assert.AreEqual(1, list["Key"]);
         }
         #endregion
 
         #region GetEnumerator
         [TestMethod]
-        public async Task GetEnumerator()
+        public void GetEnumerator()
         {
-            var list = new DictionaryReactiveCollectionSource<string, int>();
-
-            list.Add("Key1", 1);
+            var list = new DictionaryReactiveCollectionSource<string, int>
+            {
+                { "Key1", 1 }
+            };
 
             var enumerator = list.GetEnumerator();
 
