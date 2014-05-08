@@ -259,10 +259,10 @@ namespace ExRam.ReactiveCollections
             this.Remove((T)value);
         }
 
-        //void IList.RemoveAt(int index)
-        //{
-        //    this.RemoveAt(index);
-        //}
+        void IList<T>.RemoveAt(int index)
+        {
+            this.RemoveAt(index);
+        }
 
         object IList.this[int index]
         {
