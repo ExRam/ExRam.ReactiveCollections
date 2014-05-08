@@ -138,7 +138,7 @@ namespace ExRam.ReactiveCollections
                     .Using(() => source.Subscribe(
                         (notification) =>
                         {
-                            lock (_syncRoot)
+                            lock (this._syncRoot)
                             {
                                 switch (notification.Action)
                                 {
