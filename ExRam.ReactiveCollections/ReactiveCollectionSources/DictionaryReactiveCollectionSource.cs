@@ -69,7 +69,7 @@ namespace ExRam.ReactiveCollections
         {
             Contract.Requires(keys != null);
 
-            //TODO: Optimize!
+            // TODO: Optimize!
             foreach (var key in keys)
             {
                 this.Remove(key);
@@ -92,7 +92,7 @@ namespace ExRam.ReactiveCollections
         {
             Contract.Requires(items != null);
 
-            //TODO: Optimize!
+            // TODO: Optimize!
             foreach (var item in items)
             {
                 this.SetItem(item.Key, item.Value);

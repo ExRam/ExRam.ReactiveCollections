@@ -142,12 +142,13 @@ namespace ExRam.ReactiveCollections
 
                                         case (NotifyCollectionChangedAction.Replace):
                                         {
-                                            //TODO: Performance
+                                            // TODO: Performance
                                             resultList.RemoveRange(notification.OldItems.Where(x => filter(x.Value)).Select(x => x.Key));
                                             resultList.AddRange(notification.NewItems.Where(x => filter(x.Value)));
 
                                             break;
                                         }
+
                                         default:
                                         {
                                             resultList.Clear();

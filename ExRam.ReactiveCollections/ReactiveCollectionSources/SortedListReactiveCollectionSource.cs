@@ -169,18 +169,6 @@ namespace ExRam.ReactiveCollections
             throw new NotSupportedException();
         }
 
-        private int FindInsertionIndex(T item)
-        {
-            //TODO: Optimize, do a binary search or something.
-            for (var newInsertionIndex = 0; newInsertionIndex < this._innerList.Count; newInsertionIndex++)
-            {
-                if (this._comparer.Compare(item, this._innerList[newInsertionIndex]) < 0)
-                    return newInsertionIndex;
-            }
-
-            return this._innerList.Count;
-        }
-
         #region Explicit IList<T> implementation
         T IList<T>.this[int index]
         {
@@ -208,7 +196,7 @@ namespace ExRam.ReactiveCollections
         int IList.Add(object value)
         {
             var insertionIndex = this.FindInsertionIndex((T)value);
-            this._innerList.Insert(insertionIndex,(T)value);
+            this._innerList.Insert(insertionIndex, (T)value);
 
             return insertionIndex;
         }
@@ -298,6 +286,18 @@ namespace ExRam.ReactiveCollections
             }
         }
         #endregion
+
+        private int FindInsertionIndex(T item)
+        {
+            // TODO: Optimize, do a binary search or something.
+            for (var newInsertionIndex = 0; newInsertionIndex < this._innerList.Count; newInsertionIndex++)
+            {
+                if (this._comparer.Compare(item, this._innerList[newInsertionIndex]) < 0)
+                    return newInsertionIndex;
+            }
+
+            return this._innerList.Count;
+        }
 
         public int Count
         {

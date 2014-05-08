@@ -178,7 +178,7 @@ namespace ExRam.ReactiveCollections
 
                                         case (NotifyCollectionChangedAction.Replace):
                                         {
-                                            //TODO: Performance
+                                            // TODO: Performance
                                             resultList.RemoveRange(notification.OldItems.Select(x => x.Key));
                                             resultList.AddRange(notification.NewItems.Select(x => new KeyValuePair<TKey, TResult>(x.Key, selector(x.Value))));
                                             break;
