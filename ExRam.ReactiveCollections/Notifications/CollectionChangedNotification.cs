@@ -20,7 +20,7 @@ namespace ExRam.ReactiveCollections
 
         protected CollectionChangedNotification(TCollection current, NotifyCollectionChangedAction action, IReadOnlyList<T> oldItems, IReadOnlyList<T> newItems)
         {
-            Contract.Requires((object)current != null);
+            Contract.Requires(current != null);
             Contract.Requires(oldItems != null);
             Contract.Requires(newItems != null);
 
@@ -52,9 +52,9 @@ namespace ExRam.ReactiveCollections
         {
             get 
             {
-                Contract.Ensures((object)Contract.Result<TCollection>() != null);
+                Contract.Ensures(Contract.Result<TCollection>() != null);
 
-                Contract.Assume((object)this._current != null);
+                Contract.Assume(this._current != null);
                 return this._current;
             }
         }
