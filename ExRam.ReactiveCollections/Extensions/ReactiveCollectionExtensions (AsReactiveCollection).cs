@@ -38,6 +38,7 @@ namespace ExRam.ReactiveCollections
             where TNotification : ICollectionChangedNotification<T>
         {
             Contract.Requires(reactiveCollection != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<TNotification, T>>() != null);
 
             return new AsReactiveCollectionImpl<TNotification, T>(reactiveCollection);
         }

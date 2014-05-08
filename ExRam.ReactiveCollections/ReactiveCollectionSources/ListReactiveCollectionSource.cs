@@ -40,6 +40,8 @@ namespace ExRam.ReactiveCollections
 
         public void AddRange(IEnumerable<T> items)
         {
+            Contract.Requires(items != null);
+
             this.InsertRange(this.Current.Count, items);
         }
 
@@ -65,6 +67,9 @@ namespace ExRam.ReactiveCollections
 
         public void InsertRange(int index, IEnumerable<T> items)
         {
+            Contract.Requires(items != null);
+            Contract.Requires(index >= 0);
+
             var immutableItems = ImmutableList<T>.Empty.AddRange(items);
 
             if (immutableItems.Count > 0)
@@ -81,6 +86,9 @@ namespace ExRam.ReactiveCollections
 
         public void Insert(int index, T item)
         {
+            // Cannot add Requires
+            // Contract.Requires(index >= 0);
+
             this.Subject.OnNext(new ListChangedNotification<T>(this.Current.Insert(index, item), NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, ImmutableList.Create(item), index));
         }
 
@@ -91,6 +99,8 @@ namespace ExRam.ReactiveCollections
 
         public bool Remove(T item, IEqualityComparer<T> equalityComparer)
         {
+            Contract.Requires(equalityComparer != null);
+
             var oldList = this.Current;
             var index = oldList.IndexOf(item, equalityComparer);
             if (index > -1)
@@ -101,6 +111,8 @@ namespace ExRam.ReactiveCollections
 
         public void RemoveAll(Predicate<T> match)
         {
+            Contract.Requires(match != null);
+
             var newList = this.Current.RemoveAll(match);
             this.Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
@@ -115,6 +127,8 @@ namespace ExRam.ReactiveCollections
 
         public void RemoveRange(int index, int count)
         {
+            Contract.Requires(index >= 0);
+
             var oldList = this.Current;
             var range = oldList.GetRange(index, count);
             var newList = oldList.RemoveRange(index, count);
@@ -123,11 +137,16 @@ namespace ExRam.ReactiveCollections
 
         public void RemoveRange(IEnumerable<T> items)
         {
+            Contract.Requires(items != null);
+
             this.RemoveRange(items, EqualityComparer<T>.Default);
         }
 
         public void RemoveRange(IEnumerable<T> items, IEqualityComparer<T> equalityComparer)
         {
+            Contract.Requires(items != null);
+            Contract.Requires(equalityComparer != null);
+
             var removedItems = ImmutableList<T>.Empty.AddRange(items);
 
             if (removedItems.Count > 0)
@@ -149,6 +168,8 @@ namespace ExRam.ReactiveCollections
 
         public void Replace(T oldValue, T newValue, IEqualityComparer<T> equalityComparer)
         {
+            Contract.Requires(equalityComparer != null);
+
             var index = this.Current.IndexOf(oldValue, 0, this.Count, equalityComparer);
 
             if (index > -1)
@@ -162,6 +183,8 @@ namespace ExRam.ReactiveCollections
 
         public void Reverse(int index, int count)
         {
+            Contract.Requires(index >= 0);
+
             var newList = this.Current.Reverse(index, count);
 
             this.Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
@@ -169,6 +192,8 @@ namespace ExRam.ReactiveCollections
 
         public void SetItem(int index, T value)
         {
+            Contract.Requires(index >= 0);
+
             var oldList = this.Current;
             var oldItem = oldList[index];
             var newList = oldList.SetItem(index, value);
@@ -190,11 +215,16 @@ namespace ExRam.ReactiveCollections
 
         public void Sort(IComparer<T> comparer)
         {
+            Contract.Requires(comparer != null);
+
             this.Sort(0, this.Count, comparer);
         }
 
         public void Sort(int index, int count, IComparer<T> comparer)
         {
+            Contract.Requires(index >= 0);
+            Contract.Requires(comparer != null);
+
             var newList = this.Current.Sort(index, count, comparer);
 
             this.Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
@@ -322,6 +352,8 @@ namespace ExRam.ReactiveCollections
         {
             get
             {
+                Contract.Ensures(Contract.Result<int>() >= 0);
+
                 return this.Current.Count();
             }
         }
@@ -330,6 +362,8 @@ namespace ExRam.ReactiveCollections
         {
             get
             {
+                Contract.Ensures(Contract.Result<ImmutableList<T>>() != null);
+
                 return this.Subject.Value.Current;
             }
         }
@@ -338,11 +372,15 @@ namespace ExRam.ReactiveCollections
         {
             get
             {
+                Contract.Requires(index >= 0);
+
                 return this.Current[index];
             }
 
             set
             {
+                Contract.Requires(index >= 0);
+
                 this.SetItem(index, value);
             }
         }

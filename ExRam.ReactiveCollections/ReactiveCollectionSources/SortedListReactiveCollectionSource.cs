@@ -86,11 +86,15 @@ namespace ExRam.ReactiveCollections
 
         public bool Remove(T item, IEqualityComparer<T> equalityComparer)
         {
+            Contract.Requires(equalityComparer != null);
+
             return this._innerList.Remove(item, equalityComparer);
         }
 
         public void RemoveAll(Predicate<T> match)
         {
+            Contract.Requires(match != null);
+
             this._innerList.RemoveAll(match);
         }
 
@@ -101,6 +105,8 @@ namespace ExRam.ReactiveCollections
 
         public void RemoveRange(int index, int count)
         {
+            Contract.Requires(index >= 0);
+
             this._innerList.RemoveRange(index, count);
         }
 
@@ -128,6 +134,8 @@ namespace ExRam.ReactiveCollections
 
         public void Replace(T oldValue, T newValue, IEqualityComparer<T> equalityComparer)
         {
+            Contract.Requires(equalityComparer != null);
+
             this.Remove(oldValue, equalityComparer);
             this.Add(newValue);
         }
@@ -161,6 +169,8 @@ namespace ExRam.ReactiveCollections
 
         public void Sort(IComparer<T> comparer)
         {
+            Contract.Requires(comparer != null);
+
             this.Sort(0, this.Count, comparer);
         }
 
@@ -289,6 +299,8 @@ namespace ExRam.ReactiveCollections
 
         private int FindInsertionIndex(T item)
         {
+            Contract.Ensures(Contract.Result<int>() >= 0);
+
             // TODO: Optimize, do a binary search or something.
             for (var newInsertionIndex = 0; newInsertionIndex < this._innerList.Count; newInsertionIndex++)
             {
@@ -303,6 +315,8 @@ namespace ExRam.ReactiveCollections
         {
             get
             {
+                Contract.Ensures(Contract.Result<int>() >= 0);
+
                 return this._innerList.Count();
             }
         }
@@ -311,6 +325,8 @@ namespace ExRam.ReactiveCollections
         {
             get
             {
+                Contract.Requires(index >= 0);
+
                 return this._innerList[index];
             }
         }

@@ -16,6 +16,7 @@ namespace ExRam.ReactiveCollections
         {
             Contract.Requires(source != null);
             Contract.Requires(changesTransformation != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<TNotification, TSource>>() != null);
 
             return changesTransformation(source.Changes)
                 .ToReactiveCollection<TNotification, TSource>();

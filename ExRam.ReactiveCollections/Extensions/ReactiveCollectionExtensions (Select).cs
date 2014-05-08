@@ -215,6 +215,7 @@ namespace ExRam.ReactiveCollections
         {
             Contract.Requires(source != null);
             Contract.Requires(selector != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TResult>, TResult>>() != null);
 
             return source.Select(selector, EqualityComparer<TResult>.Default);
         }
@@ -224,6 +225,7 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(source != null);
             Contract.Requires(selector != null);
             Contract.Requires(equalityComparer != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TResult>, TResult>>() != null);
 
             return new SelectListReactiveCollection<TSource, TResult>(source.Changes, selector, equalityComparer);
         }
@@ -232,6 +234,7 @@ namespace ExRam.ReactiveCollections
         {
             Contract.Requires(source != null);
             Contract.Requires(selector != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<DictionaryChangedNotification<TKey, TResult>, KeyValuePair<TKey, TResult>>>() != null);
 
             return new SelectReactiveDictionarySource<TKey, TSource, TResult>(source.Changes, selector);
         }

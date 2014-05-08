@@ -200,6 +200,7 @@ namespace ExRam.ReactiveCollections
         public static IReactiveCollection<ListChangedNotification<TSource>, TSource> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>, TSource> source)
         {
             Contract.Requires(source != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>, TSource>>() != null);
 
             return source.Sort(Comparer<TSource>.Default, EqualityComparer<TSource>.Default);
         }
@@ -208,6 +209,7 @@ namespace ExRam.ReactiveCollections
         {
             Contract.Requires(source != null);
             Contract.Requires(comparer != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>, TSource>>() != null);
 
             return source.Sort(comparer, EqualityComparer<TSource>.Default);
         }
@@ -216,6 +218,7 @@ namespace ExRam.ReactiveCollections
         {
             Contract.Requires(source != null);
             Contract.Requires(equalityComparer != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>, TSource>>() != null);
 
             return source.Sort(Comparer<TSource>.Default, equalityComparer);
         }
@@ -225,6 +228,7 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(source != null);
             Contract.Requires(comparer != null);
             Contract.Requires(equalityComparer != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>, TSource>>() != null);
 
             return new SortedReactiveCollection<TSource>(source.Changes, comparer, equalityComparer);
         }
@@ -232,6 +236,7 @@ namespace ExRam.ReactiveCollections
         public static IReactiveCollection<ListChangedNotification<TValue>, TValue> Sort<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>> source)
         {
             Contract.Requires(source != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TValue>, TValue>>() != null);
 
             return new SortedFromDictionaryReactiveSortedList<TKey, TValue>(source.Changes, Comparer<TValue>.Default);
         }
@@ -240,6 +245,7 @@ namespace ExRam.ReactiveCollections
         {
             Contract.Requires(source != null);
             Contract.Requires(comparer != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TValue>, TValue>>() != null);
 
             return new SortedFromDictionaryReactiveSortedList<TKey, TValue>(source.Changes, comparer);
         }

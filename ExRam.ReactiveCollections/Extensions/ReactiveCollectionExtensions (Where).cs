@@ -179,6 +179,7 @@ namespace ExRam.ReactiveCollections
         public static IReactiveCollection<ListChangedNotification<TSource>, TSource> Where<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>, TSource> source, Predicate<TSource> filter)
         {
             Contract.Requires(source != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>, TSource>>() != null);
 
             return new WhereReactiveList<TSource>(source.Changes, filter);
         }
@@ -186,6 +187,7 @@ namespace ExRam.ReactiveCollections
         public static IReactiveCollection<DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>> Where<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>> source, Predicate<TValue> filter)
         {
             Contract.Requires(source != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>>>() != null);
 
             return new WhereReactiveDictionary<TKey, TValue>(source.Changes, filter);
         }

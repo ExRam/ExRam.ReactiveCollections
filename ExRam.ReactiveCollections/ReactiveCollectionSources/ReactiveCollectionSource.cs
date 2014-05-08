@@ -49,6 +49,8 @@ namespace ExRam.ReactiveCollections
         {
             get
             {
+                Contract.Ensures(Contract.Result<IReactiveCollection<TNotification, T>>() != null);
+
                 return this._reactiveCollection;
             }
         }
@@ -57,6 +59,8 @@ namespace ExRam.ReactiveCollections
         {
             get
             {
+                Contract.Ensures(Contract.Result<BehaviorSubject<TNotification>>() != null);
+
                 return this._subject;
             }
         }

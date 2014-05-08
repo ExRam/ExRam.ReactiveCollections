@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace ExRam.ReactiveCollections
@@ -25,6 +26,8 @@ namespace ExRam.ReactiveCollections
 
         public SortedSetReactiveCollectionSource(IComparer<T> comparer)
         {
+            Contract.Requires(comparer != null);
+
             this.Subject.OnNext(new SortedSetChangedNotification<T>(ImmutableSortedSet.Create(comparer), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty));
         }
 
@@ -40,36 +43,55 @@ namespace ExRam.ReactiveCollections
 
         public void Except(IEnumerable<T> other)
         {
+            Contract.Requires(other != null);
+
             this.Subject.OnNext(new SortedSetChangedNotification<T>(this.Current.Except(other), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty));
         }
 
         public void Intersect(IEnumerable<T> other)
         {
+            Contract.Requires(other != null);
+
             this.Subject.OnNext(new SortedSetChangedNotification<T>(this.Current.Intersect(other), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty));
         }
 
         public bool IsProperSubsetOf(IEnumerable<T> other)
         {
+            // Cannot add Requires.
+            // Contract.Requires(other != null);
+
             return this.Current.IsProperSubsetOf(other);
         }
 
         public bool IsProperSupersetOf(IEnumerable<T> other)
         {
+            // Cannot add Requires.
+            // Contract.Requires(other != null);
+
             return this.Current.IsProperSupersetOf(other);
         }
 
         public bool IsSubsetOf(IEnumerable<T> other)
         {
+            // Cannot add Requires.
+            // Contract.Requires(other != null);
+
             return this.Current.IsSubsetOf(other);
         }
 
         public bool IsSupersetOf(IEnumerable<T> other)
         {
+            // Cannot add Requires.
+            // Contract.Requires(other != null);
+
             return this.Current.IsSupersetOf(other);
         }
 
         public bool Overlaps(IEnumerable<T> other)
         {
+            // Cannot add Requires.
+            // Contract.Requires(other != null);
+
             return this.Current.Overlaps(other);
         }
 
@@ -80,11 +102,16 @@ namespace ExRam.ReactiveCollections
 
         public bool SetEquals(IEnumerable<T> other)
         {
+            // Cannot add Requires.
+            // Contract.Requires(other != null);
+
             return this.Current.SetEquals(other);
         }
 
         public void SymmetricExcept(IEnumerable<T> other)
         {
+            Contract.Requires(other != null);
+
             this.Subject.OnNext(new SortedSetChangedNotification<T>(this.Current.SymmetricExcept(other), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty));
         }
 
@@ -95,6 +122,8 @@ namespace ExRam.ReactiveCollections
 
         public void Union(IEnumerable<T> other)
         {
+            Contract.Requires(other != null);
+
             this.Subject.OnNext(new SortedSetChangedNotification<T>(this.Current.Union(other), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty));
         }
 
@@ -302,6 +331,8 @@ namespace ExRam.ReactiveCollections
         {
             get
             {
+                Contract.Ensures(Contract.Result<ImmutableSortedSet<T>>() != null);
+
                 return this.Subject.Value.Current;
             }
         }

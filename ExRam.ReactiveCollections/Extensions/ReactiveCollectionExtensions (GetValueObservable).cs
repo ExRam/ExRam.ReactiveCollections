@@ -16,6 +16,7 @@ namespace ExRam.ReactiveCollections
         public static IObservable<TValue> GetValueObservable<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>> reactiveCollection, TKey key)
         {
             Contract.Requires(reactiveCollection != null);
+            Contract.Ensures(Contract.Result<IObservable<TValue>>() != null);
 
             return reactiveCollection.Changes
                 .Where(x => x.Current.ContainsKey(key))

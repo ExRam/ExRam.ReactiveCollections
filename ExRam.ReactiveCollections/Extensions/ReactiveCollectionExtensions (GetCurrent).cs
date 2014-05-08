@@ -19,6 +19,7 @@ namespace ExRam.ReactiveCollections
             where TNotification : ICollectionChangedNotification<T>
         {
             Contract.Requires(reactiveCollection != null);
+            Contract.Ensures(Contract.Result<IReadOnlyCollection<T>>() != null);
 
             return reactiveCollection.Changes
                 .FirstAsync()

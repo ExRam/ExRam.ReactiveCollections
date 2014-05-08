@@ -29,6 +29,7 @@ namespace System.Reactive.Linq
             where TNotification : ICollectionChangedNotification<T>
         {
             Contract.Requires(observable != null);
+            Contract.Ensures(Contract.Result<IObservable<TNotification>>() != null);
 
             return observable
                 .Scan(new StateHolder<TNotification>(true, default(TNotification)), (state, notification) => new StateHolder<TNotification>(false, ((state.First) ? ((TNotification)notification.ToResetNotification()) : (notification))))

@@ -50,6 +50,7 @@ namespace System.Reactive.Linq
         {
             Contract.Requires(changesObservable != null);
             Contract.Requires(connectFunction != null);
+            Contract.Ensures(Contract.Result<IConnectableReactiveCollection<TNotification, T>>() != null);
 
             return new ToConnectableReactiveCollectionImpl<TNotification, T>(changesObservable, connectFunction);
         }
@@ -58,6 +59,7 @@ namespace System.Reactive.Linq
            where TNotification : ICollectionChangedNotification<T>
         {
             Contract.Requires(changesObservable != null);
+            Contract.Ensures(Contract.Result<IConnectableReactiveCollection<TNotification, T>>() != null);
 
             return new ToConnectableReactiveCollectionImpl<TNotification, T>(changesObservable, changesObservable.Connect);
         }
