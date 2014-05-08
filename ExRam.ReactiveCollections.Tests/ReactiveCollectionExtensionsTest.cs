@@ -1139,6 +1139,26 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
+        #region ToObservableCollection_Add_multiple
+        [TestMethod]
+        public async Task ToObservableCollection_Add_multiple()
+        {
+            var list = new ListReactiveCollectionSource<int>();
+            var observableCollection = list.ReactiveCollection.ToObservableCollection();
+
+            using (Observable
+                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>((eh) => ((INotifyCollectionChanged)observableCollection).CollectionChanged += eh, (eh) => ((INotifyCollectionChanged)observableCollection).CollectionChanged -= eh)
+                .Subscribe())
+            {
+                list.AddRange(new[] { 1, 2, 3 });
+                CollectionAssert.AreEqual(new[] { 1, 2, 3 }, observableCollection);
+
+                list.InsertRange(2, new[] { 4, 5, 6 });
+                CollectionAssert.AreEqual(new[] { 1, 2, 4, 5, 6, 3 }, observableCollection);
+            }
+        }
+        #endregion
+
         #region ToObservableCollection_Remove
         [TestMethod]
         public async Task ToObservableCollection_Remove()
@@ -1179,7 +1199,7 @@ namespace ExRam.ReactiveCollections.Tests
                 list.AddRange(new[] { 1, 2, 3, 4, 5, 6, 7 });
                 list.RemoveRange(2, 3);
 
-                CollectionAssert.AreEqual(new[] { 1, 2, 6, 7 }, observableCollection.ToArray());
+                CollectionAssert.AreEqual(new[] { 1, 2, 6, 7 }, observableCollection);
             }
         }
         #endregion
