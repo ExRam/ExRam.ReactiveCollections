@@ -28,18 +28,25 @@ namespace ExRam.ReactiveCollections
         public void Add(TKey key, TValue value)
         {
             var newList = this.Current.Add(key, value);
+
             this.Subject.OnNext(new DictionaryChangedNotification<TKey, TValue>(newList, NotifyCollectionChangedAction.Add, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList.Create(new KeyValuePair<TKey, TValue>(key, value))));
         }
 
         public void AddRange(IEnumerable<TValue> values, Func<TValue, TKey> keySelector)
         {
+            Contract.Requires(values != null);
+            Contract.Requires(keySelector != null);
+
             this.AddRange(values.Select(x => new KeyValuePair<TKey, TValue>(keySelector(x), x)));
         }
 
         public void AddRange(IEnumerable<KeyValuePair<TKey, TValue>> pairs)
         {
+            Contract.Requires(pairs != null);
+
             var immutablePairs = ImmutableList<KeyValuePair<TKey, TValue>>.Empty.AddRange(pairs);
             var newList = this.Current.AddRange(immutablePairs);
+
             this.Subject.OnNext(new DictionaryChangedNotification<TKey, TValue>(newList, NotifyCollectionChangedAction.Add, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, immutablePairs));
         }
 
@@ -61,6 +68,7 @@ namespace ExRam.ReactiveCollections
             if (oldList != newList)
             {
                 var oldValue = oldList[key];
+
                 this.Subject.OnNext(new DictionaryChangedNotification<TKey, TValue>(newList, NotifyCollectionChangedAction.Remove, ImmutableList.Create(new KeyValuePair<TKey, TValue>(key, oldValue)), ImmutableList<KeyValuePair<TKey, TValue>>.Empty));
             }
         }
@@ -296,6 +304,8 @@ namespace ExRam.ReactiveCollections
         {
             get
             {
+                Contract.Ensures(Contract.Result<IEnumerable<TValue>>() != null);
+
                 return this.Current.Values;
             }
         }
@@ -304,6 +314,8 @@ namespace ExRam.ReactiveCollections
         {
             get
             {
+                Contract.Ensures(Contract.Result<ImmutableDictionary<TKey, TValue>>() != null);
+
                 return this.Subject.Value.Current;
             }
         }
