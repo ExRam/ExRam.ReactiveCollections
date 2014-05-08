@@ -1,11 +1,15 @@
-﻿using System;
+﻿// (c) Copyright 2014 ExRam GmbH & Co. KG http://www.exram.de
+//
+// Licensed using Microsoft Public License (Ms-PL)
+// Full License description can be found in the LICENSE
+// file.
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 
 namespace ExRam.ReactiveCollections
 {
