@@ -69,9 +69,9 @@ namespace ExRam.ReactiveCollections.Tests
 
         #endregion
 
-        #region AddRange
+        #region AddRange1
         [TestMethod]
-        public async Task AddRange()
+        public async Task AddRange1()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
 
@@ -98,6 +98,58 @@ namespace ExRam.ReactiveCollections.Tests
 
             CollectionAssert.AreEqual(range, notification.NewItems.ToArray());
             CollectionAssert.AreEquivalent(range, notification.Current);
+        }
+        #endregion
+
+        #region AddRange2
+        [TestMethod]
+        public async Task AddRange2()
+        {
+            var list = new DictionaryReactiveCollectionSource<int, string>();
+
+            var notificationTask = list.ReactiveCollection.Changes
+                .Skip(1)
+                .FirstAsync()
+                .ToTask();
+
+            var range = new[]
+            {
+                "A",
+                "BB",
+                "CCC",
+            };
+
+            list.AddRange(range, x => x.Length);
+
+            var notification = await notificationTask;
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
+
+            Assert.AreEqual(3, notification.NewItems.Count);
+            Assert.AreEqual(0, notification.OldItems.Count);
+
+            Assert.AreEqual("A", notification.Current[1]);
+            Assert.AreEqual("BB", notification.Current[2]);
+            Assert.AreEqual("CCC", notification.Current[3]);
+        }
+        #endregion
+
+        #region Count_reflects_actual_count
+        [TestMethod]
+        public async Task Count_reflects_actual_count()
+        {
+            var list = new DictionaryReactiveCollectionSource<string, int>();
+
+            var range = new[]
+            {
+                new KeyValuePair<string, int>("Key1", 1),
+                new KeyValuePair<string, int>("Key2", 2),
+                new KeyValuePair<string, int>("Key3", 3)
+            };
+
+            list.AddRange(range);
+
+            Assert.AreEqual(3, list.Count);
         }
         #endregion
 
