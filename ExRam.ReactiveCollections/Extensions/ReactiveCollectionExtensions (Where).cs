@@ -16,17 +16,20 @@ namespace ExRam.ReactiveCollections
     public static partial class ReactiveCollectionExtensions
     {
         #region WhereReactiveList
-        private sealed class WhereReactiveList<TSource> : IReactiveCollection<ListChangedNotification<TSource>, TSource>
+        private sealed class WhereReactiveList<T> : IReactiveCollection<ListChangedNotification<T>, T>
         {
-            private readonly IObservable<ListChangedNotification<TSource>> _changes;
+            private readonly IEqualityComparer<T> _equalityComparer;
+            private readonly IObservable<ListChangedNotification<T>> _changes;
 
-            public WhereReactiveList(IObservable<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter)
+            public WhereReactiveList(IObservable<ICollectionChangedNotification<T>> source, Predicate<T> filter, IEqualityComparer<T> equalityComparer)
             {
+                this._equalityComparer = equalityComparer;
+
                 this._changes = Observable
-                    .Create<ListReactiveCollectionSource<TSource>>(observer =>
+                    .Create<ListReactiveCollectionSource<T>>(observer =>
                     {
                         var syncRoot = new object();
-                        var resultList = new ListReactiveCollectionSource<TSource>();
+                        var resultList = new ListReactiveCollectionSource<T>();
 
                         observer.OnNext(resultList);
 
@@ -46,7 +49,7 @@ namespace ExRam.ReactiveCollections
 
                                         case (NotifyCollectionChangedAction.Remove):
                                         {
-                                            resultList.RemoveRange(notification.OldItems.Where(x => filter(x)));
+                                            resultList.RemoveRange(notification.OldItems.Where(x => filter(x)), this._equalityComparer);
 
                                             break;
                                         }
@@ -59,16 +62,16 @@ namespace ExRam.ReactiveCollections
                                                 var getsIn = filter(notification.NewItems[0]);
 
                                                 if ((wasIn) && (getsIn))
-                                                    resultList.Replace(notification.OldItems[0], notification.NewItems[0]);
+                                                    resultList.Replace(notification.OldItems[0], notification.NewItems[0], this._equalityComparer);
                                                 else if (wasIn)
-                                                    resultList.Remove(notification.OldItems[0]);
+                                                    resultList.Remove(notification.OldItems[0], this._equalityComparer);
                                                 else if (getsIn)
                                                     resultList.Add(notification.NewItems[0]);
                                             }
                                             else
                                             {
                                                 resultList
-                                                    .RemoveRange(notification.OldItems.Where(x => filter(x)));
+                                                    .RemoveRange(notification.OldItems.Where(x => filter(x)), this._equalityComparer);
 
                                                 resultList
                                                     .AddRange(notification.NewItems.Where(x => filter(x)));
@@ -91,10 +94,10 @@ namespace ExRam.ReactiveCollections
                     .SelectMany(x => x.ReactiveCollection.Changes)
                     .Replay(1)
                     .RefCount()
-                    .Normalize<ListChangedNotification<TSource>, TSource>();
+                    .Normalize<ListChangedNotification<T>, T>();
             }
 
-            public IObservable<ListChangedNotification<TSource>> Changes
+            public IObservable<ListChangedNotification<T>> Changes
             {
                 get
                 {
@@ -181,7 +184,16 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(source != null);
             Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>, TSource>>() != null);
 
-            return new WhereReactiveList<TSource>(source.Changes, filter);
+            return source.Where(filter, EqualityComparer<TSource>.Default);
+        }
+
+        public static IReactiveCollection<ListChangedNotification<TSource>, TSource> Where<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>, TSource> source, Predicate<TSource> filter, IEqualityComparer<TSource> equalityComparer)
+        {
+            Contract.Requires(source != null);
+            Contract.Requires(equalityComparer != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>, TSource>>() != null);
+
+            return new WhereReactiveList<TSource>(source.Changes, filter, equalityComparer);
         }
 
         public static IReactiveCollection<DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>> Where<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>> source, Predicate<TValue> filter)
