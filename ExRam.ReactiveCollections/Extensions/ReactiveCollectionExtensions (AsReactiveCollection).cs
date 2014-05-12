@@ -6,6 +6,7 @@
 
 using System;
 using System.Diagnostics.Contracts;
+using System.Reactive.Linq;
 
 namespace ExRam.ReactiveCollections
 {
@@ -28,7 +29,7 @@ namespace ExRam.ReactiveCollections
             {
                 get
                 {
-                    return this._reactiveCollection.Changes;
+                    return this._reactiveCollection.Changes.AsObservable();
                 }
             }
         }
