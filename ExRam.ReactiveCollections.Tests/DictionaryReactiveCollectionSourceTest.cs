@@ -116,7 +116,7 @@ namespace ExRam.ReactiveCollections.Tests
             {
                 "A",
                 "BB",
-                "CCC",
+                "CCC"
             };
 
             list.AddRange(range, x => x.Length);
