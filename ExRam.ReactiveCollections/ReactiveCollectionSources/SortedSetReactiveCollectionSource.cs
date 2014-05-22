@@ -24,11 +24,9 @@ namespace ExRam.ReactiveCollections
         {
         }
 
-        public SortedSetReactiveCollectionSource(IComparer<T> comparer)
+        public SortedSetReactiveCollectionSource(IComparer<T> comparer) : base(new SortedSetChangedNotification<T>(ImmutableSortedSet.Create(comparer), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty))
         {
             Contract.Requires(comparer != null);
-
-            this.Subject.OnNext(new SortedSetChangedNotification<T>(ImmutableSortedSet.Create(comparer), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty));
         }
 
         public void Add(T value)

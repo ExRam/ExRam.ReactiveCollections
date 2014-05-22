@@ -19,9 +19,8 @@ namespace ExRam.ReactiveCollections
         IDictionary<TKey, TValue>, 
         IDictionary
     {
-        public DictionaryReactiveCollectionSource()
+        public DictionaryReactiveCollectionSource() : base(new DictionaryChangedNotification<TKey, TValue>(ImmutableDictionary<TKey, TValue>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList<KeyValuePair<TKey, TValue>>.Empty))
         {
-            this.Subject.OnNext(new DictionaryChangedNotification<TKey, TValue>(ImmutableDictionary<TKey, TValue>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList<KeyValuePair<TKey, TValue>>.Empty));
         }
 
         #region IImmutableDictionary<TKey, TValue> implementation

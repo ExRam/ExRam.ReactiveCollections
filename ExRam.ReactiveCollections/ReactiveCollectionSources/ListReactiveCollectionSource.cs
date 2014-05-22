@@ -23,11 +23,9 @@ namespace ExRam.ReactiveCollections
         {
         }
 
-        public ListReactiveCollectionSource(IEnumerable<T> items)
+        public ListReactiveCollectionSource(IEnumerable<T> items) : base(new ListChangedNotification<T>(ImmutableList<T>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null))
         {
             Contract.Requires(items != null);
-
-            this.Subject.OnNext(new ListChangedNotification<T>(ImmutableList<T>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
 
             if (!object.ReferenceEquals(items, ImmutableList<T>.Empty))
                 this.AddRange(items);

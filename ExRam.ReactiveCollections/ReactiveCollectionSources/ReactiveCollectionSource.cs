@@ -37,11 +37,16 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
+        private readonly BehaviorSubject<TNotification> _subject;
         private readonly IReactiveCollection<TNotification, T> _reactiveCollection;
-        private readonly BehaviorSubject<TNotification> _subject = new BehaviorSubject<TNotification>(default(TNotification));
 
-        protected ReactiveCollectionSource()
+        protected ReactiveCollectionSource(TNotification initialNotification)
         {
+            // ReSharper disable RedundantCast
+            Contract.Requires(((object)initialNotification) != null);
+            // ReSharper restore RedundantCast
+
+            this._subject = new BehaviorSubject<TNotification>(initialNotification);
             this._reactiveCollection = new ReactiveCollectionImpl(this._subject);
         }
 
