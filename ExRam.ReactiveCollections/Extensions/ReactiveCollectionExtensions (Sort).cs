@@ -162,7 +162,6 @@ namespace ExRam.ReactiveCollections
                                             this._resultList.Replace(notification.OldItems[0], notification.NewItems[0], EqualityComparer);
                                         else
                                         {
-                                            // TODO: Performance
                                             this._resultList.RemoveRange(notification.OldItems, EqualityComparer);
                                             this._resultList.AddRange(notification.NewItems);
                                         }
