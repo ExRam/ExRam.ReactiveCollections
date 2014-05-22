@@ -99,10 +99,12 @@ namespace ExRam.ReactiveCollections
         {
             Contract.Requires(items != null);
 
-            // TODO: Optimize!
-            foreach (var item in items)
+            var oldList = this.Current;
+            var newList = oldList.SetItems(items);
+
+            if (oldList != newList)
             {
-                this.SetItem(item.Key, item.Value);
+                this.Subject.OnNext(new DictionaryChangedNotification<TKey, TValue>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList<KeyValuePair<TKey, TValue>>.Empty));
             }
         }
 

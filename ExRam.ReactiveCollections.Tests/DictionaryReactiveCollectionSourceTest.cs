@@ -299,7 +299,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new DictionaryReactiveCollectionSource<string, int>();
 
             var notificationTask = list.ReactiveCollection.Changes
-                .Skip(4)
+                .Skip(2)
                 .FirstAsync()
                 .ToTask();
 
@@ -318,6 +318,8 @@ namespace ExRam.ReactiveCollections.Tests
             });
 
             var notification = await notificationTask;
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notification.Action);
 
             CollectionAssert.AreEquivalent(new[]
             {
