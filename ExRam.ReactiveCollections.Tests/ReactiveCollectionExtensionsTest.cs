@@ -1257,5 +1257,28 @@ namespace ExRam.ReactiveCollections.Tests
             CollectionAssert.AreEqual(new[] { 1, 2 }, (ICollection)observableCollection);
         }
         #endregion
+
+        #region GetValueObservable_Test1
+        [TestMethod]
+        public async Task GetValueObservable_Test1()
+        {
+            var dict = new DictionaryReactiveCollectionSource<int, int>();
+
+            var arrayTask = dict.ReactiveCollection.GetValueObservable(1)
+                .Take(4)
+                .ToArray()
+                .ToTask();
+
+            dict.Add(2, 2);
+            dict.Add(1, 1);
+            dict[2] = 1;
+            dict.Remove(1);
+            dict[2] = 1;
+            dict.Add(1, 2);
+            dict[1] = 3;
+
+            CollectionAssert.AreEqual(new[] { 1, 1, 2, 3 }, await arrayTask);
+        }
+        #endregion
     }
 }
