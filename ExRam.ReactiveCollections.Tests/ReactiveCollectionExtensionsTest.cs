@@ -1243,7 +1243,7 @@ namespace ExRam.ReactiveCollections.Tests
 
             var eventTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>((eh) => observableCollection.CollectionChanged += eh, (eh) => observableCollection.CollectionChanged -= eh)
-                .Skip(5)
+                .Skip(1)
                 .Select(x => x.EventArgs)
                 .FirstAsync()
                 .ToTask();
