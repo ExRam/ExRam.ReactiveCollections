@@ -62,29 +62,18 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notificationsTask = list.ReactiveCollection.Changes
                 .Skip(1)
-                .Take(3)
-                .ToArray()
+                .FirstAsync()
                 .ToTask();
 
             var range = new[] { 3, 1, 2 };
             list.AddRange(range);
 
-            var notifications = await notificationsTask;
+            var notification = await notificationsTask;
 
-            Assert.AreEqual(0, notifications[0].Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[0].Action);
-            Assert.AreEqual(1, notifications[0].NewItems.Count);
-            Assert.AreEqual(0, notifications[0].OldItems.Count);
-
-            Assert.AreEqual(0, notifications[1].Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
-            Assert.AreEqual(1, notifications[1].NewItems.Count);
-            Assert.AreEqual(0, notifications[1].OldItems.Count);
-
-            Assert.AreEqual(1, notifications[2].Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[2].Action);
-            Assert.AreEqual(1, notifications[1].NewItems.Count);
-            Assert.AreEqual(0, notifications[0].OldItems.Count);
+            Assert.AreEqual(0, notification.Index);
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
+            Assert.AreEqual(0, notification.OldItems.Count);
+            CollectionAssert.AreEquivalent(new[]{1,2,3}, (IList)notification.NewItems);
         }
         #endregion
 
@@ -268,7 +257,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new SortedListReactiveCollectionSource<int>();
 
             var notificationTask = list.ReactiveCollection.Changes
-                .Skip(4)
+                .Skip(2)
                 .FirstAsync()
                 .ToTask();
 
@@ -316,7 +305,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new SortedListReactiveCollectionSource<int>();
 
             var notificationsTask = list.ReactiveCollection.Changes
-                .Skip(5)
+                .Skip(2)
                 .Take(2)
                 .ToArray()
                 .ToTask();
@@ -345,7 +334,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new SortedListReactiveCollectionSource<int>();
 
             var notificationTask = list.ReactiveCollection.Changes
-                .Skip(5)
+                .Skip(2)
                 .FirstAsync()
                 .ToTask();
 
@@ -369,7 +358,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new SortedListReactiveCollectionSource<int>();
 
             var notificationsTask = list.ReactiveCollection.Changes
-                .Skip(6)
+                .Skip(2)
                 .Take(2)
                 .ToArray()
                 .ToTask();

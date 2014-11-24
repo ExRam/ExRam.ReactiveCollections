@@ -38,9 +38,14 @@ namespace ExRam.ReactiveCollections
         {
             Contract.Requires(items != null);
 
-            foreach (var item in items)
+            if (this._innerList.Count == 0)
+                this._innerList.AddRange(items.OrderBy(x => x, this._comparer));
+            else
             {
-                this.Add(item);
+                foreach (var item in items)
+                {
+                    this.Add(item);
+                }
             }
         }
 

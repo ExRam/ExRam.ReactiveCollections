@@ -889,7 +889,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .Sort();
 
             var notificationTask = projectedList.Changes
-                .Skip(4)
+                .Skip(2)
                 .FirstAsync()
                 .ToTask();
 
@@ -946,7 +946,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .Sort();
 
             var notificationTask = projectedList.Changes
-                .Skip(4)
+                .Skip(2)
                 .FirstAsync()
                 .ToTask();
 
@@ -975,7 +975,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .Sort();
 
             var notificationsTask = projectedList.Changes
-                .Skip(4)
+                .Skip(2)
                 .Take(2)
                 .ToArray()
                 .ToTask();
@@ -1007,7 +1007,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .Sort();
 
             var notificationsTask = projectedList.Changes
-                .Skip(4)
+                .Skip(2)
                 .Take(2)
                 .ToArray()
                 .ToTask();
@@ -1044,7 +1044,7 @@ namespace ExRam.ReactiveCollections.Tests
             var projectedList = observable.Sort();
 
             var notificationsTask = projectedList.Changes
-                .Skip(3)
+                .Skip(2)
                 .Take(4)
                 .ToArray()
                 .ToTask();
