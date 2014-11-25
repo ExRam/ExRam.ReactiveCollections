@@ -110,10 +110,8 @@
     <AssemblyOriginatorKeyFile>ExRam.ReactiveCollections.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\ExRam.Extensions\ExRam.Extensions\System\Reactive\Linq\ObservableExtensions %28ToNotifyCollectionChangedEventPattern%29.cs">
-      <Link>Extensions\ObservableExtensions %28ToNotifyCollectionChangedEventPattern%29.cs</Link>
-    </Compile>
     <Compile Include="Extensions\ObservableExtensions %28ToConnectableReactiveCollection%29.cs" />
+    <Compile Include="Extensions\ObservableExtensions %28ToNotifyCollectionChangedEventPattern%291.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28ObserveOn%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28WithChanges%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28ToObservableCollection%29.cs" />
