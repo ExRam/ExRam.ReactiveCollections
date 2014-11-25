@@ -150,51 +150,52 @@ namespace ExRam.ReactiveCollections
                 Contract.Requires(selector != null);
 
                 this._changes = Observable
-                    .Create<DictionaryReactiveCollectionSource<TKey, TResult>>(observer =>
+                    .Defer(() =>
                     {
                         var syncRoot = new object();
                         var resultList = new DictionaryReactiveCollectionSource<TKey, TResult>();
 
-                        observer.OnNext(resultList);
-
-                        return source.Subscribe(
-                            (notification) =>
-                            {
-                                lock (syncRoot)
+                        return Observable.Using(
+                            () => source
+                                .Subscribe((notification) =>
                                 {
-                                    switch (notification.Action)
+                                    lock (syncRoot)
                                     {
-                                        case (NotifyCollectionChangedAction.Add):
+                                        switch (notification.Action)
                                         {
-                                            resultList.AddRange(notification.NewItems.Select(x => new KeyValuePair<TKey, TResult>(x.Key, selector(x.Value))));
-                                            break;
-                                        }
+                                            case (NotifyCollectionChangedAction.Add):
+                                            {
+                                                resultList.AddRange(notification.NewItems.Select(x => new KeyValuePair<TKey, TResult>(x.Key, selector(x.Value))));
+                                                break;
+                                            }
 
-                                        case (NotifyCollectionChangedAction.Remove):
-                                        {
-                                            resultList.RemoveRange(notification.OldItems.Select(x => x.Key));
-                                            break;
-                                        }
+                                            case (NotifyCollectionChangedAction.Remove):
+                                            {
+                                                resultList.RemoveRange(notification.OldItems.Select(x => x.Key));
+                                                break;
+                                            }
 
-                                        case (NotifyCollectionChangedAction.Replace):
-                                        {
-                                            resultList.RemoveRange(notification.OldItems.Select(x => x.Key));
-                                            resultList.AddRange(notification.NewItems.Select(x => new KeyValuePair<TKey, TResult>(x.Key, selector(x.Value))));
-                                            break;
-                                        }
+                                            case (NotifyCollectionChangedAction.Replace):
+                                            {
+                                                resultList.RemoveRange(notification.OldItems.Select(x => x.Key));
+                                                resultList.AddRange(notification.NewItems.Select(x => new KeyValuePair<TKey, TResult>(x.Key, selector(x.Value))));
+                                             
+                                                break;
+                                            }
 
-                                        default:
-                                        {
-                                            resultList.Clear();
-                                            resultList.AddRange(notification.Current.Select(x => new KeyValuePair<TKey, TResult>(x.Key, selector(x.Value))));
-                                            
-                                            break;
+                                            default:
+                                            {
+                                                resultList.Clear();
+                                                resultList.AddRange(notification.Current.Select(x => new KeyValuePair<TKey, TResult>(x.Key, selector(x.Value))));
+
+                                                break;
+                                            }
                                         }
                                     }
-                                }
-                            });
+                                }),
+
+                            _ => resultList.ReactiveCollection.Changes);
                     })
-                    .SelectMany(x => x.ReactiveCollection.Changes)
                     .Replay(1)
                     .RefCount()
                     .Normalize<DictionaryChangedNotification<TKey, TResult>, KeyValuePair<TKey, TResult>>();
