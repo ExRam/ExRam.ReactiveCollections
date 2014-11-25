@@ -1150,10 +1150,10 @@ namespace ExRam.ReactiveCollections.Tests
                 .Subscribe())
             {
                 list.AddRange(new[] { 1, 2, 3 });
-                CollectionAssert.AreEqual(new[] { 1, 2, 3 }, observableCollection);
+                CollectionAssert.AreEqual(new[] { 1, 2, 3 }, (ICollection)observableCollection);
 
                 list.InsertRange(2, new[] { 4, 5, 6 });
-                CollectionAssert.AreEqual(new[] { 1, 2, 4, 5, 6, 3 }, observableCollection);
+                CollectionAssert.AreEqual(new[] { 1, 2, 4, 5, 6, 3 }, (ICollection)observableCollection);
             }
         }
         #endregion
@@ -1198,7 +1198,7 @@ namespace ExRam.ReactiveCollections.Tests
                 list.AddRange(new[] { 1, 2, 3, 4, 5, 6, 7 });
                 list.RemoveRange(2, 3);
 
-                CollectionAssert.AreEqual(new[] { 1, 2, 6, 7 }, observableCollection);
+                CollectionAssert.AreEqual(new[] { 1, 2, 6, 7 }, (ICollection)observableCollection);
             }
         }
         #endregion

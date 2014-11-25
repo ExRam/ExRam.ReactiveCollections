@@ -7,20 +7,20 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 
 namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
         #region ReactiveReadOnlyObservableCollection
-        private sealed class ReactiveReadOnlyObservableCollection<T> : Collection<T>, IList<T>, IReadOnlyList<T>, IList, INotifyCollectionChanged, INotifyPropertyChanged
+        private sealed class ReactiveReadOnlyObservableCollection<T> : IList<T>, IReadOnlyList<T>, IList, INotifyCollectionChanged, INotifyPropertyChanged
         {
+            #region Events
             public event PropertyChangedEventHandler PropertyChanged
             {
                 add
@@ -46,33 +46,29 @@ namespace ExRam.ReactiveCollections
                     this._collectionChanged.CollectionChanged -= value;
                 }
             }
+            #endregion
 
             private readonly INotifyPropertyChanged _propertyChanged;
             private readonly INotifyCollectionChanged _collectionChanged;
 
-            public ReactiveReadOnlyObservableCollection(IObservable<ListChangedNotification<T>> source) : base(new List<T>())
+            private ImmutableList<T> _currentList = ImmutableList<T>.Empty;
+
+            public ReactiveReadOnlyObservableCollection(IObservable<ListChangedNotification<T>> source)
             {
                 Contract.Requires(source != null);
 
                 var eventArgs = source
                     .Select(notification =>
                     {
+                        this._currentList = notification.Current;
+
                         switch (notification.Action)
                         {
                             case (NotifyCollectionChangedAction.Add):
                             {
-                                // ReSharper disable PossibleInvalidOperationException
-                                var index = notification.Index.Value;
-                                // ReSharper restore PossibleInvalidOperationException
-
-                                for (var i = 0; i < notification.NewItems.Count; i++)
-                                {
-                                    this.Items.Insert((i + index), notification.NewItems[i]);
-                                }
-
                                 return new EventArgs[]
                                 {
-                                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)notification.NewItems, index),
+                                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)notification.NewItems, notification.Index.Value),
                                     new PropertyChangedEventArgs("Count"),
                                     new PropertyChangedEventArgs("Item[]")
                                 };
@@ -80,18 +76,10 @@ namespace ExRam.ReactiveCollections
 
                             case (NotifyCollectionChangedAction.Remove):
                             {
-                                // ReSharper disable PossibleInvalidOperationException
-                                var index = notification.Index.Value;
-                                // ReSharper restore PossibleInvalidOperationException
-
-                                for (var i = 0; i < notification.OldItems.Count; i++)
-                                {
-                                    this.Items.RemoveAt(index);
-                                }
-
                                 return new EventArgs[]
                                 {
-                                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, (IList)notification.OldItems, index),
+
+                                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, (IList)notification.OldItems, notification.Index.Value),
                                     new PropertyChangedEventArgs("Count"),
                                     new PropertyChangedEventArgs("Item[]")
                                 };
@@ -99,18 +87,9 @@ namespace ExRam.ReactiveCollections
 
                             case (NotifyCollectionChangedAction.Replace):
                             {
-                                // ReSharper disable PossibleInvalidOperationException
-                                var index = notification.Index.Value;
-                                // ReSharper restore PossibleInvalidOperationException
-
-                                for (var i = 0; i < notification.OldItems.Count; i++)
-                                {
-                                    this.Items[i + index] = notification.NewItems[i];
-                                }
-
                                 return new EventArgs[]
                                 {
-                                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, (IList)notification.NewItems, (IList)notification.OldItems, index),
+                                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, (IList)notification.NewItems, (IList)notification.OldItems, notification.Index.Value),
                                     new PropertyChangedEventArgs("Item[]")
                                 };
                             }
@@ -119,9 +98,9 @@ namespace ExRam.ReactiveCollections
                             {
                                 var list = new List<EventArgs>();
 
-                                if (this.Count > 0)
+                                if (this._currentList.Count > 0)
                                 {
-                                    this.Items.Clear();
+                                    this._currentList = ImmutableList<T>.Empty;
 
                                     list.Add(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
                                     list.Add(new PropertyChangedEventArgs("Count"));
@@ -130,10 +109,7 @@ namespace ExRam.ReactiveCollections
 
                                 if (notification.Current.Count > 0)
                                 {
-                                    foreach (var item in notification.Current)
-                                    {
-                                        this.Items.Add(item);
-                                    }
+                                    this._currentList = notification.Current;
 
                                     list.Add(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)notification.Current, 0));
                                     list.Add(new PropertyChangedEventArgs("Count"));
@@ -158,32 +134,198 @@ namespace ExRam.ReactiveCollections
                     .ToNotifyPropertyChangedEventPattern(this);
             }
 
-            protected override void ClearItems()
+            void ICollection<T>.Add(T item)
             {
                 throw new NotSupportedException();
             }
 
-            protected override void InsertItem(int index, T item)
+            void ICollection<T>.Clear()
             {
                 throw new NotSupportedException();
             }
 
-            protected override void RemoveItem(int index)
+            bool ICollection<T>.Contains(T item)
+            {
+                return this._currentList.Contains(item);
+            }
+
+            void ICollection<T>.CopyTo(T[] array, int arrayIndex)
+            {
+                this._currentList.CopyTo(array, arrayIndex);
+            }
+
+            int ICollection<T>.Count
+            {
+                get 
+                {
+                    return this._currentList.Count;
+                }
+            }
+
+            bool ICollection<T>.IsReadOnly
+            {
+                get 
+                {
+                    return true;
+                }
+            }
+
+            bool ICollection<T>.Remove(T item)
             {
                 throw new NotSupportedException();
             }
 
-            protected override void SetItem(int index, T item)
+            IEnumerator<T> IEnumerable<T>.GetEnumerator()
+            {
+                return this._currentList.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return this._currentList.GetEnumerator();
+            }
+
+            int IList<T>.IndexOf(T item)
+            {
+                return this._currentList.IndexOf(item);
+            }
+
+            void IList<T>.Insert(int index, T item)
             {
                 throw new NotSupportedException();
+            }
+
+            void IList<T>.RemoveAt(int index)
+            {
+                throw new NotSupportedException();
+            }
+
+            T IList<T>.this[int index]
+            {
+                get
+                {
+                    return this._currentList[index];
+                }
+                set
+                {
+                    throw new NotSupportedException();
+                }
+            }
+
+            T IReadOnlyList<T>.this[int index]
+            {
+                get
+                {
+                    return this._currentList[index];
+                }
+            }
+
+            int IReadOnlyCollection<T>.Count
+            {
+                get
+                {
+                    return this._currentList.Count;
+                }
+            }
+
+            int IList.Add(object value)
+            {
+                throw new NotSupportedException();
+            }
+
+            void IList.Clear()
+            {
+                throw new NotSupportedException();
+            }
+
+            bool IList.Contains(object value)
+            {
+                return ((IList)this._currentList).Contains(value);
+            }
+
+            int IList.IndexOf(object value)
+            {
+                return ((IList)this._currentList).IndexOf(value);
+            }
+
+            void IList.Insert(int index, object value)
+            {
+                throw new NotSupportedException();
+            }
+
+            bool IList.IsFixedSize
+            {
+                get 
+                {
+                    return false;
+                }
+            }
+
+            bool IList.IsReadOnly
+            {
+                get
+                {
+                    return true;
+                }
+            }
+
+            void IList.Remove(object value)
+            {
+                throw new NotSupportedException();
+            }
+
+            void IList.RemoveAt(int index)
+            {
+                throw new NotSupportedException();
+            }
+
+            object IList.this[int index]
+            {
+                get
+                {
+                    return this._currentList[index];
+                }
+                set
+                {
+                    throw new NotSupportedException();
+                }
+            }
+
+            void ICollection.CopyTo(Array array, int index)
+            {
+                ((ICollection)this._currentList).CopyTo(array, index);
+            }
+
+            int ICollection.Count
+            {
+                get
+                {
+                    return this._currentList.Count;
+                }
+            }
+
+            bool ICollection.IsSynchronized
+            {
+                get 
+                {
+                    return false;
+                }
+            }
+
+            object ICollection.SyncRoot
+            {
+                get
+                {
+                    return this;
+                }
             }
         }
         #endregion
 
-        public static Collection<T> ToObservableCollection<T>(this IReactiveCollection<ListChangedNotification<T>, T> source)
+        public static ICollection<T> ToObservableCollection<T>(this IReactiveCollection<ListChangedNotification<T>, T> source)
         {
             Contract.Requires(source != null);
-            Contract.Ensures(Contract.Result<Collection<T>>() != null);
+            Contract.Ensures(Contract.Result<ICollection<T>>() != null);
 
             return new ReactiveReadOnlyObservableCollection<T>(source.Changes);
         }
