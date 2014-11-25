@@ -28,66 +28,67 @@ namespace ExRam.ReactiveCollections
                 Contract.Requires(equalityComparer != null);
 
                 this._changes = Observable
-                    .Create<SortedListReactiveCollectionSource<TSource>>(observer =>
-                    {
-                        var syncRoot = new object();
-                        var resultList = new SortedListReactiveCollectionSource<TSource>(comparer);
+                    .Defer(
+                        () =>
+                        {
+                            var syncRoot = new object();
+                            var resultList = new SortedListReactiveCollectionSource<TSource>(comparer);
 
-                        observer.OnNext(resultList);
-
-                        return source.Subscribe(
-                            (notification) =>
-                            {
-                                lock (syncRoot)
-                                {
-                                    switch (notification.Action)
+                            return Observable.Using(
+                                () => source.Subscribe(
+                                    (notification) =>
                                     {
-                                        case (NotifyCollectionChangedAction.Add):
+                                        lock (syncRoot)
                                         {
-                                            resultList.AddRange(notification.NewItems);
-
-                                            break;
-                                        }
-
-                                        case (NotifyCollectionChangedAction.Remove):
-                                        {
-                                            resultList.RemoveRange(notification.OldItems, equalityComparer);
-
-                                            break;
-                                        }
-
-                                        case (NotifyCollectionChangedAction.Replace):
-                                        {
-                                            if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
-                                                resultList.Replace(notification.OldItems[0], notification.NewItems[0], equalityComparer);
-                                            else
+                                            switch (notification.Action)
                                             {
-                                                foreach (var value in notification.OldItems)
+                                                case (NotifyCollectionChangedAction.Add):
                                                 {
-                                                    resultList.Remove(value, equalityComparer);
+                                                    resultList.AddRange(notification.NewItems);
+
+                                                    break;
                                                 }
 
-                                                foreach (var value in notification.NewItems)
+                                                case (NotifyCollectionChangedAction.Remove):
                                                 {
-                                                    resultList.Add(value);
+                                                    resultList.RemoveRange(notification.OldItems, equalityComparer);
+
+                                                    break;
+                                                }
+
+                                                case (NotifyCollectionChangedAction.Replace):
+                                                {
+                                                    if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
+                                                        resultList.Replace(notification.OldItems[0], notification.NewItems[0], equalityComparer);
+                                                    else
+                                                    {
+                                                        foreach (var value in notification.OldItems)
+                                                        {
+                                                            resultList.Remove(value, equalityComparer);
+                                                        }
+
+                                                        foreach (var value in notification.NewItems)
+                                                        {
+                                                            resultList.Add(value);
+                                                        }
+                                                    }
+
+                                                    break;
+                                                }
+
+                                                default:
+                                                {
+                                                    resultList.Clear();
+                                                    resultList.AddRange(notification.Current);
+
+                                                    break;
                                                 }
                                             }
-
-                                            break;
                                         }
+                                    }),
 
-                                        default:
-                                        {
-                                            resultList.Clear();
-                                            resultList.AddRange(notification.Current);
-
-                                            break;
-                                        }
-                                    }
-                                }
-                            });
-                    })
-                    .SelectMany(x => x.ReactiveCollection.Changes)
+                                    _ => resultList.ReactiveCollection.Changes);
+                        })
                     .Replay(1)
                     .RefCount()
                     .Normalize<ListChangedNotification<TSource>, TSource>();
@@ -123,64 +124,69 @@ namespace ExRam.ReactiveCollections
 
             private static readonly KeyValuePairEqualityComparer EqualityComparer = new KeyValuePairEqualityComparer();
 
-            private readonly object _syncRoot = new object();
             private readonly IObservable<ListChangedNotification<TValue>> _changes;
-            private readonly SortedListReactiveCollectionSource<KeyValuePair<TKey, TValue>> _resultList;
  
             public SortedFromDictionaryReactiveSortedList(IObservable<DictionaryChangedNotification<TKey, TValue>> source, IComparer<TValue> comparer)
             {
                 Contract.Requires(source != null);
                 Contract.Requires(comparer != null);
 
-                this._resultList = new SortedListReactiveCollectionSource<KeyValuePair<TKey, TValue>>(new Comparison<KeyValuePair<TKey, TValue>>((x, y) => comparer.Compare(x.Value, y.Value)).ToComparer());
-                
                 this._changes = Observable
-                    .Using(() => source.Subscribe(
-                        (notification) =>
+                    .Defer(
+                        () => 
                         {
-                            lock (this._syncRoot)
-                            {
-                                switch (notification.Action)
-                                {
-                                    case (NotifyCollectionChangedAction.Add):
-                                    {
-                                        this._resultList.AddRange(notification.NewItems);
+                            var syncRoot = new object();
+                            var resultList = new SortedListReactiveCollectionSource<KeyValuePair<TKey, TValue>>(new Comparison<KeyValuePair<TKey, TValue>>((x, y) => comparer.Compare(x.Value, y.Value)).ToComparer());
 
-                                        break;
-                                    }
-
-                                    case (NotifyCollectionChangedAction.Remove):
-                                    {
-                                        this._resultList.RemoveRange(notification.OldItems, EqualityComparer);
-
-                                        break;
-                                    }
-
-                                    case (NotifyCollectionChangedAction.Replace):
-                                    {
-                                        if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
-                                            this._resultList.Replace(notification.OldItems[0], notification.NewItems[0], EqualityComparer);
-                                        else
+                            return Observable
+                                .Using(
+                                    () => source.Subscribe(
+                                        (notification) =>
                                         {
-                                            this._resultList.RemoveRange(notification.OldItems, EqualityComparer);
-                                            this._resultList.AddRange(notification.NewItems);
-                                        }
+                                            lock (syncRoot)
+                                            {
+                                                switch (notification.Action)
+                                                {
+                                                    case (NotifyCollectionChangedAction.Add):
+                                                    {
+                                                        resultList.AddRange(notification.NewItems);
 
-                                        break;
-                                    }
+                                                        break;
+                                                    }
 
-                                    default:
-                                    {
-                                        this._resultList.Clear();
-                                        this._resultList.AddRange(notification.Current);
+                                                    case (NotifyCollectionChangedAction.Remove):
+                                                    {
+                                                        resultList.RemoveRange(notification.OldItems, EqualityComparer);
+
+                                                        break;
+                                                    }
+
+                                                    case (NotifyCollectionChangedAction.Replace):
+                                                    {
+                                                        if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
+                                                            resultList.Replace(notification.OldItems[0], notification.NewItems[0], EqualityComparer);
+                                                        else
+                                                        {
+                                                            resultList.RemoveRange(notification.OldItems, EqualityComparer);
+                                                            resultList.AddRange(notification.NewItems);
+                                                        }
+
+                                                        break;
+                                                    }
+
+                                                    default:
+                                                    {
+                                                        resultList.Clear();
+                                                        resultList.AddRange(notification.Current);
                                             
-                                        break;
-                                    }
-                                }
-                            }
-                        }),
-                        _ => Observable.Return(Unit.Default).Concat(Observable.Never<Unit>()))
-                    .SelectMany(_ => this._resultList.ReactiveCollection.Select(y => y.Value).Changes)
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }),
+
+                                    _ => resultList.ReactiveCollection.Select(y => y.Value).Changes);
+                        })
                     .Replay(1)
                     .RefCount()
                     .Normalize<ListChangedNotification<TValue>, TValue>();
