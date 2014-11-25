@@ -30,98 +30,98 @@ namespace ExRam.ReactiveCollections
                 Contract.Requires(equalityComparer != null);
 
                 this._changes = Observable
-                    .Create<ListReactiveCollectionSource<TResult>>(observer =>
+                    .Defer(() =>
                     {
                         var syncRoot = new object();
                         var resultList = new ListReactiveCollectionSource<TResult>();
 
-                        observer.OnNext(resultList);
-
-                        return source.Subscribe(
-                            (notification) =>
-                            {
-                                lock (syncRoot)
+                        return Observable.Using(
+                            () => source.Subscribe(
+                                (notification) =>
                                 {
-                                    switch (notification.Action)
+                                    lock (syncRoot)
                                     {
-                                        case (NotifyCollectionChangedAction.Add):
+                                        switch (notification.Action)
                                         {
-                                            var listNotification = notification as ListChangedNotification<TSource>;
-
-                                            if (listNotification != null)
-                                                // ReSharper disable PossibleInvalidOperationException
-                                                resultList.InsertRange(listNotification.Index.Value, notification.NewItems.Select(selector));
-                                                // ReSharper restore PossibleInvalidOperationException
-                                            else
-                                                resultList.AddRange(notification.NewItems.Select(selector));
-
-                                            break;
-                                        }
-
-                                        case (NotifyCollectionChangedAction.Remove):
-                                        {
-                                            var listNotification = notification as ListChangedNotification<TSource>;
-
-                                            if (listNotification != null)
-                                                // ReSharper disable PossibleInvalidOperationException
-                                                resultList.RemoveRange(listNotification.Index.Value, notification.OldItems.Count);
-                                                // ReSharper restore PossibleInvalidOperationException
-                                            else
-                                                resultList.RemoveRange(notification.OldItems.Select(selector), equalityComparer);
-
-                                            break;
-                                        }
-
-                                        case (NotifyCollectionChangedAction.Replace):
-                                        {
-                                            var listNotification = notification as ListChangedNotification<TSource>;
-
-                                            if (listNotification != null)
+                                            case (NotifyCollectionChangedAction.Add):
                                             {
-                                                // ReSharper disable PossibleInvalidOperationException
-                                                var index = listNotification.Index.Value;
-                                                // ReSharper restore PossibleInvalidOperationException
+                                                var listNotification = notification as ListChangedNotification<TSource>;
 
-                                                if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
-                                                    resultList.Replace(selector(notification.OldItems[0]), selector(notification.NewItems[0]), equalityComparer);
+                                                if (listNotification != null)
+                                                    // ReSharper disable PossibleInvalidOperationException
+                                                    resultList.InsertRange(listNotification.Index.Value, notification.NewItems.Select(selector));
+                                                    // ReSharper restore PossibleInvalidOperationException
                                                 else
-                                                {
-                                                    resultList
-                                                        .RemoveRange(index, notification.OldItems.Count);
+                                                    resultList.AddRange(notification.NewItems.Select(selector));
 
-                                                    resultList
-                                                        .InsertRange(index, notification.NewItems.Select(selector));
-                                                }
-                                            }
-                                            else
-                                            {
-                                                if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
-                                                    resultList.Replace(selector(notification.OldItems[0]), selector(notification.NewItems[0]), equalityComparer);
-                                                else
-                                                {
-                                                    resultList
-                                                        .RemoveRange(notification.OldItems.Select(selector), equalityComparer);
-
-                                                    resultList
-                                                        .AddRange(notification.NewItems.Select(selector));
-                                                }
+                                                break;
                                             }
 
-                                            break;
-                                        }
+                                            case (NotifyCollectionChangedAction.Remove):
+                                            {
+                                                var listNotification = notification as ListChangedNotification<TSource>;
 
-                                        default:
-                                        {
-                                            resultList.Clear();
-                                            resultList.AddRange(notification.Current.Select(selector));
+                                                if (listNotification != null)
+                                                    // ReSharper disable PossibleInvalidOperationException
+                                                    resultList.RemoveRange(listNotification.Index.Value, notification.OldItems.Count);
+                                                    // ReSharper restore PossibleInvalidOperationException
+                                                else
+                                                    resultList.RemoveRange(notification.OldItems.Select(selector), equalityComparer);
 
-                                            break;
+                                                break;
+                                            }
+
+                                            case (NotifyCollectionChangedAction.Replace):
+                                            {
+                                                var listNotification = notification as ListChangedNotification<TSource>;
+
+                                                if (listNotification != null)
+                                                {
+                                                    // ReSharper disable PossibleInvalidOperationException
+                                                    var index = listNotification.Index.Value;
+                                                    // ReSharper restore PossibleInvalidOperationException
+
+                                                    if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
+                                                        resultList.Replace(selector(notification.OldItems[0]), selector(notification.NewItems[0]), equalityComparer);
+                                                    else
+                                                    {
+                                                        resultList
+                                                            .RemoveRange(index, notification.OldItems.Count);
+
+                                                        resultList
+                                                            .InsertRange(index, notification.NewItems.Select(selector));
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
+                                                        resultList.Replace(selector(notification.OldItems[0]), selector(notification.NewItems[0]), equalityComparer);
+                                                    else
+                                                    {
+                                                        resultList
+                                                            .RemoveRange(notification.OldItems.Select(selector), equalityComparer);
+
+                                                        resultList
+                                                            .AddRange(notification.NewItems.Select(selector));
+                                                    }
+                                                }
+
+                                                break;
+                                            }
+
+                                            default:
+                                            {
+                                                resultList.Clear();
+                                                resultList.AddRange(notification.Current.Select(selector));
+
+                                                break;
+                                            }
                                         }
                                     }
-                                }
-                            });
+                                }),
+
+                            _ => resultList.ReactiveCollection.Changes);
                     })
-                    .SelectMany(x => x.ReactiveCollection.Changes)
                     .Replay(1)
                     .RefCount()
                     .Normalize<ListChangedNotification<TResult>, TResult>();
