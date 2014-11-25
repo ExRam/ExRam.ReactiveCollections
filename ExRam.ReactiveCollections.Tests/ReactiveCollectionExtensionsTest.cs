@@ -1258,6 +1258,31 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
+        #region ToObservableCollection_does_not_raise_events_on_event_subscription
+        [TestMethod]
+        public async Task ToObservableCollection_does_not_raise_events_on_event_subscription()
+        {
+            var list = new ListReactiveCollectionSource<int> {1, 2, 3};
+
+            var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
+
+            var eventsTask = Observable
+                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>((eh) => observableCollection.CollectionChanged += eh, (eh) => observableCollection.CollectionChanged -= eh)
+                .Select(x => x.EventArgs)
+                .FirstAsync()
+                .ToTask();
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, (ICollection)observableCollection);
+            list.Add(4);
+
+            var ev = await eventsTask;
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, ev.Action);
+            CollectionAssert.AreEqual(new[] { 4 }, ev.NewItems);
+            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4 }, (ICollection)observableCollection);
+        }
+        #endregion
+
         #region GetValueObservable_Test1
         [TestMethod]
         public async Task GetValueObservable_Test1()

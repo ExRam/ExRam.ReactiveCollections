@@ -54,91 +54,98 @@ namespace ExRam.ReactiveCollections
             {
                 Contract.Requires(source != null);
 
-                var eventArgs = Observable
-                    .Create<EventArgs>((obs) => source
-                        .Subscribe(notification =>
+                var eventArgs = source
+                    .Select(notification =>
+                    {
+                        switch (notification.Action)
                         {
-                            switch (notification.Action)
+                            case (NotifyCollectionChangedAction.Add):
                             {
-                                case (NotifyCollectionChangedAction.Add):
+                                // ReSharper disable PossibleInvalidOperationException
+                                var index = notification.Index.Value;
+                                // ReSharper restore PossibleInvalidOperationException
+
+                                for (var i = 0; i < notification.NewItems.Count; i++)
                                 {
-                                    // ReSharper disable PossibleInvalidOperationException
-                                    var index = notification.Index.Value;
-                                    // ReSharper restore PossibleInvalidOperationException
-
-                                    for (var i = 0; i < notification.NewItems.Count; i++)
-                                    {
-                                        this.Items.Insert((i + index), notification.NewItems[i]);
-                                    }
-
-                                    obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)notification.NewItems, index));
-                                    obs.OnNext(new PropertyChangedEventArgs("Count"));
-                                    obs.OnNext(new PropertyChangedEventArgs("Item[]"));
-
-                                    break;
+                                    this.Items.Insert((i + index), notification.NewItems[i]);
                                 }
 
-                                case (NotifyCollectionChangedAction.Remove):
+                                return new EventArgs[]
                                 {
-                                    // ReSharper disable PossibleInvalidOperationException
-                                    var index = notification.Index.Value;
-                                    // ReSharper restore PossibleInvalidOperationException
-
-                                    for (var i = 0; i < notification.OldItems.Count; i++)
-                                    {
-                                        this.Items.RemoveAt(index);
-                                    }
-
-                                    obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, (IList)notification.OldItems, index));
-                                    obs.OnNext(new PropertyChangedEventArgs("Count"));
-                                    obs.OnNext(new PropertyChangedEventArgs("Item[]"));
-
-                                    break;
-                                }
-
-                                case (NotifyCollectionChangedAction.Replace):
-                                {
-                                    // ReSharper disable PossibleInvalidOperationException
-                                    var index = notification.Index.Value;
-                                    // ReSharper restore PossibleInvalidOperationException
-
-                                    for (var i = 0; i < notification.OldItems.Count; i++)
-                                    {
-                                        this.Items[i + index] = notification.NewItems[i];
-                                    }
-
-                                    obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, (IList)notification.NewItems, (IList)notification.OldItems, index));
-                                    obs.OnNext(new PropertyChangedEventArgs("Item[]"));
-
-                                    break;
-                                }
-
-                                default:
-                                {
-                                    if (this.Count > 0)
-                                    {
-                                        this.Items.Clear();
-                                        obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-                                        obs.OnNext(new PropertyChangedEventArgs("Count"));
-                                        obs.OnNext(new PropertyChangedEventArgs("Item[]"));
-                                    }
-
-                                    if (notification.Current.Count > 0)
-                                    {
-                                        foreach (var item in notification.Current)
-                                        {
-                                            this.Items.Add(item);
-                                        }
-
-                                        obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)notification.Current, 0));
-                                        obs.OnNext(new PropertyChangedEventArgs("Count"));
-                                        obs.OnNext(new PropertyChangedEventArgs("Item[]"));
-                                    }
-
-                                    break;
-                                }
+                                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)notification.NewItems, index),
+                                    new PropertyChangedEventArgs("Count"),
+                                    new PropertyChangedEventArgs("Item[]")
+                                };
                             }
-                        }))
+
+                            case (NotifyCollectionChangedAction.Remove):
+                            {
+                                // ReSharper disable PossibleInvalidOperationException
+                                var index = notification.Index.Value;
+                                // ReSharper restore PossibleInvalidOperationException
+
+                                for (var i = 0; i < notification.OldItems.Count; i++)
+                                {
+                                    this.Items.RemoveAt(index);
+                                }
+
+                                return new EventArgs[]
+                                {
+                                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, (IList)notification.OldItems, index),
+                                    new PropertyChangedEventArgs("Count"),
+                                    new PropertyChangedEventArgs("Item[]")
+                                };
+                            }
+
+                            case (NotifyCollectionChangedAction.Replace):
+                            {
+                                // ReSharper disable PossibleInvalidOperationException
+                                var index = notification.Index.Value;
+                                // ReSharper restore PossibleInvalidOperationException
+
+                                for (var i = 0; i < notification.OldItems.Count; i++)
+                                {
+                                    this.Items[i + index] = notification.NewItems[i];
+                                }
+
+                                return new EventArgs[]
+                                {
+                                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, (IList)notification.NewItems, (IList)notification.OldItems, index),
+                                    new PropertyChangedEventArgs("Item[]")
+                                };
+                            }
+
+                            default:
+                            {
+                                var list = new List<EventArgs>();
+
+                                if (this.Count > 0)
+                                {
+                                    this.Items.Clear();
+
+                                    list.Add(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                                    list.Add(new PropertyChangedEventArgs("Count"));
+                                    list.Add(new PropertyChangedEventArgs("Item[]"));
+                                }
+
+                                if (notification.Current.Count > 0)
+                                {
+                                    foreach (var item in notification.Current)
+                                    {
+                                        this.Items.Add(item);
+                                    }
+
+                                    list.Add(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)notification.Current, 0));
+                                    list.Add(new PropertyChangedEventArgs("Count"));
+                                    list.Add(new PropertyChangedEventArgs("Item[]"));
+                                }
+
+                                return list.ToArray();
+                            }
+                        }
+                    })
+                    .Skip(1)
+                    .SelectMany(x => x)
                     .Publish()
                     .RefCount();
 
