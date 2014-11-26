@@ -119,54 +119,55 @@ namespace ExRam.ReactiveCollections
             public WhereReactiveDictionary(IObservable<DictionaryChangedNotification<TKey, TValue>> source, Predicate<TValue> filter)
             {
                 this._changes = Observable
-                    .Create<DictionaryReactiveCollectionSource<TKey, TValue>>(observer =>
+                    .Defer(() =>
                     {
                         var syncRoot = new object();
                         var resultList = new DictionaryReactiveCollectionSource<TKey, TValue>();
 
-                        observer.OnNext(resultList);
-
-                        return source.Subscribe(
-                            (notification) =>
-                            {
-                                lock (syncRoot)
-                                {
-                                    switch (notification.Action)
+                        return Observable
+                            .Using(
+                                () => source.Subscribe(
+                                    (notification) =>
                                     {
-                                        case (NotifyCollectionChangedAction.Add):
+                                        lock (syncRoot)
                                         {
-                                            resultList.AddRange(notification.NewItems.Where(x => filter(x.Value)));
+                                            switch (notification.Action)
+                                            {
+                                                case (NotifyCollectionChangedAction.Add):
+                                                {
+                                                    resultList.AddRange(notification.NewItems.Where(x => filter(x.Value)));
 
-                                            break;
+                                                    break;
+                                                }
+
+                                                case (NotifyCollectionChangedAction.Remove):
+                                                {
+                                                    resultList.RemoveRange(notification.OldItems.Where(x => filter(x.Value)).Select(x => x.Key));
+
+                                                    break;
+                                                }
+
+                                                case (NotifyCollectionChangedAction.Replace):
+                                                {
+                                                    resultList.RemoveRange(notification.OldItems.Where(x => filter(x.Value)).Select(x => x.Key));
+                                                    resultList.AddRange(notification.NewItems.Where(x => filter(x.Value)));
+
+                                                    break;
+                                                }
+
+                                                default:
+                                                {
+                                                    resultList.Clear();
+                                                    resultList.AddRange(notification.Current.Where(x => filter(x.Value)));
+
+                                                    break;
+                                                }
+                                            }
                                         }
+                                    }),
 
-                                        case (NotifyCollectionChangedAction.Remove):
-                                        {
-                                            resultList.RemoveRange(notification.OldItems.Where(x => filter(x.Value)).Select(x => x.Key));
-
-                                            break;
-                                        }
-
-                                        case (NotifyCollectionChangedAction.Replace):
-                                        {
-                                            resultList.RemoveRange(notification.OldItems.Where(x => filter(x.Value)).Select(x => x.Key));
-                                            resultList.AddRange(notification.NewItems.Where(x => filter(x.Value)));
-
-                                            break;
-                                        }
-
-                                        default:
-                                        {
-                                            resultList.Clear();
-                                            resultList.AddRange(notification.Current.Where(x => filter(x.Value)));
-
-                                            break;
-                                        }
-                                    }
-                                }
-                            });
+                                _ => resultList.ReactiveCollection.Changes);
                     })
-                    .SelectMany(x => x.ReactiveCollection.Changes)
                     .Replay(1)
                     .RefCount()
                     .Normalize<DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>>();
