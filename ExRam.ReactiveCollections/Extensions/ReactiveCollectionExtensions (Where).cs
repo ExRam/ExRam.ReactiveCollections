@@ -30,72 +30,73 @@ namespace ExRam.ReactiveCollections
                 this._equalityComparer = equalityComparer;
 
                 this._changes = Observable
-                    .Create<ListReactiveCollectionSource<T>>(observer =>
+                    .Defer(() =>
                     {
                         var syncRoot = new object();
                         var resultList = new ListReactiveCollectionSource<T>();
 
-                        observer.OnNext(resultList);
-
-                        return source.Subscribe(
-                            (notification) =>
-                            {
-                                lock (syncRoot)
-                                {
-                                    switch (notification.Action)
+                        return Observable
+                            .Using(
+                                () => source.Subscribe(
+                                    (notification) =>
                                     {
-                                        case (NotifyCollectionChangedAction.Add):
+                                        lock (syncRoot)
                                         {
-                                            resultList.AddRange(notification.NewItems.Where(x => filter(x)));
-
-                                            break;
-                                        }
-
-                                        case (NotifyCollectionChangedAction.Remove):
-                                        {
-                                            resultList.RemoveRange(notification.OldItems.Where(x => filter(x)), this._equalityComparer);
-
-                                            break;
-                                        }
-
-                                        case (NotifyCollectionChangedAction.Replace):
-                                        {
-                                            if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
+                                            switch (notification.Action)
                                             {
-                                                var wasIn = filter(notification.OldItems[0]);
-                                                var getsIn = filter(notification.NewItems[0]);
+                                                case (NotifyCollectionChangedAction.Add):
+                                                {
+                                                    resultList.AddRange(notification.NewItems.Where(x => filter(x)));
 
-                                                if ((wasIn) && (getsIn))
-                                                    resultList.Replace(notification.OldItems[0], notification.NewItems[0], this._equalityComparer);
-                                                else if (wasIn)
-                                                    resultList.Remove(notification.OldItems[0], this._equalityComparer);
-                                                else if (getsIn)
-                                                    resultList.Add(notification.NewItems[0]);
+                                                    break;
+                                                }
+
+                                                case (NotifyCollectionChangedAction.Remove):
+                                                {
+                                                    resultList.RemoveRange(notification.OldItems.Where(x => filter(x)), this._equalityComparer);
+
+                                                    break;
+                                                }
+
+                                                case (NotifyCollectionChangedAction.Replace):
+                                                {
+                                                    if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
+                                                    {
+                                                        var wasIn = filter(notification.OldItems[0]);
+                                                        var getsIn = filter(notification.NewItems[0]);
+
+                                                        if ((wasIn) && (getsIn))
+                                                            resultList.Replace(notification.OldItems[0], notification.NewItems[0], this._equalityComparer);
+                                                        else if (wasIn)
+                                                            resultList.Remove(notification.OldItems[0], this._equalityComparer);
+                                                        else if (getsIn)
+                                                            resultList.Add(notification.NewItems[0]);
+                                                    }
+                                                    else
+                                                    {
+                                                        resultList
+                                                            .RemoveRange(notification.OldItems.Where(x => filter(x)), this._equalityComparer);
+
+                                                        resultList
+                                                            .AddRange(notification.NewItems.Where(x => filter(x)));
+                                                    }
+
+                                                    break;
+                                                }
+
+                                                default:
+                                                {
+                                                    resultList.Clear();
+                                                    resultList.AddRange(notification.Current.Where(x => filter(x)));
+
+                                                    break;
+                                                }
                                             }
-                                            else
-                                            {
-                                                resultList
-                                                    .RemoveRange(notification.OldItems.Where(x => filter(x)), this._equalityComparer);
-
-                                                resultList
-                                                    .AddRange(notification.NewItems.Where(x => filter(x)));
-                                            }
-
-                                            break;
                                         }
+                                    }),
 
-                                        default:
-                                        {
-                                            resultList.Clear();
-                                            resultList.AddRange(notification.Current.Where(x => filter(x)));
-
-                                            break;
-                                        }
-                                    }
-                                }
-                            });
+                                _ => resultList.ReactiveCollection.Changes);
                     })
-                    .SelectMany(x => x.ReactiveCollection.Changes)
                     .Replay(1)
                     .RefCount()
                     .Normalize<ListChangedNotification<T>, T>();
