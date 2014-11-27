@@ -14,6 +14,17 @@ namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
+        public static IReactiveCollection<TNotification, TSource> SubscribeOn<TNotification, TSource>(this IReactiveCollection<TNotification, TSource> source, SynchronizationContext syncContext) where TNotification : ICollectionChangedNotification<TSource>
+        {
+            Contract.Requires(source != null);
+            Contract.Requires(syncContext != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<TNotification, TSource>>() != null);
+
+            return source.Changes
+                .SubscribeOn(syncContext)
+                .ToReactiveCollection<TNotification, TSource>();
+        }
+
         public static IReactiveCollection<TNotification, TSource> SubscribeOn<TNotification, TSource>(this IReactiveCollection<TNotification, TSource> source, IScheduler scheduler) where TNotification : ICollectionChangedNotification<TSource>
         {
             Contract.Requires(source != null);
