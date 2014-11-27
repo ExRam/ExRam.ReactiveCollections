@@ -112,6 +112,7 @@
   <ItemGroup>
     <Compile Include="Extensions\ObservableExtensions %28ToConnectableReactiveCollection%29.cs" />
     <Compile Include="Extensions\ObservableExtensions %28ToNotifyCollectionChangedEventPattern%29.cs" />
+    <Compile Include="Extensions\ReactiveCollectionExtensions %28SubscribeOn%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28ObserveOn%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28WithChanges%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28ToObservableCollection%29.cs" />
