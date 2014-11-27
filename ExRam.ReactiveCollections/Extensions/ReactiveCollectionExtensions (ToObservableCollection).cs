@@ -139,7 +139,7 @@ namespace ExRam.ReactiveCollections
                 throw new NotSupportedException();
             }
 
-            void ICollection<T>.Clear()
+            public void Clear()
             {
                 throw new NotSupportedException();
             }
@@ -154,7 +154,7 @@ namespace ExRam.ReactiveCollections
                 this._currentList.CopyTo(array, arrayIndex);
             }
 
-            int ICollection<T>.Count
+            public int Count
             {
                 get 
                 {
@@ -162,7 +162,7 @@ namespace ExRam.ReactiveCollections
                 }
             }
 
-            bool ICollection<T>.IsReadOnly
+            public bool IsReadOnly
             {
                 get 
                 {
@@ -219,21 +219,7 @@ namespace ExRam.ReactiveCollections
                     return this._currentList[index];
                 }
             }
-
-            int IReadOnlyCollection<T>.Count
-            {
-                get
-                {
-                    return this._currentList.Count;
-                }
-            }
-
             int IList.Add(object value)
-            {
-                throw new NotSupportedException();
-            }
-
-            void IList.Clear()
             {
                 throw new NotSupportedException();
             }
@@ -261,14 +247,6 @@ namespace ExRam.ReactiveCollections
                 }
             }
 
-            bool IList.IsReadOnly
-            {
-                get
-                {
-                    return true;
-                }
-            }
-
             void IList.Remove(object value)
             {
                 throw new NotSupportedException();
@@ -278,7 +256,6 @@ namespace ExRam.ReactiveCollections
             {
                 throw new NotSupportedException();
             }
-
             object IList.this[int index]
             {
                 get
@@ -290,18 +267,9 @@ namespace ExRam.ReactiveCollections
                     throw new NotSupportedException();
                 }
             }
-
             void ICollection.CopyTo(Array array, int index)
             {
                 ((ICollection)this._currentList).CopyTo(array, index);
-            }
-
-            int ICollection.Count
-            {
-                get
-                {
-                    return this._currentList.Count;
-                }
             }
 
             bool ICollection.IsSynchronized
