@@ -4,7 +4,6 @@
 // Full License description can be found in the LICENSE
 // file.
 
-using System;
 using System.Diagnostics.Contracts;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;

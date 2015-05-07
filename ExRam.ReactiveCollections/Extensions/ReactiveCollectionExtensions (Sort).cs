@@ -8,8 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
 
 namespace ExRam.ReactiveCollections
@@ -36,7 +34,7 @@ namespace ExRam.ReactiveCollections
 
                             return Observable.Using(
                                 () => source.Subscribe(
-                                    (notification) =>
+                                    notification =>
                                     {
                                         lock (syncRoot)
                                         {
@@ -141,7 +139,7 @@ namespace ExRam.ReactiveCollections
                             return Observable
                                 .Using(
                                     () => source.Subscribe(
-                                        (notification) =>
+                                        notification =>
                                         {
                                             lock (syncRoot)
                                             {

@@ -1118,7 +1118,7 @@ namespace ExRam.ReactiveCollections.Tests
             var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
 
             var eventsTask = Observable
-                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>((eh) => observableCollection.CollectionChanged += eh, (eh) => observableCollection.CollectionChanged -= eh)
+                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
                 .Take(3)
                 .Select(x => x.EventArgs)
                 .ToArray()
@@ -1146,7 +1146,7 @@ namespace ExRam.ReactiveCollections.Tests
             var observableCollection = list.ReactiveCollection.ToObservableCollection();
 
             using (Observable
-                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>((eh) => ((INotifyCollectionChanged)observableCollection).CollectionChanged += eh, (eh) => ((INotifyCollectionChanged)observableCollection).CollectionChanged -= eh)
+                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => ((INotifyCollectionChanged)observableCollection).CollectionChanged += eh, eh => ((INotifyCollectionChanged)observableCollection).CollectionChanged -= eh)
                 .Subscribe())
             {
                 list.AddRange(new[] { 1, 2, 3 });
@@ -1166,7 +1166,7 @@ namespace ExRam.ReactiveCollections.Tests
             var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
 
             var eventsTask = Observable
-                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>((eh) => observableCollection.CollectionChanged += eh, (eh) => observableCollection.CollectionChanged -= eh)
+                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
                 .Take(3)
                 .Select(x => x.EventArgs)
                 .ToArray()
@@ -1192,7 +1192,7 @@ namespace ExRam.ReactiveCollections.Tests
             var observableCollection = list.ReactiveCollection.ToObservableCollection();
 
             using (Observable
-                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>((eh) => ((INotifyCollectionChanged)observableCollection).CollectionChanged += eh, (eh) => ((INotifyCollectionChanged)observableCollection).CollectionChanged -= eh)
+                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => ((INotifyCollectionChanged)observableCollection).CollectionChanged += eh, eh => ((INotifyCollectionChanged)observableCollection).CollectionChanged -= eh)
                 .Subscribe())
             {
                 list.AddRange(new[] { 1, 2, 3, 4, 5, 6, 7 });
@@ -1211,7 +1211,7 @@ namespace ExRam.ReactiveCollections.Tests
             var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
 
             var eventsTask = Observable
-                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>((eh) => observableCollection.CollectionChanged += eh, (eh) => observableCollection.CollectionChanged -= eh)
+                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
                 .Take(3)
                 .Select(x => x.EventArgs)
                 .ToArray()
@@ -1242,7 +1242,7 @@ namespace ExRam.ReactiveCollections.Tests
             var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
 
             var eventTask = Observable
-                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>((eh) => observableCollection.CollectionChanged += eh, (eh) => observableCollection.CollectionChanged -= eh)
+                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
                 .Skip(1)
                 .Select(x => x.EventArgs)
                 .FirstAsync()
@@ -1267,7 +1267,7 @@ namespace ExRam.ReactiveCollections.Tests
             var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
 
             var eventsTask = Observable
-                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>((eh) => observableCollection.CollectionChanged += eh, (eh) => observableCollection.CollectionChanged -= eh)
+                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
                 .Select(x => x.EventArgs)
                 .FirstAsync()
                 .ToTask();

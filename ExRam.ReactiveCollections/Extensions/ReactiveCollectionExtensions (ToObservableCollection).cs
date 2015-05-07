@@ -78,7 +78,6 @@ namespace ExRam.ReactiveCollections
                             {
                                 return new EventArgs[]
                                 {
-
                                     new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, (IList)notification.OldItems, notification.Index.Value),
                                     new PropertyChangedEventArgs("Count"),
                                     new PropertyChangedEventArgs("Item[]")

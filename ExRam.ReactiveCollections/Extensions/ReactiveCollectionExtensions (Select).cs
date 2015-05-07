@@ -37,7 +37,7 @@ namespace ExRam.ReactiveCollections
 
                         return Observable.Using(
                             () => source.Subscribe(
-                                (notification) =>
+                                notification =>
                                 {
                                     lock (syncRoot)
                                     {
@@ -158,7 +158,7 @@ namespace ExRam.ReactiveCollections
                         return Observable
                             .Using(
                                 () => source
-                                    .Subscribe((notification) =>
+                                    .Subscribe(notification =>
                                     {
                                         lock (syncRoot)
                                         {
