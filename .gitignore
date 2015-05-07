@@ -1,1 +1,6 @@
 /ExRam.ReactiveCollections.v12.suo
+/ExRam.ReactiveCollections/obj
+/ExRam.ReactiveCollections/bin
+/ExRam.ReactiveCollections.Tests/obj
+/ExRam.ReactiveCollections.Tests/bin
+/packages
