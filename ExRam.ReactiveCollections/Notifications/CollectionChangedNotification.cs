@@ -71,6 +71,11 @@ namespace ExRam.ReactiveCollections
             }
         }
 
+        ICollectionChangedNotification ICollectionChangedNotification.ToResetNotification()
+        {
+            return this.ToResetNotification();
+        }
+
         IEnumerable ICollectionChangedNotification.Current
         {
             get { return this.Current; }

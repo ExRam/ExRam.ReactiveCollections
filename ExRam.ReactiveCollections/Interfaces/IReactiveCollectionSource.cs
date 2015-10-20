@@ -12,7 +12,7 @@ namespace ExRam.ReactiveCollections
     public interface IReactiveCollectionSource<out TNotification, T>
          where TNotification : ICollectionChangedNotification<T>
     {
-        IReactiveCollection<TNotification, T> ReactiveCollection
+        IReactiveCollection<TNotification> ReactiveCollection
         {
             get;
         }
@@ -22,13 +22,13 @@ namespace ExRam.ReactiveCollections
     public abstract class ReactiveCollectionSourceContracts<TNotification, T> : IReactiveCollectionSource<TNotification, T>
         where TNotification : ICollectionChangedNotification<T>
     {
-        IReactiveCollection<TNotification, T> IReactiveCollectionSource<TNotification, T>.ReactiveCollection
+        IReactiveCollection<TNotification> IReactiveCollectionSource<TNotification, T>.ReactiveCollection
         {
             get 
             {
-                Contract.Ensures(Contract.Result<IReactiveCollection<TNotification, T>>() != null);
+                Contract.Ensures(Contract.Result<IReactiveCollection<TNotification>>() != null);
 
-                return default(IReactiveCollection<TNotification, T>);
+                return default(IReactiveCollection<TNotification>);
             }
         }
     }

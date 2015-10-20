@@ -15,7 +15,7 @@ using System.Linq;
 namespace ExRam.ReactiveCollections
 {
     public class SortedSetReactiveCollectionSource<T> :
-        ReactiveCollectionSource<SortedSetChangedNotification<T>, T>,
+        ReactiveCollectionSource<SortedSetChangedNotification<T>>,
         IList<T>,
         IList,
         ISet<T>

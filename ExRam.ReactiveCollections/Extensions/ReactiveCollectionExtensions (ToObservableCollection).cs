@@ -289,7 +289,7 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
-        public static ICollection<T> ToObservableCollection<T>(this IReactiveCollection<ListChangedNotification<T>, T> source)
+        public static ICollection<T> ToObservableCollection<T>(this IReactiveCollection<ListChangedNotification<T>> source)
         {
             Contract.Requires(source != null);
             Contract.Ensures(Contract.Result<ICollection<T>>() != null);

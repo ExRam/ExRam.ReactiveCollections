@@ -15,7 +15,7 @@ using System.Linq;
 namespace ExRam.ReactiveCollections
 {
     public class ListReactiveCollectionSource<T> : 
-        ReactiveCollectionSource<ListChangedNotification<T>, T>,
+        ReactiveCollectionSource<ListChangedNotification<T>>,
         IList<T>,
         IList
     {

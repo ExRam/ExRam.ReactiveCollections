@@ -16,7 +16,7 @@ namespace ExRam.ReactiveCollections
     public static partial class ReactiveCollectionExtensions
     {
         #region WhereReactiveList
-        private sealed class WhereReactiveList<T> : IReactiveCollection<ListChangedNotification<T>, T>
+        private sealed class WhereReactiveList<T> : IReactiveCollection<ListChangedNotification<T>>
         {
             private readonly IEqualityComparer<T> _equalityComparer;
             private readonly IObservable<ListChangedNotification<T>> _changes;
@@ -99,7 +99,7 @@ namespace ExRam.ReactiveCollections
                     })
                     .Replay(1)
                     .RefCount()
-                    .Normalize<ListChangedNotification<T>, T>();
+                    .Normalize();
             }
 
             public IObservable<ListChangedNotification<T>> Changes
@@ -113,7 +113,7 @@ namespace ExRam.ReactiveCollections
         #endregion
 
         #region WhereReactiveDictionary
-        private sealed class WhereReactiveDictionary<TKey, TValue> : IReactiveCollection<DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>>
+        private sealed class WhereReactiveDictionary<TKey, TValue> : IReactiveCollection<DictionaryChangedNotification<TKey, TValue>>
         {
             private readonly IObservable<DictionaryChangedNotification<TKey, TValue>> _changes;
 
@@ -171,7 +171,7 @@ namespace ExRam.ReactiveCollections
                     })
                     .Replay(1)
                     .RefCount()
-                    .Normalize<DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>>();
+                    .Normalize();
             }
 
             public IObservable<DictionaryChangedNotification<TKey, TValue>> Changes
@@ -184,30 +184,30 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
-        public static IReactiveCollection<ListChangedNotification<TSource>, TSource> Where<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>, TSource> source, Predicate<TSource> filter)
+        public static IReactiveCollection<ListChangedNotification<TSource>> Where<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter)
         {
             Contract.Requires(source != null);
             Contract.Requires(filter != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>, TSource>>() != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
 
             return source.Where(filter, EqualityComparer<TSource>.Default);
         }
 
-        public static IReactiveCollection<ListChangedNotification<TSource>, TSource> Where<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>, TSource> source, Predicate<TSource> filter, IEqualityComparer<TSource> equalityComparer)
+        public static IReactiveCollection<ListChangedNotification<TSource>> Where<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, IEqualityComparer<TSource> equalityComparer)
         {
             Contract.Requires(source != null);
             Contract.Requires(filter != null);
             Contract.Requires(equalityComparer != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>, TSource>>() != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
 
             return new WhereReactiveList<TSource>(source.Changes, filter, equalityComparer);
         }
 
-        public static IReactiveCollection<DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>> Where<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>> source, Predicate<TValue> filter)
+        public static IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> Where<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> source, Predicate<TValue> filter)
         {
             Contract.Requires(source != null);
             Contract.Requires(filter != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>>>() != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<DictionaryChangedNotification<TKey, TValue>>>() != null);
 
             return new WhereReactiveDictionary<TKey, TValue>(source.Changes, filter);
         }

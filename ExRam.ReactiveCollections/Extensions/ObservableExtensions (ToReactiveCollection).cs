@@ -12,8 +12,8 @@ namespace System.Reactive.Linq
     public static partial class ObservableExtensions
     {
         #region ToReactiveCollectionImpl
-        private sealed class ToReactiveCollectionImpl<TNotification, T> : IReactiveCollection<TNotification, T>
-            where TNotification : ICollectionChangedNotification<T>
+        private sealed class ToReactiveCollectionImpl<TNotification> : IReactiveCollection<TNotification>
+            where TNotification : ICollectionChangedNotification
         {
             private readonly IObservable<TNotification> _changes;
 
@@ -22,10 +22,10 @@ namespace System.Reactive.Linq
                 Contract.Requires(changes != null);
 
                 this._changes = changes
-                    .Normalize<TNotification, T>();
+                    .Normalize();
             }
 
-            IObservable<TNotification> IReactiveCollection<TNotification, T>.Changes
+            IObservable<TNotification> IReactiveCollection<TNotification>.Changes
             {
                 get
                 {
@@ -35,12 +35,12 @@ namespace System.Reactive.Linq
         }
         #endregion
 
-        public static IReactiveCollection<TNotification, T> ToReactiveCollection<TNotification, T>(this IObservable<TNotification> changesObservable)
-            where TNotification : ICollectionChangedNotification<T>
+        public static IReactiveCollection<TNotification> ToReactiveCollection<TNotification>(this IObservable<TNotification> changesObservable)
+            where TNotification : ICollectionChangedNotification
         {
             Contract.Requires(changesObservable != null);
 
-            return new ToReactiveCollectionImpl<TNotification, T>(changesObservable);
+            return new ToReactiveCollectionImpl<TNotification>(changesObservable);
         }
     }
 }

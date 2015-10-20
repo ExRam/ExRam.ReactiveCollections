@@ -25,8 +25,8 @@ namespace System.Reactive.Linq
         }
         #endregion
 
-        internal static IObservable<TNotification> Normalize<TNotification, T>(this IObservable<TNotification> observable)
-            where TNotification : ICollectionChangedNotification<T>
+        internal static IObservable<TNotification> Normalize<TNotification>(this IObservable<TNotification> observable)
+            where TNotification : ICollectionChangedNotification
         {
             Contract.Requires(observable != null);
             Contract.Ensures(Contract.Result<IObservable<TNotification>>() != null);

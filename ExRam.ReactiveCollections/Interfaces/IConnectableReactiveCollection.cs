@@ -10,7 +10,7 @@ using System.Diagnostics.Contracts;
 namespace ExRam.ReactiveCollections
 {
     [ContractClass(typeof(ConnectableReactiveCollectionContracts<,>))]
-    public interface IConnectableReactiveCollection<out TNotification, T> : IReactiveCollection<TNotification, T>
+    public interface IConnectableReactiveCollection<out TNotification, T> : IReactiveCollection<TNotification>
         where TNotification : ICollectionChangedNotification<T>
     {
         IDisposable Connect();

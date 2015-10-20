@@ -25,12 +25,12 @@ namespace System.Reactive.Linq
                 Contract.Requires(connectFunction != null);
 
                 this._changes = changes
-                    .Normalize<TNotification, T>();
+                    .Normalize();
 
                 this._connectFunction = connectFunction;
             }
 
-            IObservable<TNotification> IReactiveCollection<TNotification, T>.Changes
+            IObservable<TNotification> IReactiveCollection<TNotification>.Changes
             {
                 get
                 {

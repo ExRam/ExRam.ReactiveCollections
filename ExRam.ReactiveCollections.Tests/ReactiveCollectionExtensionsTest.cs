@@ -272,7 +272,7 @@ namespace ExRam.ReactiveCollections.Tests
                     new ListChangedNotification<int>(ImmutableList.Create(3, 4), NotifyCollectionChangedAction.Replace, ImmutableList.Create(1, 2), ImmutableList.Create(3, 4), 0)
                 }
                 .ToObservable()
-                .ToReactiveCollection<ListChangedNotification<int>, int>();
+                .ToReactiveCollection();
 
             var projectedList = observable.Select(x => x.ToString(CultureInfo.InvariantCulture));
 
@@ -311,7 +311,7 @@ namespace ExRam.ReactiveCollections.Tests
                     new SortedSetChangedNotification<int>(ImmutableSortedSet.Create(3, 4), NotifyCollectionChangedAction.Replace, ImmutableList.Create(1, 2), ImmutableList.Create(3, 4))
                 }
                 .ToObservable()
-                .ToReactiveCollection<SortedSetChangedNotification<int>, int>();
+                .ToReactiveCollection();
 
             var projectedList = observable.Select(x => x.ToString(CultureInfo.InvariantCulture));
 
@@ -767,7 +767,7 @@ namespace ExRam.ReactiveCollections.Tests
                     new ListChangedNotification<int>(ImmutableList.Create(3, 4), NotifyCollectionChangedAction.Replace, ImmutableList.Create(1, 2), ImmutableList.Create(3, 4), 0)
                 }
             .ToObservable()
-            .ToReactiveCollection<ListChangedNotification<int>, int>();
+            .ToReactiveCollection();
 
             var projectedList = observable.Where(x => x % 2 == 0);
 
@@ -1039,7 +1039,7 @@ namespace ExRam.ReactiveCollections.Tests
                     new ListChangedNotification<int>(ImmutableList.Create(3, 4), NotifyCollectionChangedAction.Replace, ImmutableList.Create(1, 2), ImmutableList.Create(3, 4), 0)
                 }
                 .ToObservable()
-                .ToReactiveCollection<ListChangedNotification<int>, int>();
+                .ToReactiveCollection();
 
             var projectedList = observable.Sort();
 

@@ -15,7 +15,7 @@ namespace ExRam.ReactiveCollections
     public static partial class ReactiveCollectionExtensions
     {
         #region SortReactiveSortedList
-        private sealed class SortedReactiveCollection<TSource> : IReactiveCollection<ListChangedNotification<TSource>, TSource>
+        private sealed class SortedReactiveCollection<TSource> : IReactiveCollection<ListChangedNotification<TSource>>
         {
             private readonly IObservable<ListChangedNotification<TSource>> _changes;
 
@@ -89,7 +89,7 @@ namespace ExRam.ReactiveCollections
                         })
                     .Replay(1)
                     .RefCount()
-                    .Normalize<ListChangedNotification<TSource>, TSource>();
+                    .Normalize();
             }
 
             public IObservable<ListChangedNotification<TSource>> Changes
@@ -103,7 +103,7 @@ namespace ExRam.ReactiveCollections
         #endregion
 
         #region SortedFromDictionaryReactiveSortedList
-        private sealed class SortedFromDictionaryReactiveSortedList<TKey, TValue> : IReactiveCollection<ListChangedNotification<TValue>, TValue>
+        private sealed class SortedFromDictionaryReactiveSortedList<TKey, TValue> : IReactiveCollection<ListChangedNotification<TValue>>
         {
             #region KeyValuePairEqualityComparer
             private sealed class KeyValuePairEqualityComparer : IEqualityComparer<KeyValuePair<TKey, TValue>>
@@ -187,7 +187,7 @@ namespace ExRam.ReactiveCollections
                         })
                     .Replay(1)
                     .RefCount()
-                    .Normalize<ListChangedNotification<TValue>, TValue>();
+                    .Normalize();
             }
 
             public IObservable<ListChangedNotification<TValue>> Changes
@@ -200,55 +200,55 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
-        public static IReactiveCollection<ListChangedNotification<TSource>, TSource> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>, TSource> source)
+        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source)
         {
             Contract.Requires(source != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>, TSource>>() != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
 
             return source.Sort(Comparer<TSource>.Default, EqualityComparer<TSource>.Default);
         }
 
-        public static IReactiveCollection<ListChangedNotification<TSource>, TSource> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>, TSource> source, IComparer<TSource> comparer)
+        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer)
         {
             Contract.Requires(source != null);
             Contract.Requires(comparer != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>, TSource>>() != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
 
             return source.Sort(comparer, EqualityComparer<TSource>.Default);
         }
 
-        public static IReactiveCollection<ListChangedNotification<TSource>, TSource> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>, TSource> source, IEqualityComparer<TSource> equalityComparer)
+        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IEqualityComparer<TSource> equalityComparer)
         {
             Contract.Requires(source != null);
             Contract.Requires(equalityComparer != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>, TSource>>() != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
 
             return source.Sort(Comparer<TSource>.Default, equalityComparer);
         }
 
-        public static IReactiveCollection<ListChangedNotification<TSource>, TSource> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>, TSource> source, IComparer<TSource> comparer, IEqualityComparer<TSource> equalityComparer)
+        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer, IEqualityComparer<TSource> equalityComparer)
         {
             Contract.Requires(source != null);
             Contract.Requires(comparer != null);
             Contract.Requires(equalityComparer != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>, TSource>>() != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
 
             return new SortedReactiveCollection<TSource>(source.Changes, comparer, equalityComparer);
         }
 
-        public static IReactiveCollection<ListChangedNotification<TValue>, TValue> Sort<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>> source)
+        public static IReactiveCollection<ListChangedNotification<TValue>> Sort<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> source)
         {
             Contract.Requires(source != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TValue>, TValue>>() != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TValue>>>() != null);
 
             return source.Sort(Comparer<TValue>.Default);
         }
 
-        public static IReactiveCollection<ListChangedNotification<TValue>, TValue> Sort<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>> source, IComparer<TValue> comparer)
+        public static IReactiveCollection<ListChangedNotification<TValue>> Sort<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> source, IComparer<TValue> comparer)
         {
             Contract.Requires(source != null);
             Contract.Requires(comparer != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TValue>, TValue>>() != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TValue>>>() != null);
 
             return new SortedFromDictionaryReactiveSortedList<TKey, TValue>(source.Changes, comparer);
         }

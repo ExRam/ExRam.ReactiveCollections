@@ -13,26 +13,26 @@ namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        public static IReactiveCollection<TNotification, TSource> ObserveOn<TNotification, TSource>(this IReactiveCollection<TNotification, TSource> source, SynchronizationContext syncContext) where TNotification : ICollectionChangedNotification<TSource>
+        public static IReactiveCollection<TNotification> ObserveOn<TNotification, TSource>(this IReactiveCollection<TNotification> source, SynchronizationContext syncContext) where TNotification : ICollectionChangedNotification<TSource>
         {
             Contract.Requires(source != null);
             Contract.Requires(syncContext != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<TNotification, TSource>>() != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<TNotification>>() != null);
 
             return source.Changes
                 .ObserveOn(syncContext)
-                .ToReactiveCollection<TNotification, TSource>();
+                .ToReactiveCollection();
         }
 
-        public static IReactiveCollection<TNotification, TSource> ObserveOn<TNotification, TSource>(this IReactiveCollection<TNotification, TSource> source, IScheduler scheduler) where TNotification : ICollectionChangedNotification<TSource>
+        public static IReactiveCollection<TNotification> ObserveOn<TNotification, TSource>(this IReactiveCollection<TNotification> source, IScheduler scheduler) where TNotification : ICollectionChangedNotification<TSource>
         {
             Contract.Requires(source != null);
             Contract.Requires(scheduler != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<TNotification, TSource>>() != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<TNotification>>() != null);
 
             return source.Changes
                 .ObserveOn(scheduler)
-                .ToReactiveCollection<TNotification, TSource>();
+                .ToReactiveCollection();
         }
     }
 }

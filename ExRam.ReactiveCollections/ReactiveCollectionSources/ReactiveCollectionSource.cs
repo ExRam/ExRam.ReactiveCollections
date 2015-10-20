@@ -11,11 +11,11 @@ using System.Reactive.Subjects;
 
 namespace ExRam.ReactiveCollections
 {
-    public abstract class ReactiveCollectionSource<TNotification, T>
-        where TNotification : ICollectionChangedNotification<T>
+    public abstract class ReactiveCollectionSource<TNotification>
+        where TNotification : ICollectionChangedNotification
     {
         #region ReactiveCollectionImpl
-        private sealed class ReactiveCollectionImpl : IReactiveCollection<TNotification, T>
+        private sealed class ReactiveCollectionImpl : IReactiveCollection<TNotification>
         {
             private readonly IObservable<TNotification> _changes;
 
@@ -24,10 +24,10 @@ namespace ExRam.ReactiveCollections
                 Contract.Requires(subject != null);
 
                 this._changes = subject
-                    .Normalize<TNotification, T>();
+                    .Normalize();
             }
 
-            IObservable<TNotification> IReactiveCollection<TNotification, T>.Changes
+            IObservable<TNotification> IReactiveCollection<TNotification>.Changes
             {
                 get
                 {
@@ -38,7 +38,7 @@ namespace ExRam.ReactiveCollections
         #endregion
 
         private readonly BehaviorSubject<TNotification> _subject;
-        private readonly IReactiveCollection<TNotification, T> _reactiveCollection;
+        private readonly IReactiveCollection<TNotification> _reactiveCollection;
 
         protected ReactiveCollectionSource(TNotification initialNotification)
         {
@@ -50,11 +50,11 @@ namespace ExRam.ReactiveCollections
             this._reactiveCollection = new ReactiveCollectionImpl(this._subject);
         }
 
-        public IReactiveCollection<TNotification, T> ReactiveCollection
+        public IReactiveCollection<TNotification> ReactiveCollection
         {
             get
             {
-                Contract.Ensures(Contract.Result<IReactiveCollection<TNotification, T>>() != null);
+                Contract.Ensures(Contract.Result<IReactiveCollection<TNotification>>() != null);
 
                 return this._reactiveCollection;
             }

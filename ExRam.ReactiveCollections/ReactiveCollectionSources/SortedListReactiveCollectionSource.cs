@@ -336,7 +336,7 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        public IReactiveCollection<ListChangedNotification<T>, T> ReactiveCollection
+        public IReactiveCollection<ListChangedNotification<T>> ReactiveCollection
         {
             get
             {

@@ -16,7 +16,7 @@ namespace ExRam.ReactiveCollections
     public static partial class ReactiveCollectionExtensions
     {
         #region SelectListReactiveCollection
-        private sealed class SelectListReactiveCollection<TSource, TResult> : IReactiveCollection<ListChangedNotification<TResult>, TResult>
+        private sealed class SelectListReactiveCollection<TSource, TResult> : IReactiveCollection<ListChangedNotification<TResult>>
         {
             private readonly IObservable<ListChangedNotification<TResult>> _changes;
 
@@ -124,7 +124,7 @@ namespace ExRam.ReactiveCollections
                     })
                     .Replay(1)
                     .RefCount()
-                    .Normalize<ListChangedNotification<TResult>, TResult>();
+                    .Normalize();
             }
 
             public IObservable<ListChangedNotification<TResult>> Changes
@@ -138,7 +138,7 @@ namespace ExRam.ReactiveCollections
         #endregion
 
         #region SelectListReactiveDictionarySource
-        private sealed class SelectReactiveDictionarySource<TKey, TSource, TResult> : IReactiveCollection<DictionaryChangedNotification<TKey, TResult>, KeyValuePair<TKey, TResult>>
+        private sealed class SelectReactiveDictionarySource<TKey, TSource, TResult> : IReactiveCollection<DictionaryChangedNotification<TKey, TResult>>
         {
             private readonly IObservable<DictionaryChangedNotification<TKey, TResult>> _changes;
 
@@ -199,7 +199,7 @@ namespace ExRam.ReactiveCollections
                     })
                     .Replay(1)
                     .RefCount()
-                    .Normalize<DictionaryChangedNotification<TKey, TResult>, KeyValuePair<TKey, TResult>>();
+                    .Normalize();
             }
 
             public IObservable<DictionaryChangedNotification<TKey, TResult>> Changes
@@ -212,30 +212,30 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
-        public static IReactiveCollection<ListChangedNotification<TResult>, TResult> Select<TSource, TResult>(this IReactiveCollection<ICollectionChangedNotification<TSource>, TSource> source, Func<TSource, TResult> selector)
+        public static IReactiveCollection<ListChangedNotification<TResult>> Select<TSource, TResult>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Func<TSource, TResult> selector)
         {
             Contract.Requires(source != null);
             Contract.Requires(selector != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TResult>, TResult>>() != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TResult>>>() != null);
 
             return source.Select(selector, EqualityComparer<TResult>.Default);
         }
 
-        public static IReactiveCollection<ListChangedNotification<TResult>, TResult> Select<TSource, TResult>(this IReactiveCollection<ICollectionChangedNotification<TSource>, TSource> source, Func<TSource, TResult> selector, IEqualityComparer<TResult> equalityComparer)
+        public static IReactiveCollection<ListChangedNotification<TResult>> Select<TSource, TResult>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Func<TSource, TResult> selector, IEqualityComparer<TResult> equalityComparer)
         {
             Contract.Requires(source != null);
             Contract.Requires(selector != null);
             Contract.Requires(equalityComparer != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TResult>, TResult>>() != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TResult>>>() != null);
 
             return new SelectListReactiveCollection<TSource, TResult>(source.Changes, selector, equalityComparer);
         }
 
-        public static IReactiveCollection<DictionaryChangedNotification<TKey, TResult>, KeyValuePair<TKey, TResult>> Select<TKey, TSource, TResult>(this IReactiveCollection<DictionaryChangedNotification<TKey, TSource>, KeyValuePair<TKey, TSource>> source, Func<TSource, TResult> selector)
+        public static IReactiveCollection<DictionaryChangedNotification<TKey, TResult>> Select<TKey, TSource, TResult>(this IReactiveCollection<DictionaryChangedNotification<TKey, TSource>> source, Func<TSource, TResult> selector)
         {
             Contract.Requires(source != null);
             Contract.Requires(selector != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<DictionaryChangedNotification<TKey, TResult>, KeyValuePair<TKey, TResult>>>() != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<DictionaryChangedNotification<TKey, TResult>>>() != null);
 
             return new SelectReactiveDictionarySource<TKey, TSource, TResult>(source.Changes, selector);
         }

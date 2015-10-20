@@ -5,7 +5,6 @@
 // file.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Reactive.Linq;
 
@@ -13,7 +12,7 @@ namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        public static IObservable<TValue> GetValueObservable<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>> reactiveCollection, TKey key)
+        public static IObservable<TValue> GetValueObservable<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> reactiveCollection, TKey key)
         {
             Contract.Requires(reactiveCollection != null);
             Contract.Ensures(Contract.Result<IObservable<TValue>>() != null);

@@ -13,19 +13,19 @@ namespace ExRam.ReactiveCollections
     public static partial class ReactiveCollectionExtensions
     {
         #region AsReactiveCollectionImpl
-        private sealed class AsReactiveCollectionImpl<TNotification, T> : IReactiveCollection<TNotification, T>
+        private sealed class AsReactiveCollectionImpl<TNotification, T> : IReactiveCollection<TNotification>
             where TNotification : ICollectionChangedNotification<T>
         {
-            private readonly IReactiveCollection<TNotification, T> _reactiveCollection;
+            private readonly IReactiveCollection<TNotification> _reactiveCollection;
 
-            public AsReactiveCollectionImpl(IReactiveCollection<TNotification, T> reactiveCollection)
+            public AsReactiveCollectionImpl(IReactiveCollection<TNotification> reactiveCollection)
             {
                 Contract.Requires(reactiveCollection != null);
 
                 this._reactiveCollection = reactiveCollection;
             }
 
-            IObservable<TNotification> IReactiveCollection<TNotification, T>.Changes
+            IObservable<TNotification> IReactiveCollection<TNotification>.Changes
             {
                 get
                 {
@@ -35,11 +35,11 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
-        public static IReactiveCollection<TNotification, T> AsReactiveCollection<TNotification, T>(this IReactiveCollection<TNotification, T> reactiveCollection)
+        public static IReactiveCollection<TNotification> AsReactiveCollection<TNotification, T>(this IReactiveCollection<TNotification> reactiveCollection)
             where TNotification : ICollectionChangedNotification<T>
         {
             Contract.Requires(reactiveCollection != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<TNotification, T>>() != null);
+            Contract.Ensures(Contract.Result<IReactiveCollection<TNotification>>() != null);
 
             return new AsReactiveCollectionImpl<TNotification, T>(reactiveCollection);
         }

@@ -15,7 +15,7 @@ using System.Linq;
 namespace ExRam.ReactiveCollections
 {
     public class DictionaryReactiveCollectionSource<TKey, TValue> :
-        ReactiveCollectionSource<DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>>,
+        ReactiveCollectionSource<DictionaryChangedNotification<TKey, TValue>>,
         IDictionary<TKey, TValue>, 
         IDictionary
     {
