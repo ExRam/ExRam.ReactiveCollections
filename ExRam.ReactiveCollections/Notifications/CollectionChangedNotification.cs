@@ -4,6 +4,7 @@
 // Full License description can be found in the LICENSE
 // file.
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.Contracts;
@@ -68,6 +69,21 @@ namespace ExRam.ReactiveCollections
 
                 return this._current;
             }
+        }
+
+        IEnumerable ICollectionChangedNotification.Current
+        {
+            get { return this.Current; }
+        }
+
+        IEnumerable ICollectionChangedNotification.NewItems
+        {
+            get { return this.NewItems; }
+        }
+
+        IEnumerable ICollectionChangedNotification.OldItems
+        {
+            get { return this.OldItems; }
         }
     }
 }

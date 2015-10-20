@@ -4,23 +4,23 @@
 // Full License description can be found in the LICENSE
 // file.
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.Contracts;
 
 namespace ExRam.ReactiveCollections
 {
-    [ContractClass(typeof(CollectionChangedNotificationContracts<>))]
-    public interface ICollectionChangedNotification<out T> 
+    public interface ICollectionChangedNotification
     {
-        ICollectionChangedNotification<T> ToResetNotification();
+        ICollectionChangedNotification ToResetNotification();
 
-        IReadOnlyList<T> OldItems
+        IEnumerable OldItems
         {
             get;
         }
 
-        IReadOnlyList<T> NewItems
+        IEnumerable NewItems
         {
             get;
         }
@@ -30,7 +30,28 @@ namespace ExRam.ReactiveCollections
             get;
         }
 
-        IReadOnlyCollection<T> Current
+        IEnumerable Current
+        {
+            get;
+        }
+    }
+
+    [ContractClass(typeof(CollectionChangedNotificationContracts<>))]
+    public interface ICollectionChangedNotification<out T> : ICollectionChangedNotification
+    {
+        new ICollectionChangedNotification<T> ToResetNotification();
+
+        new IReadOnlyList<T> OldItems
+        {
+            get;
+        }
+
+        new IReadOnlyList<T> NewItems
+        {
+            get;
+        }
+
+        new IReadOnlyCollection<T> Current
         {
             get;
         }
@@ -78,6 +99,43 @@ namespace ExRam.ReactiveCollections
                 Contract.Ensures(Contract.Result<IReadOnlyCollection<T>>() != null);
 
                 return default(IReadOnlyCollection<T>);
+            }
+        }
+
+        ICollectionChangedNotification ICollectionChangedNotification.ToResetNotification()
+        {
+            Contract.Ensures(Contract.Result<ICollectionChangedNotification>() != null);
+
+            return default(ICollectionChangedNotification);
+        }
+
+        IEnumerable ICollectionChangedNotification.NewItems
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IEnumerable>() != null);
+
+                return default(IEnumerable);
+            }
+        }
+
+        IEnumerable ICollectionChangedNotification.OldItems
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IEnumerable>() != null);
+
+                return default(IEnumerable);
+            }
+        }
+
+        IEnumerable ICollectionChangedNotification.Current
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IEnumerable>() != null);
+
+                return default(IEnumerable);
             }
         }
     }
