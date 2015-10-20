@@ -11,8 +11,7 @@ using System.Diagnostics.Contracts;
 
 namespace ExRam.ReactiveCollections
 {
-    public sealed class DictionaryChangedNotification<TKey, TValue> : CollectionChangedNotification<ImmutableDictionary<TKey, TValue>, KeyValuePair<TKey, TValue>>,
-        ICollectionChangedNotification<KeyValuePair<TKey, TValue>>
+    public sealed class DictionaryChangedNotification<TKey, TValue> : CollectionChangedNotification<KeyValuePair<TKey, TValue>>
     {
         public DictionaryChangedNotification(ImmutableDictionary<TKey, TValue> current, NotifyCollectionChangedAction action, ImmutableList<KeyValuePair<TKey, TValue>> oldItems, ImmutableList<KeyValuePair<TKey, TValue>> newItems) : base(current, action, oldItems, newItems)
         {
@@ -26,11 +25,11 @@ namespace ExRam.ReactiveCollections
             return new DictionaryChangedNotification<TKey, TValue>(this.Current, NotifyCollectionChangedAction.Reset, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList<KeyValuePair<TKey, TValue>>.Empty);
         }
 
-        IReadOnlyCollection<KeyValuePair<TKey, TValue>> ICollectionChangedNotification<KeyValuePair<TKey, TValue>>.Current
+        public new ImmutableDictionary<TKey, TValue> Current
         {
-            get 
+            get
             {
-                return this.Current;
+                return (ImmutableDictionary<TKey, TValue>)base.Current;
             }
         }
     }

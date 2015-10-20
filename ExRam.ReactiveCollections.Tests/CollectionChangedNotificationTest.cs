@@ -8,7 +8,7 @@ namespace ExRam.ReactiveCollections.Tests
     public class CollectionChangedNotificationTest
     {
         #region NotificationImpl
-        private sealed class NotificationImpl : CollectionChangedNotification<ImmutableList<int>, int>
+        private sealed class NotificationImpl : CollectionChangedNotification<int>
         {
             public NotificationImpl(ImmutableList<int> current, NotifyCollectionChangedAction action, ImmutableList<int> oldItems, ImmutableList<int> newItems) : base(current, action, oldItems, newItems)
             {
@@ -16,7 +16,7 @@ namespace ExRam.ReactiveCollections.Tests
 
             public override ICollectionChangedNotification<int> ToResetNotification()
             {
-                return new NotificationImpl(this.Current, NotifyCollectionChangedAction.Reset, ImmutableList<int>.Empty, ImmutableList<int>.Empty);
+                return new NotificationImpl((ImmutableList<int>)this.Current, NotifyCollectionChangedAction.Reset, ImmutableList<int>.Empty, ImmutableList<int>.Empty);
             }
         }
         #endregion
@@ -27,7 +27,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = ImmutableList.Create(1, 2, 3);
             var notification = new NotificationImpl(list, NotifyCollectionChangedAction.Reset, ImmutableList<int>.Empty, ImmutableList<int>.Empty);
 
-            Assert.AreEqual(list, ((ICollectionChangedNotification<int>)notification).Current);
+            Assert.AreEqual(list, notification.Current);
         }
     }
 }

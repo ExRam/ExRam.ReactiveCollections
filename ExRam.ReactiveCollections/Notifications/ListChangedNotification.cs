@@ -11,8 +11,7 @@ using System.Diagnostics.Contracts;
 
 namespace ExRam.ReactiveCollections
 {
-    public sealed class ListChangedNotification<T> : CollectionChangedNotification<ImmutableList<T>, T>,
-        ICollectionChangedNotification<T>
+    public sealed class ListChangedNotification<T> : CollectionChangedNotification<T>
     {
         private readonly int? _index;
 
@@ -38,11 +37,11 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        IReadOnlyCollection<T> ICollectionChangedNotification<T>.Current
+        public new ImmutableList<T> Current
         {
             get 
             {
-                return this.Current;
+                return (ImmutableList<T>)base.Current;
             }
         }
     }

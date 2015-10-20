@@ -11,8 +11,7 @@ using System.Diagnostics.Contracts;
 
 namespace ExRam.ReactiveCollections
 {
-    public sealed class SortedSetChangedNotification<T> : CollectionChangedNotification<ImmutableSortedSet<T>, T>,
-        ICollectionChangedNotification<T>
+    public sealed class SortedSetChangedNotification<T> : CollectionChangedNotification<T>
     {
         public SortedSetChangedNotification(ImmutableSortedSet<T> current, NotifyCollectionChangedAction action, IReadOnlyList<T> oldItems, IReadOnlyList<T> newItems) : base(current, action, oldItems, newItems)
         {
@@ -26,11 +25,11 @@ namespace ExRam.ReactiveCollections
             return new SortedSetChangedNotification<T>(this.Current, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty);
         }
 
-        IReadOnlyCollection<T> ICollectionChangedNotification<T>.Current
+        public ImmutableSortedSet<T> Current
         {
             get
             {
-                return this.Current;
+                return (ImmutableSortedSet<T>)base.Current;
             }
         }
     }

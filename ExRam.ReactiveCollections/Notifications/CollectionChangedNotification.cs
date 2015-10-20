@@ -10,15 +10,14 @@ using System.Diagnostics.Contracts;
 
 namespace ExRam.ReactiveCollections
 {
-    public abstract class CollectionChangedNotification<TCollection, T> : ICollectionChangedNotification<T>
-        where TCollection : IReadOnlyCollection<T>
+    public abstract class CollectionChangedNotification<T> : ICollectionChangedNotification<T>
     {
-        private readonly TCollection _current;
         private readonly IReadOnlyList<T> _oldItems;
         private readonly IReadOnlyList<T> _newItems;
+        private readonly IReadOnlyCollection<T> _current;
         private readonly NotifyCollectionChangedAction _action;
 
-        protected CollectionChangedNotification(TCollection current, NotifyCollectionChangedAction action, IReadOnlyList<T> oldItems, IReadOnlyList<T> newItems)
+        protected CollectionChangedNotification(IReadOnlyCollection<T> current, NotifyCollectionChangedAction action, IReadOnlyList<T> oldItems, IReadOnlyList<T> newItems)
         {
             // ReSharper disable RedundantCast
             Contract.Requires(((object)current) != null);
@@ -50,19 +49,6 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        public TCollection Current
-        {
-            get 
-            {
-                // ReSharper disable RedundantCast
-                Contract.Ensures(((object)Contract.Result<TCollection>()) != null);
-                Contract.Assume(((object)this._current) != null);
-                // ReSharper restore RedundantCast
-                
-                return this._current;
-            }
-        }
-
         public NotifyCollectionChangedAction Action
         {
             get 
@@ -71,11 +57,16 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        IReadOnlyCollection<T> ICollectionChangedNotification<T>.Current
+        public IReadOnlyCollection<T> Current
         {
             get 
             {
-                return this.Current;
+                // ReSharper disable RedundantCast
+                Contract.Ensures(((object)Contract.Result<IReadOnlyCollection<T>>()) != null);
+                Contract.Assume(((object)this._current) != null);
+                // ReSharper restore RedundantCast
+
+                return this._current;
             }
         }
     }
