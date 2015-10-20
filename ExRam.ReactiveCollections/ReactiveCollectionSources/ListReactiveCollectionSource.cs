@@ -45,7 +45,8 @@ namespace ExRam.ReactiveCollections
 
         public void Clear()
         {
-            this.Subject.OnNext(new ListChangedNotification<T>(ImmutableList<T>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+            if (!this.Current.IsEmpty)
+                this.Subject.OnNext(new ListChangedNotification<T>(ImmutableList<T>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
         public bool Contains(T item)

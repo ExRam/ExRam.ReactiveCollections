@@ -44,14 +44,19 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(pairs != null);
 
             var immutablePairs = ImmutableList<KeyValuePair<TKey, TValue>>.Empty.AddRange(pairs);
-            var newList = this.Current.AddRange(immutablePairs);
 
-            this.Subject.OnNext(new DictionaryChangedNotification<TKey, TValue>(newList, NotifyCollectionChangedAction.Add, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, immutablePairs));
+            if (immutablePairs.Count != 0)
+            {
+                var newList = this.Current.AddRange(immutablePairs);
+
+                this.Subject.OnNext(new DictionaryChangedNotification<TKey, TValue>(newList, NotifyCollectionChangedAction.Add, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, immutablePairs));
+            }
         }
 
         public void Clear()
         {
-            this.Subject.OnNext(new DictionaryChangedNotification<TKey, TValue>(ImmutableDictionary<TKey, TValue>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList<KeyValuePair<TKey, TValue>>.Empty));
+            if (!this.Current.IsEmpty)
+                this.Subject.OnNext(new DictionaryChangedNotification<TKey, TValue>(ImmutableDictionary<TKey, TValue>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList<KeyValuePair<TKey, TValue>>.Empty));
         }
 
         public bool Contains(KeyValuePair<TKey, TValue> pair)

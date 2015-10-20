@@ -33,8 +33,7 @@ namespace System.Reactive.Linq
 
             return observable
                 .Scan(new StateHolder<TNotification>(true, default(TNotification)), (state, notification) => new StateHolder<TNotification>(false, ((state.First) ? ((TNotification)notification.ToResetNotification()) : (notification))))
-                .Select(x => x.Notification)
-                .DistinctUntilChanged(x => x.Current);
+                .Select(x => x.Notification);
         }
     }
 }
