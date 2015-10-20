@@ -9,16 +9,16 @@ using System.Diagnostics.Contracts;
 
 namespace ExRam.ReactiveCollections
 {
-    [ContractClass(typeof(ConnectableReactiveCollectionContracts<,>))]
-    public interface IConnectableReactiveCollection<out TNotification, T> : IReactiveCollection<TNotification>
-        where TNotification : ICollectionChangedNotification<T>
+    [ContractClass(typeof(ConnectableReactiveCollectionContracts<>))]
+    public interface IConnectableReactiveCollection<out TNotification> : IReactiveCollection<TNotification>
+        where TNotification : ICollectionChangedNotification
     {
         IDisposable Connect();
     }
 
-    [ContractClassFor(typeof(IConnectableReactiveCollection<,>))]
-    public abstract class ConnectableReactiveCollectionContracts<TNotification, T> : IConnectableReactiveCollection<TNotification, T>
-         where TNotification : ICollectionChangedNotification<T>
+    [ContractClassFor(typeof(IConnectableReactiveCollection<>))]
+    public abstract class ConnectableReactiveCollectionContracts<TNotification> : IConnectableReactiveCollection<TNotification>
+         where TNotification : ICollectionChangedNotification
     {
         public abstract IObservable<TNotification> Changes
         {
