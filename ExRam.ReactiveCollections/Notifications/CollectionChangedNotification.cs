@@ -43,7 +43,6 @@ namespace ExRam.ReactiveCollections
             {
                 // ReSharper disable RedundantCast
                 Contract.Ensures(((object)Contract.Result<IReadOnlyCollection<T>>()) != null);
-                Contract.Assume(((object)this._current) != null);
                 // ReSharper restore RedundantCast
 
                 return this._current;

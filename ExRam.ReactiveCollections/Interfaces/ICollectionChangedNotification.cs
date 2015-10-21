@@ -11,6 +11,7 @@ using System.Diagnostics.Contracts;
 
 namespace ExRam.ReactiveCollections
 {
+    [ContractClass(typeof(CollectionChangedNotificationContracts))]
     public interface ICollectionChangedNotification
     {
         ICollectionChangedNotification ToResetNotification();
@@ -57,6 +58,55 @@ namespace ExRam.ReactiveCollections
         }
     }
 
+    [ContractClassFor(typeof(ICollectionChangedNotification))]
+    public abstract class CollectionChangedNotificationContracts : ICollectionChangedNotification
+    {
+        ICollectionChangedNotification ICollectionChangedNotification.ToResetNotification()
+        {
+            Contract.Ensures(Contract.Result<ICollectionChangedNotification>() != null);
+
+            return default(ICollectionChangedNotification);
+        }
+
+        IEnumerable ICollectionChangedNotification.NewItems
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IEnumerable>() != null);
+
+                return default(IEnumerable);
+            }
+        }
+
+        NotifyCollectionChangedAction ICollectionChangedNotification.Action
+        {
+            get
+            {
+                return default(NotifyCollectionChangedAction);
+            }
+        }
+
+        IEnumerable ICollectionChangedNotification.OldItems
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IEnumerable>() != null);
+
+                return default(IEnumerable);
+            }
+        }
+
+        IEnumerable ICollectionChangedNotification.Current
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IEnumerable>() != null);
+
+                return default(IEnumerable);
+            }
+        }
+    }
+
     [ContractClassFor(typeof(ICollectionChangedNotification<>))]
     public abstract class CollectionChangedNotificationContracts<T> : ICollectionChangedNotification<T>
     {
@@ -92,6 +142,11 @@ namespace ExRam.ReactiveCollections
             get;
         }
 
+        IEnumerable ICollectionChangedNotification.Current
+        {
+            get { return Current; }
+        }
+
         public IReadOnlyCollection<T> Current
         {
             get
@@ -102,41 +157,25 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        ICollectionChangedNotification ICollectionChangedNotification.ToResetNotification()
+        IEnumerable ICollectionChangedNotification.OldItems
         {
-            Contract.Ensures(Contract.Result<ICollectionChangedNotification>() != null);
-
-            return default(ICollectionChangedNotification);
+            get
+            {
+                return default(IEnumerable<T>);
+            }
         }
 
         IEnumerable ICollectionChangedNotification.NewItems
         {
             get
             {
-                Contract.Ensures(Contract.Result<IEnumerable>() != null);
-
-                return default(IEnumerable);
+                return default(IEnumerable<T>);
             }
         }
 
-        IEnumerable ICollectionChangedNotification.OldItems
+        ICollectionChangedNotification ICollectionChangedNotification.ToResetNotification()
         {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable>() != null);
-
-                return default(IEnumerable);
-            }
-        }
-
-        IEnumerable ICollectionChangedNotification.Current
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable>() != null);
-
-                return default(IEnumerable);
-            }
+            return default(ICollectionChangedNotification);
         }
     }
 }
