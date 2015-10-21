@@ -11,6 +11,7 @@ using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics.Contracts;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
 namespace ExRam.ReactiveCollections
@@ -58,69 +59,66 @@ namespace ExRam.ReactiveCollections
                 Contract.Requires(source != null);
 
                 var eventArgs = source
-                    .Select(notification =>
-                    {
-                        this._currentList = notification.Current;
-
-                        switch (notification.Action)
-                        {
-                            case (NotifyCollectionChangedAction.Add):
-                            {
-                                return new EventArgs[]
-                                {
-                                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)notification.NewItems, notification.Index.Value),
-                                    new PropertyChangedEventArgs("Count"),
-                                    new PropertyChangedEventArgs("Item[]")
-                                };
-                            }
-
-                            case (NotifyCollectionChangedAction.Remove):
-                            {
-                                return new EventArgs[]
-                                {
-                                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, (IList)notification.OldItems, notification.Index.Value),
-                                    new PropertyChangedEventArgs("Count"),
-                                    new PropertyChangedEventArgs("Item[]")
-                                };
-                            }
-
-                            case (NotifyCollectionChangedAction.Replace):
-                            {
-                                return new EventArgs[]
-                                {
-                                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, (IList)notification.NewItems, (IList)notification.OldItems, notification.Index.Value),
-                                    new PropertyChangedEventArgs("Item[]")
-                                };
-                            }
-
-                            default:
-                            {
-                                var list = new List<EventArgs>();
-
-                                if (this._currentList.Count > 0)
-                                {
-                                    this._currentList = ImmutableList<T>.Empty;
-
-                                    list.Add(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-                                    list.Add(new PropertyChangedEventArgs("Count"));
-                                    list.Add(new PropertyChangedEventArgs("Item[]"));
-                                }
-
-                                if (notification.Current.Count > 0)
-                                {
-                                    this._currentList = notification.Current;
-
-                                    list.Add(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)notification.Current, 0));
-                                    list.Add(new PropertyChangedEventArgs("Count"));
-                                    list.Add(new PropertyChangedEventArgs("Item[]"));
-                                }
-
-                                return list.ToArray();
-                            }
-                        }
-                    })
+                    .Do(notification => this._currentList = notification.Current)
                     .Skip(1)
-                    .SelectMany(x => x)
+                    .SelectMany(notification => Observable
+                        .Create<EventArgs>(obs =>
+                        {
+                            switch (notification.Action)
+                            {
+                                case (NotifyCollectionChangedAction.Add):
+                                {
+                                    obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)notification.NewItems, notification.Index.Value));
+                                    obs.OnNext(new PropertyChangedEventArgs("Count"));
+                                    obs.OnNext(new PropertyChangedEventArgs("Item[]"));
+
+                                    break;
+                                }
+
+                                case (NotifyCollectionChangedAction.Remove):
+                                {
+
+                                    obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, (IList)notification.OldItems, notification.Index.Value));
+                                    obs.OnNext(new PropertyChangedEventArgs("Count"));
+                                    obs.OnNext(new PropertyChangedEventArgs("Item[]"));
+
+                                    break;
+                                }
+
+                                case (NotifyCollectionChangedAction.Replace):
+                                {
+                                    obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, (IList)notification.NewItems, (IList)notification.OldItems, notification.Index.Value));
+                                    obs.OnNext(new PropertyChangedEventArgs("Item[]"));
+
+                                    break;
+                                }
+
+                                default:
+                                {
+                                    if (this._currentList.Count > 0)
+                                    {
+                                        this._currentList = ImmutableList<T>.Empty;
+
+                                        obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                                        obs.OnNext(new PropertyChangedEventArgs("Count"));
+                                        obs.OnNext(new PropertyChangedEventArgs("Item[]"));
+                                    }
+
+                                    if (notification.Current.Count > 0)
+                                    {
+                                        this._currentList = notification.Current;
+
+                                        obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)notification.Current, 0));
+                                        obs.OnNext(new PropertyChangedEventArgs("Count"));
+                                        obs.OnNext(new PropertyChangedEventArgs("Item[]"));
+                                    }
+
+                                    break;
+                                }
+                            }
+
+                            return Disposable.Empty;
+                        }))
                     .Publish()
                     .RefCount();
 
