@@ -216,6 +216,7 @@ namespace ExRam.ReactiveCollections
                     return this._currentList[index];
                 }
             }
+
             int IList.Add(object value)
             {
                 throw new NotSupportedException();
@@ -253,6 +254,7 @@ namespace ExRam.ReactiveCollections
             {
                 throw new NotSupportedException();
             }
+
             object IList.this[int index]
             {
                 get
@@ -264,6 +266,7 @@ namespace ExRam.ReactiveCollections
                     throw new NotSupportedException();
                 }
             }
+
             void ICollection.CopyTo(Array array, int index)
             {
                 ((ICollection)this._currentList).CopyTo(array, index);

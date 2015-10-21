@@ -186,7 +186,7 @@ namespace ExRam.ReactiveCollections
         {
             get
             {
-                return this.Current.Count();
+                return this.Current.Count;
             }
         }
 
