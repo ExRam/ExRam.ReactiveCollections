@@ -38,15 +38,21 @@ namespace ExRam.ReactiveCollections
         {
             Contract.Requires(items != null);
 
-            var builder = this.Current.ToBuilder();
             var newItems = items.ToImmutableList();
-
-            foreach (var item in newItems)
+            if (!newItems.IsEmpty)
             {
-                builder.Add(item);
-            }
+                var builder = this.Current.ToBuilder();
 
-            this.Subject.OnNext(new SortedSetChangedNotification<T>(builder.ToImmutable(), NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, newItems));
+                foreach (var item in newItems)
+                {
+                    builder.Add(item);
+                }
+
+                var newSet = builder.ToImmutable();
+
+                if (this.Current != newSet)
+                    this.Subject.OnNext(new SortedSetChangedNotification<T>(builder.ToImmutable(), NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, newItems));
+            }
         }
 
         public void Clear()
