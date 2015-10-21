@@ -17,14 +17,12 @@ namespace ExRam.ReactiveCollections
         #region SortReactiveSortedList
         private sealed class SortedSetReactiveCollection<TSource> : IReactiveCollection<SortedSetChangedNotification<TSource>>
         {
-            private readonly IObservable<SortedSetChangedNotification<TSource>> _changes;
-
             public SortedSetReactiveCollection(IObservable<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer)
             {
                 Contract.Requires(source != null);
                 Contract.Requires(comparer != null);
 
-                this._changes = Observable
+                this.Changes = Observable
                     .Defer(
                         () =>
                         {
@@ -92,13 +90,7 @@ namespace ExRam.ReactiveCollections
                     .Normalize();
             }
 
-            public IObservable<SortedSetChangedNotification<TSource>> Changes
-            {
-                get
-                {
-                    return this._changes;
-                }
-            }
+            public IObservable<SortedSetChangedNotification<TSource>> Changes { get; }
         }
         #endregion
 

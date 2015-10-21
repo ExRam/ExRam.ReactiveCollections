@@ -27,13 +27,7 @@ namespace ExRam.ReactiveCollections
                     .Normalize();
             }
 
-            IObservable<TNotification> IReactiveCollection<TNotification>.Changes
-            {
-                get
-                {
-                    return this._changes;
-                }
-            }
+            IObservable<TNotification> IReactiveCollection<TNotification>.Changes => this._changes;
         }
         #endregion
 

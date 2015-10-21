@@ -19,7 +19,6 @@ namespace ExRam.ReactiveCollections
         private sealed class WhereReactiveList<T> : IReactiveCollection<ListChangedNotification<T>>
         {
             private readonly IEqualityComparer<T> _equalityComparer;
-            private readonly IObservable<ListChangedNotification<T>> _changes;
 
             public WhereReactiveList(IObservable<ICollectionChangedNotification<T>> source, Predicate<T> filter, IEqualityComparer<T> equalityComparer)
             {
@@ -29,7 +28,7 @@ namespace ExRam.ReactiveCollections
 
                 this._equalityComparer = equalityComparer;
 
-                this._changes = Observable
+                this.Changes = Observable
                     .Defer(() =>
                     {
                         var syncRoot = new object();
@@ -102,24 +101,16 @@ namespace ExRam.ReactiveCollections
                     .Normalize();
             }
 
-            public IObservable<ListChangedNotification<T>> Changes
-            {
-                get
-                {
-                    return this._changes;
-                }
-            }
+            public IObservable<ListChangedNotification<T>> Changes { get; }
         }
         #endregion
 
         #region WhereReactiveDictionary
         private sealed class WhereReactiveDictionary<TKey, TValue> : IReactiveCollection<DictionaryChangedNotification<TKey, TValue>>
         {
-            private readonly IObservable<DictionaryChangedNotification<TKey, TValue>> _changes;
-
             public WhereReactiveDictionary(IObservable<DictionaryChangedNotification<TKey, TValue>> source, Predicate<TValue> filter)
             {
-                this._changes = Observable
+                this.Changes = Observable
                     .Defer(() =>
                     {
                         var syncRoot = new object();
@@ -174,13 +165,7 @@ namespace ExRam.ReactiveCollections
                     .Normalize();
             }
 
-            public IObservable<DictionaryChangedNotification<TKey, TValue>> Changes
-            {
-                get
-                {
-                    return this._changes;
-                }
-            }
+            public IObservable<DictionaryChangedNotification<TKey, TValue>> Changes { get; }
         }
         #endregion
 

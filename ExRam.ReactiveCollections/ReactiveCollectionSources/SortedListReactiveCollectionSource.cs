@@ -198,13 +198,8 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        bool ICollection<T>.IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool ICollection<T>.IsReadOnly => false;
+
         #endregion
 
         #region Explicit IList implementation
@@ -241,21 +236,9 @@ namespace ExRam.ReactiveCollections
             return this.GetEnumerator();
         }
 
-        bool IList.IsFixedSize
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool IList.IsFixedSize => false;
 
-        bool IList.IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool IList.IsReadOnly => false;
 
         void IList.Remove(object value)
         {
@@ -285,21 +268,10 @@ namespace ExRam.ReactiveCollections
             this.CopyTo((T[])array, index);
         }
 
-        bool ICollection.IsSynchronized
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool ICollection.IsSynchronized => false;
 
-        object ICollection.SyncRoot
-        {
-            get
-            {
-                return this;
-            }
-        }
+        object ICollection.SyncRoot => this;
+
         #endregion
 
         private int FindInsertionIndex(T item)
@@ -322,7 +294,7 @@ namespace ExRam.ReactiveCollections
             {
                 Contract.Ensures(Contract.Result<int>() >= 0);
 
-                return this._innerList.Count();
+                return this._innerList.Count;
             }
         }
 
@@ -336,12 +308,6 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        public IReactiveCollection<ListChangedNotification<T>> ReactiveCollection
-        {
-            get
-            {
-                return this._innerList.ReactiveCollection;
-            }
-        }
+        public IReactiveCollection<ListChangedNotification<T>> ReactiveCollection => this._innerList.ReactiveCollection;
     }
 }

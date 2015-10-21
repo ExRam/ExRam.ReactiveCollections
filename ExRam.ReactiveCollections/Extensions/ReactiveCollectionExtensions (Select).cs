@@ -18,8 +18,6 @@ namespace ExRam.ReactiveCollections
         #region SelectListReactiveCollection
         private sealed class SelectListReactiveCollection<TSource, TResult> : IReactiveCollection<ListChangedNotification<TResult>>
         {
-            private readonly IObservable<ListChangedNotification<TResult>> _changes;
-
             public SelectListReactiveCollection(
                 IObservable<ICollectionChangedNotification<TSource>> source, 
                 Func<TSource, TResult> selector,
@@ -29,7 +27,7 @@ namespace ExRam.ReactiveCollections
                 Contract.Requires(selector != null);
                 Contract.Requires(equalityComparer != null);
 
-                this._changes = Observable
+                this.Changes = Observable
                     .Defer(() =>
                     {
                         var syncRoot = new object();
@@ -127,21 +125,13 @@ namespace ExRam.ReactiveCollections
                     .Normalize();
             }
 
-            public IObservable<ListChangedNotification<TResult>> Changes
-            {
-                get
-                {
-                    return this._changes;
-                }
-            }
+            public IObservable<ListChangedNotification<TResult>> Changes { get; }
         }
         #endregion
 
         #region SelectListReactiveDictionarySource
         private sealed class SelectReactiveDictionarySource<TKey, TSource, TResult> : IReactiveCollection<DictionaryChangedNotification<TKey, TResult>>
         {
-            private readonly IObservable<DictionaryChangedNotification<TKey, TResult>> _changes;
-
             public SelectReactiveDictionarySource(
                 IObservable<DictionaryChangedNotification<TKey, TSource>> source,
                 Func<TSource, TResult> selector)
@@ -149,7 +139,7 @@ namespace ExRam.ReactiveCollections
                 Contract.Requires(source != null);
                 Contract.Requires(selector != null);
 
-                this._changes = Observable
+                this.Changes = Observable
                     .Defer(() =>
                     {
                         var syncRoot = new object();
@@ -202,13 +192,7 @@ namespace ExRam.ReactiveCollections
                     .Normalize();
             }
 
-            public IObservable<DictionaryChangedNotification<TKey, TResult>> Changes
-            {
-                get
-                {
-                    return this._changes;
-                }
-            }
+            public IObservable<DictionaryChangedNotification<TKey, TResult>> Changes { get; }
         }
         #endregion
 

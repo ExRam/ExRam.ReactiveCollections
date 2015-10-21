@@ -13,15 +13,14 @@ namespace ExRam.ReactiveCollections
 {
     public sealed class ListChangedNotification<T> : CollectionChangedNotification<T>
     {
-        private readonly int? _index;
-
+        // ReSharper disable once SuggestBaseTypeForParameter
         public ListChangedNotification(ImmutableList<T> current, NotifyCollectionChangedAction action, IReadOnlyList<T> oldItems, IReadOnlyList<T> newItems, int? index) : base(current, action, oldItems, newItems)
         {
             Contract.Requires(current != null);
             Contract.Requires(oldItems != null);
             Contract.Requires(newItems != null);
 
-            this._index = index;
+            this.Index = index;
         }
 
         public override ICollectionChangedNotification<T> ToResetNotification()
@@ -29,20 +28,8 @@ namespace ExRam.ReactiveCollections
             return new ListChangedNotification<T>(this.Current, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
         }
 
-        public int? Index
-        {
-            get
-            {
-                return this._index;
-            }
-        }
+        public int? Index { get; }
 
-        public new ImmutableList<T> Current
-        {
-            get 
-            {
-                return (ImmutableList<T>)base.Current;
-            }
-        }
+        public new ImmutableList<T> Current => (ImmutableList<T>)base.Current;
     }
 }

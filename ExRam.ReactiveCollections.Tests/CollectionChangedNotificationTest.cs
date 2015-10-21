@@ -10,6 +10,7 @@ namespace ExRam.ReactiveCollections.Tests
         #region NotificationImpl
         private sealed class NotificationImpl : CollectionChangedNotification<int>
         {
+            // ReSharper disable once SuggestBaseTypeForParameter
             public NotificationImpl(ImmutableList<int> current, NotifyCollectionChangedAction action, ImmutableList<int> oldItems, ImmutableList<int> newItems) : base(current, action, oldItems, newItems)
             {
             }

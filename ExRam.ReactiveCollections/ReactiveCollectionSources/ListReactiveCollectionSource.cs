@@ -243,13 +243,8 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        bool ICollection<T>.IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool ICollection<T>.IsReadOnly => false;
+
         #endregion
 
         #region Explicit IList implementation
@@ -286,21 +281,9 @@ namespace ExRam.ReactiveCollections
             return this.GetEnumerator();
         }
 
-        bool IList.IsFixedSize
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool IList.IsFixedSize => false;
 
-        bool IList.IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool IList.IsReadOnly => false;
 
         void IList.Remove(object value)
         {
@@ -330,21 +313,10 @@ namespace ExRam.ReactiveCollections
             this.CopyTo((T[])array, index);
         }
 
-        bool ICollection.IsSynchronized
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool ICollection.IsSynchronized => false;
 
-        object ICollection.SyncRoot
-        {
-            get
-            {
-                return this;
-            }
-        }
+        object ICollection.SyncRoot => this;
+
         #endregion
 
         public int Count
@@ -353,7 +325,7 @@ namespace ExRam.ReactiveCollections
             {
                 Contract.Ensures(Contract.Result<int>() >= 0);
 
-                return this.Current.Count();
+                return this.Current.Count;
             }
         }
 

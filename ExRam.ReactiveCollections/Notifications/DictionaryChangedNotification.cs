@@ -13,7 +13,7 @@ namespace ExRam.ReactiveCollections
 {
     public sealed class DictionaryChangedNotification<TKey, TValue> : CollectionChangedNotification<KeyValuePair<TKey, TValue>>
     {
-        public DictionaryChangedNotification(ImmutableDictionary<TKey, TValue> current, NotifyCollectionChangedAction action, ImmutableList<KeyValuePair<TKey, TValue>> oldItems, ImmutableList<KeyValuePair<TKey, TValue>> newItems) : base(current, action, oldItems, newItems)
+        public DictionaryChangedNotification(ImmutableDictionary<TKey, TValue> current, NotifyCollectionChangedAction action, IReadOnlyList<KeyValuePair<TKey, TValue>> oldItems, IReadOnlyList<KeyValuePair<TKey, TValue>> newItems) : base(current, action, oldItems, newItems)
         {
             Contract.Requires(current != null);
             Contract.Requires(oldItems != null);
@@ -25,12 +25,6 @@ namespace ExRam.ReactiveCollections
             return new DictionaryChangedNotification<TKey, TValue>(this.Current, NotifyCollectionChangedAction.Reset, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList<KeyValuePair<TKey, TValue>>.Empty);
         }
 
-        public new ImmutableDictionary<TKey, TValue> Current
-        {
-            get
-            {
-                return (ImmutableDictionary<TKey, TValue>)base.Current;
-            }
-        }
+        public new ImmutableDictionary<TKey, TValue> Current => (ImmutableDictionary<TKey, TValue>)base.Current;
     }
 }

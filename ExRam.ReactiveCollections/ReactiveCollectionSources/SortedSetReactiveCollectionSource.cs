@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Diagnostics.Contracts;
-using System.Linq;
 
 namespace ExRam.ReactiveCollections
 {
@@ -182,21 +181,9 @@ namespace ExRam.ReactiveCollections
             ((ICollection<T>)this.Current).CopyTo(array, arrayIndex);
         }
 
-        public int Count
-        {
-            get
-            {
-                return this.Current.Count;
-            }
-        }
+        public int Count => this.Current.Count;
 
-        bool ICollection<T>.IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool ICollection<T>.IsReadOnly => false;
 
         bool ICollection<T>.Remove(T item)
         {
@@ -245,21 +232,9 @@ namespace ExRam.ReactiveCollections
             return this.GetEnumerator();
         }
 
-        bool IList.IsFixedSize
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool IList.IsFixedSize => false;
 
-        bool IList.IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool IList.IsReadOnly => false;
 
         void IList.Remove(object value)
         {
@@ -289,21 +264,10 @@ namespace ExRam.ReactiveCollections
             this.CopyTo((T[])array, index);
         }
 
-        bool ICollection.IsSynchronized
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool ICollection.IsSynchronized => false;
 
-        object ICollection.SyncRoot
-        {
-            get
-            {
-                return this;
-            }
-        }
+        object ICollection.SyncRoot => this;
+
         #endregion
 
         void ISet<T>.ExceptWith(IEnumerable<T> other)

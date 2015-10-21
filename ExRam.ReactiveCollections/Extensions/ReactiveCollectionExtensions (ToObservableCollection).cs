@@ -151,21 +151,9 @@ namespace ExRam.ReactiveCollections
                 this._currentList.CopyTo(array, arrayIndex);
             }
 
-            public int Count
-            {
-                get 
-                {
-                    return this._currentList.Count;
-                }
-            }
+            public int Count => this._currentList.Count;
 
-            public bool IsReadOnly
-            {
-                get 
-                {
-                    return true;
-                }
-            }
+            public bool IsReadOnly => true;
 
             bool ICollection<T>.Remove(T item)
             {
@@ -209,13 +197,7 @@ namespace ExRam.ReactiveCollections
                 }
             }
 
-            T IReadOnlyList<T>.this[int index]
-            {
-                get
-                {
-                    return this._currentList[index];
-                }
-            }
+            T IReadOnlyList<T>.this[int index] => this._currentList[index];
 
             int IList.Add(object value)
             {
@@ -237,13 +219,7 @@ namespace ExRam.ReactiveCollections
                 throw new NotSupportedException();
             }
 
-            bool IList.IsFixedSize
-            {
-                get 
-                {
-                    return false;
-                }
-            }
+            bool IList.IsFixedSize => false;
 
             void IList.Remove(object value)
             {
@@ -272,21 +248,9 @@ namespace ExRam.ReactiveCollections
                 ((ICollection)this._currentList).CopyTo(array, index);
             }
 
-            bool ICollection.IsSynchronized
-            {
-                get 
-                {
-                    return false;
-                }
-            }
+            bool ICollection.IsSynchronized => false;
 
-            object ICollection.SyncRoot
-            {
-                get
-                {
-                    return this;
-                }
-            }
+            object ICollection.SyncRoot => this;
         }
         #endregion
 

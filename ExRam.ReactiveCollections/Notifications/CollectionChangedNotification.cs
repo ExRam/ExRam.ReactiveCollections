@@ -13,10 +13,7 @@ namespace ExRam.ReactiveCollections
 {
     public abstract class CollectionChangedNotification<T> : ICollectionChangedNotification<T>
     {
-        private readonly IReadOnlyList<T> _oldItems;
-        private readonly IReadOnlyList<T> _newItems;
         private readonly IReadOnlyCollection<T> _current;
-        private readonly NotifyCollectionChangedAction _action;
 
         protected CollectionChangedNotification(IReadOnlyCollection<T> current, NotifyCollectionChangedAction action, IReadOnlyList<T> oldItems, IReadOnlyList<T> newItems)
         {
@@ -26,37 +23,19 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(oldItems != null);
             Contract.Requires(newItems != null);
 
-            this._action = action;
+            this.Action = action;
             this._current = current;
-            this._oldItems = oldItems;
-            this._newItems = newItems;
+            this.OldItems = oldItems;
+            this.NewItems = newItems;
         }
 
         public abstract ICollectionChangedNotification<T> ToResetNotification();
 
-        public IReadOnlyList<T> OldItems
-        {
-            get 
-            {
-                return this._oldItems;
-            }
-        }
+        public IReadOnlyList<T> OldItems { get; }
 
-        public IReadOnlyList<T> NewItems
-        {
-            get
-            {
-                return this._newItems;
-            }
-        }
+        public IReadOnlyList<T> NewItems { get; }
 
-        public NotifyCollectionChangedAction Action
-        {
-            get 
-            {
-                return this._action; 
-            }
-        }
+        public NotifyCollectionChangedAction Action { get; }
 
         public IReadOnlyCollection<T> Current
         {
@@ -76,19 +55,10 @@ namespace ExRam.ReactiveCollections
             return this.ToResetNotification();
         }
 
-        IEnumerable ICollectionChangedNotification.Current
-        {
-            get { return this.Current; }
-        }
+        IEnumerable ICollectionChangedNotification.Current => this.Current;
 
-        IEnumerable ICollectionChangedNotification.NewItems
-        {
-            get { return this.NewItems; }
-        }
+        IEnumerable ICollectionChangedNotification.NewItems => this.NewItems;
 
-        IEnumerable ICollectionChangedNotification.OldItems
-        {
-            get { return this.OldItems; }
-        }
+        IEnumerable ICollectionChangedNotification.OldItems => this.OldItems;
     }
 }

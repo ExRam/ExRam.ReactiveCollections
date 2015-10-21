@@ -136,13 +136,7 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        public int Count
-        {
-            get
-            {
-                return this.Current.Count;
-            }
-        }
+        public int Count => this.Current.Count;
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
@@ -156,13 +150,7 @@ namespace ExRam.ReactiveCollections
             this.Add(key, value);
         }
 
-        ICollection<TKey> IDictionary<TKey, TValue>.Keys
-        {
-            get
-            {
-                return this.Current.Keys.ToList();
-            }
-        }
+        ICollection<TKey> IDictionary<TKey, TValue>.Keys => this.Current.Keys.ToList();
 
         bool IDictionary<TKey, TValue>.Remove(TKey key)
         {
@@ -172,13 +160,8 @@ namespace ExRam.ReactiveCollections
             return (this.Current != oldList);
         }
 
-        ICollection<TValue> IDictionary<TKey, TValue>.Values
-        {
-            get
-            {
-                return this.Current.Values.ToList();
-            }
-        }
+        ICollection<TValue> IDictionary<TKey, TValue>.Values => this.Current.Values.ToList();
+
         #endregion
 
         #region ICollection<KeyValuePair<TKey, TValue>> implementation
@@ -202,13 +185,8 @@ namespace ExRam.ReactiveCollections
             this.Clear();
         }
 
-        bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => false;
+
         #endregion
 
         #region IDictionary implementation
@@ -232,42 +210,18 @@ namespace ExRam.ReactiveCollections
             return this.GetEnumerator();
         }
 
-        bool IDictionary.IsFixedSize
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool IDictionary.IsFixedSize => false;
 
-        bool IDictionary.IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool IDictionary.IsReadOnly => false;
 
-        ICollection IDictionary.Keys
-        {
-            get
-            {
-                return this.Current.Keys.ToList();
-            }
-        }
+        ICollection IDictionary.Keys => this.Current.Keys.ToList();
 
         void IDictionary.Remove(object key)
         {
             this.Remove((TKey)key);
         }
 
-        ICollection IDictionary.Values
-        {
-            get
-            {
-                return this.Current.Values.ToList();
-            }
-        }
+        ICollection IDictionary.Values => this.Current.Values.ToList();
 
         object IDictionary.this[object key]
         {
@@ -289,21 +243,10 @@ namespace ExRam.ReactiveCollections
         #endregion
 
         #region ICollection implementation
-        bool ICollection.IsSynchronized
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool ICollection.IsSynchronized => false;
 
-        object ICollection.SyncRoot
-        {
-            get
-            {
-                return this;
-            }
-        }
+        object ICollection.SyncRoot => this;
+
         #endregion
 
         public IEnumerable<TValue> Values
