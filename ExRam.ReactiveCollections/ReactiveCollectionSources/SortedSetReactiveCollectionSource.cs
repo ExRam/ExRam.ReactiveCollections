@@ -51,7 +51,8 @@ namespace ExRam.ReactiveCollections
 
         public void Clear()
         {
-            this.Subject.OnNext(new SortedSetChangedNotification<T>(ImmutableSortedSet<T>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty));
+            if (!this.Current.IsEmpty)
+                this.Subject.OnNext(new SortedSetChangedNotification<T>(this.Current.Clear(), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty));
         }
 
         public void Except(IEnumerable<T> other)
