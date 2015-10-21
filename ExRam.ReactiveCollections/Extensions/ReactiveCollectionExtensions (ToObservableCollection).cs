@@ -52,9 +52,9 @@ namespace ExRam.ReactiveCollections
             private readonly INotifyPropertyChanged _propertyChanged;
             private readonly INotifyCollectionChanged _collectionChanged;
 
-            private ImmutableList<T> _currentList = ImmutableList<T>.Empty;
+            private IReadOnlyCollection<T> _currentList = ImmutableList<T>.Empty;
 
-            public ReactiveReadOnlyObservableCollection(IObservable<ListChangedNotification<T>> source)
+            public ReactiveReadOnlyObservableCollection(IObservable<IIndexedCollectionChangedNotification<T>> source)
             {
                 Contract.Requires(source != null);
 
@@ -143,12 +143,20 @@ namespace ExRam.ReactiveCollections
 
             bool ICollection<T>.Contains(T item)
             {
-                return this._currentList.Contains(item);
+                var list = this._currentList as ICollection<T>;
+                if (list == null)
+                    throw new InvalidOperationException();
+
+                return list.Contains(item);
             }
 
             void ICollection<T>.CopyTo(T[] array, int arrayIndex)
             {
-                this._currentList.CopyTo(array, arrayIndex);
+                var list = this._currentList as ICollection<T>;
+                if (list == null)
+                    throw new InvalidOperationException();
+
+                list.CopyTo(array, arrayIndex);
             }
 
             public int Count => this._currentList.Count;
@@ -172,7 +180,11 @@ namespace ExRam.ReactiveCollections
 
             int IList<T>.IndexOf(T item)
             {
-                return this._currentList.IndexOf(item);
+                var list = this._currentList as IList<T>;
+                if (list == null)
+                    throw new InvalidOperationException();
+
+                return list.IndexOf(item);
             }
 
             void IList<T>.Insert(int index, T item)
@@ -189,7 +201,11 @@ namespace ExRam.ReactiveCollections
             {
                 get
                 {
-                    return this._currentList[index];
+                    var list = this._currentList as IReadOnlyList<T>;
+                    if (list == null)
+                        throw new InvalidOperationException();
+
+                    return list[index];
                 }
                 set
                 {
@@ -197,7 +213,7 @@ namespace ExRam.ReactiveCollections
                 }
             }
 
-            T IReadOnlyList<T>.this[int index] => this._currentList[index];
+            T IReadOnlyList<T>.this[int index] => ((IList<T>)this)[index];
 
             int IList.Add(object value)
             {
@@ -235,7 +251,7 @@ namespace ExRam.ReactiveCollections
             {
                 get
                 {
-                    return this._currentList[index];
+                    return ((IList<T>)this)[index];
                 }
                 set
                 {
@@ -254,7 +270,7 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
-        public static ICollection<T> ToObservableCollection<T>(this IReactiveCollection<ListChangedNotification<T>> source)
+        public static ICollection<T> ToObservableCollection<T>(this IReactiveCollection<IIndexedCollectionChangedNotification<T>> source)
         {
             Contract.Requires(source != null);
             Contract.Ensures(Contract.Result<ICollection<T>>() != null);
