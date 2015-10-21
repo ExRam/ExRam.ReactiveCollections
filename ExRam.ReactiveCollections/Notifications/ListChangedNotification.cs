@@ -11,7 +11,7 @@ using System.Diagnostics.Contracts;
 
 namespace ExRam.ReactiveCollections
 {
-    public sealed class ListChangedNotification<T> : CollectionChangedNotification<T>
+    public sealed class ListChangedNotification<T> : CollectionChangedNotification<T>, IIndexedCollectionChangedNotification<T>
     {
         // ReSharper disable once SuggestBaseTypeForParameter
         public ListChangedNotification(ImmutableList<T> current, NotifyCollectionChangedAction action, IReadOnlyList<T> oldItems, IReadOnlyList<T> newItems, int? index) : base(current, action, oldItems, newItems)
