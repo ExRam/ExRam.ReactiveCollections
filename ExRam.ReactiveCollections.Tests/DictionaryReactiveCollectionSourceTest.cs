@@ -53,7 +53,7 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
-        #region Add
+        #region Adding_existing_key_throws
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void Adding_existing_key_throws()
