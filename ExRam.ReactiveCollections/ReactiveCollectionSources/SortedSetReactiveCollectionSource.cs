@@ -79,41 +79,26 @@ namespace ExRam.ReactiveCollections
 
         public bool IsProperSubsetOf(IEnumerable<T> other)
         {
-            // Cannot add Requires.
-            // Contract.Requires(other != null);
-
             return this.Current.IsProperSubsetOf(other);
         }
 
         public bool IsProperSupersetOf(IEnumerable<T> other)
         {
-            // Cannot add Requires.
-            // Contract.Requires(other != null);
-
             return this.Current.IsProperSupersetOf(other);
         }
 
         public bool IsSubsetOf(IEnumerable<T> other)
         {
-            // Cannot add Requires.
-            // Contract.Requires(other != null);
-
             return this.Current.IsSubsetOf(other);
         }
 
         public bool IsSupersetOf(IEnumerable<T> other)
         {
-            // Cannot add Requires.
-            // Contract.Requires(other != null);
-
             return this.Current.IsSupersetOf(other);
         }
 
         public bool Overlaps(IEnumerable<T> other)
         {
-            // Cannot add Requires.
-            // Contract.Requires(other != null);
-
             return this.Current.Overlaps(other);
         }
 
@@ -124,9 +109,6 @@ namespace ExRam.ReactiveCollections
 
         public bool SetEquals(IEnumerable<T> other)
         {
-            // Cannot add Requires.
-            // Contract.Requires(other != null);
-
             return this.Current.SetEquals(other);
         }
 
