@@ -19,11 +19,10 @@ namespace ExRam.ReactiveCollections
         {
             private readonly IObservable<SortedSetChangedNotification<TSource>> _changes;
 
-            public SortedSetReactiveCollection(IObservable<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer, IEqualityComparer<TSource> equalityComparer)
+            public SortedSetReactiveCollection(IObservable<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer)
             {
                 Contract.Requires(source != null);
                 Contract.Requires(comparer != null);
-                Contract.Requires(equalityComparer != null);
 
                 this._changes = Observable
                     .Defer(
@@ -108,7 +107,7 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(source != null);
             Contract.Ensures(Contract.Result<IReactiveCollection<SortedSetChangedNotification<TSource>>>() != null);
 
-            return source.SortSet(Comparer<TSource>.Default, EqualityComparer<TSource>.Default);
+            return source.SortSet(Comparer<TSource>.Default);
         }
 
         public static IReactiveCollection<SortedSetChangedNotification<TSource>> SortSet<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer)
@@ -117,26 +116,7 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(comparer != null);
             Contract.Ensures(Contract.Result<IReactiveCollection<SortedSetChangedNotification<TSource>>>() != null);
 
-            return source.SortSet(comparer, EqualityComparer<TSource>.Default);
-        }
-
-        public static IReactiveCollection<SortedSetChangedNotification<TSource>> SortSet<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IEqualityComparer<TSource> equalityComparer)
-        {
-            Contract.Requires(source != null);
-            Contract.Requires(equalityComparer != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<SortedSetChangedNotification<TSource>>>() != null);
-
-            return source.SortSet(Comparer<TSource>.Default, equalityComparer);
-        }
-
-        public static IReactiveCollection<SortedSetChangedNotification<TSource>> SortSet<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer, IEqualityComparer<TSource> equalityComparer)
-        {
-            Contract.Requires(source != null);
-            Contract.Requires(comparer != null);
-            Contract.Requires(equalityComparer != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<SortedSetChangedNotification<TSource>>>() != null);
-
-            return new SortedSetReactiveCollection<TSource>(source.Changes, comparer, equalityComparer);
+            return new SortedSetReactiveCollection<TSource>(source.Changes, comparer);
         }
     }
 }
