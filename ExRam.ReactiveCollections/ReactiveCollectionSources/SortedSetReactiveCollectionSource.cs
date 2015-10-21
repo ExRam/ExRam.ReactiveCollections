@@ -34,6 +34,21 @@ namespace ExRam.ReactiveCollections
             this.Subject.OnNext(new SortedSetChangedNotification<T>(this.Current.Add(value), NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, ImmutableList.Create(value)));
         }
 
+        public void AddRange(IEnumerable<T> items)
+        {
+            Contract.Requires(items != null);
+
+            var builder = this.Current.ToBuilder();
+            var newItems = items.ToImmutableList();
+
+            foreach (var item in newItems)
+            {
+                builder.Add(item);
+            }
+
+            this.Subject.OnNext(new SortedSetChangedNotification<T>(builder.ToImmutable(), NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, newItems));
+        }
+
         public void Clear()
         {
             this.Subject.OnNext(new SortedSetChangedNotification<T>(ImmutableSortedSet<T>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty));
