@@ -851,6 +851,65 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
+        #region Add_to_setSorted_dictionary
+        [TestMethod]
+        public async Task Add_to_setSorted_dictionary()
+        {
+            var list = new DictionaryReactiveCollectionSource<string, int>();
+
+            var projectedList = list
+                .ReactiveCollection
+                .SortSet(Comparer<KeyValuePair<string, int>>.Create((x, y) => x.Value.CompareTo(y.Value)));
+
+            var notificationTask = projectedList.Changes
+                .Skip(3)
+                .FirstAsync()
+                .ToTask();
+
+            list.Add("Key3", 3);
+            list.Add("Key1", 1);
+            list.Add("Key2", 2);
+
+            var notification = await notificationTask;
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
+
+            Assert.AreEqual(1, notification.NewItems.Count);
+            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notification.NewItems.ToArray());
+            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key2", 2), new KeyValuePair<string, int>("Key3", 3) }, notification.Current);
+        }
+        #endregion
+
+        #region Add_to_setSorted_dictionary_with_duplicate_value
+        [TestMethod]
+        public async Task Add_to_setSorted_dictionary_with_duplicate_value()
+        {
+            var list = new DictionaryReactiveCollectionSource<string, int>();
+
+            var projectedList = list
+                .ReactiveCollection
+                .SortSet(Comparer<KeyValuePair<string, int>>.Create((x, y) => x.Value.CompareTo(y.Value)));
+
+            var notificationTask = projectedList.Changes
+                .Skip(3)
+                .FirstAsync()
+                .ToTask();
+
+            list.Add("Key3", 3);
+            list.Add("Key1", 1);
+            list.Add("Key1", 1);
+            list.Add("Key2", 2);
+
+            var notification = await notificationTask;
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
+
+            Assert.AreEqual(1, notification.NewItems.Count);
+            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notification.NewItems.ToArray());
+            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key2", 2), new KeyValuePair<string, int>("Key3", 3) }, notification.Current);
+        }
+        #endregion
+
         #region Add_to_sorted_list_with_Changes
         [TestMethod]
         public async Task Add_to_sorted_list_with_Changes()
@@ -933,6 +992,32 @@ namespace ExRam.ReactiveCollections.Tests
             CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1) }, notification.OldItems.ToArray());
             Assert.AreEqual(0, notification.Index);
 
+            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notification.Current);
+        }
+        #endregion
+
+        #region Remove_in_setSorted_dictionary
+        [TestMethod]
+        public async Task Remove_in_setSorted_dictionary()
+        {
+            var list = new DictionaryReactiveCollectionSource<string, int>();
+
+            var projectedList = list.ReactiveCollection
+                .SortSet(Comparer<KeyValuePair<string, int>>.Create((x, y) => x.Value.CompareTo(y.Value)));
+
+            var notificationTask = projectedList.Changes
+                .Skip(3)
+                .FirstAsync()
+                .ToTask();
+
+            list.Add("Key1", 1);
+            list.Add("Key2", 2);
+            list.Remove("Key1");
+
+            var notification = await notificationTask;
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
+            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1) }, notification.OldItems.ToArray());
             CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notification.Current);
         }
         #endregion
@@ -1107,6 +1192,39 @@ namespace ExRam.ReactiveCollections.Tests
             Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
             CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 4) }, notifications[1].NewItems.ToArray());
             Assert.AreEqual(2, notifications[1].Index);
+
+            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key3", 3), new KeyValuePair<string, int>("Key2", 4) }, notifications[1].Current);
+        }
+        #endregion
+
+        #region Replace_in_setSorted_dictionary
+        [TestMethod]
+        public async Task Replace_in_setSorted_dictionary()
+        {
+            var list = new DictionaryReactiveCollectionSource<string, int>();
+
+            var projectedList = list.ReactiveCollection
+                .SortSet(Comparer<KeyValuePair<string, int>>.Create((x, y) => x.Value.CompareTo(y.Value)));
+
+            var notificationsTask = projectedList.Changes
+                .Skip(4)
+                .Take(2)
+                .ToArray()
+                .ToTask();
+
+            list.Add("Key1", 1);
+            list.Add("Key2", 2);
+            list.Add("Key3", 3);
+
+            list["Key2"] = 4;
+
+            var notifications = await notificationsTask;
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[0].Action);
+            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notifications[0].OldItems.ToArray());
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
+            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 4) }, notifications[1].NewItems.ToArray());
 
             CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key3", 3), new KeyValuePair<string, int>("Key2", 4) }, notifications[1].Current);
         }
