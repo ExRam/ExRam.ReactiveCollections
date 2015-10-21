@@ -12,7 +12,7 @@ namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        public static IReactiveCollection<TNotification> WithChanges<TNotification, TSource>(this IReactiveCollection<TNotification> source, Func<IObservable<TNotification>, IObservable<TNotification>> changesTransformation) where TNotification : ICollectionChangedNotification<TSource>
+        public static IReactiveCollection<TNotification> WithChanges<TNotification>(this IReactiveCollection<TNotification> source, Func<IObservable<TNotification>, IObservable<TNotification>> changesTransformation) where TNotification : ICollectionChangedNotification
         {
             Contract.Requires(source != null);
             Contract.Requires(changesTransformation != null);
