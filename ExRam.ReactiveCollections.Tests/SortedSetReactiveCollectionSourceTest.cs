@@ -42,12 +42,38 @@ namespace ExRam.ReactiveCollections.Tests
             var notification = await notificationTask;
 
             Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-
+            Assert.AreEqual(0, notification.Index);
             Assert.AreEqual(1, notification.NewItems.Count);
             Assert.AreEqual(0, notification.OldItems.Count);
 
             CollectionAssert.AreEqual(new[] { 1 }, notification.NewItems.ToArray());
             CollectionAssert.AreEqual(new[] { 1 }, notification.Current.ToArray());
+        }
+        #endregion
+
+        #region Add_multiple
+        [TestMethod]
+        public async Task Add_multiple()
+        {
+            var list = new SortedSetReactiveCollectionSource<int>();
+
+            var notificationTask = list.ReactiveCollection.Changes
+                .Skip(1)
+                .Take(6)
+                .Select(x => x.Index)
+                .ToArray()
+                .ToTask();
+
+            list.Add(1); // 0
+            list.Add(3); // 1
+            list.Add(2); // 1
+            list.Add(0); // 0
+            list.Add(6); // 4
+            list.Add(5); // 4
+
+            var notifications = await notificationTask;
+
+            CollectionAssert.AreEqual(new[] { 0, 1, 1, 0, 4, 4 }, notifications);
         }
         #endregion
 
@@ -94,6 +120,7 @@ namespace ExRam.ReactiveCollections.Tests
             Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
             Assert.AreEqual(0, notification.NewItems.Count);
             Assert.AreEqual(1, notification.OldItems.Count);
+            Assert.AreEqual(0, notification.Index);
 
             CollectionAssert.AreEqual(new[] { 1 }, notification.OldItems.ToArray());
             CollectionAssert.AreEqual(new int[0], notification.Current);
