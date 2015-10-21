@@ -828,7 +828,9 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
 
-            var projectedList = list.ReactiveCollection.Sort();
+            var projectedList = list
+                .ReactiveCollection
+                .Sort(Comparer<KeyValuePair<string, int>>.Create((x, y) => x.Value.CompareTo(y.Value)));
 
             var notificationTask = projectedList.Changes
                 .Skip(3)
@@ -844,8 +846,8 @@ namespace ExRam.ReactiveCollections.Tests
             Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
 
             Assert.AreEqual(1, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { 2 }, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, notification.Current);
+            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2)  }, notification.NewItems.ToArray());
+            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key2", 2), new KeyValuePair<string, int>("Key3", 3) }, notification.Current);
         }
         #endregion
 
@@ -914,7 +916,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new DictionaryReactiveCollectionSource<string, int>();
 
             var projectedList = list.ReactiveCollection
-                .Sort();
+                .Sort(Comparer<KeyValuePair<string, int>>.Create((x, y) => x.Value.CompareTo(y.Value)));
 
             var notificationTask = projectedList.Changes
                 .Skip(3)
@@ -928,10 +930,10 @@ namespace ExRam.ReactiveCollections.Tests
             var notification = await notificationTask;
 
             Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-            CollectionAssert.AreEqual(new[] { 1 }, notification.OldItems.ToArray());
+            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1) }, notification.OldItems.ToArray());
             Assert.AreEqual(0, notification.Index);
 
-            CollectionAssert.AreEqual(new[] { 2 }, notification.Current);
+            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notification.Current);
         }
         #endregion
 
@@ -1082,7 +1084,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new DictionaryReactiveCollectionSource<string, int>();
 
             var projectedList = list.ReactiveCollection
-                .Sort();
+                .Sort(Comparer<KeyValuePair<string, int>>.Create((x, y) => x.Value.CompareTo(y.Value)));
 
             var notificationsTask = projectedList.Changes
                 .Skip(4)
@@ -1099,14 +1101,14 @@ namespace ExRam.ReactiveCollections.Tests
             var notifications = await notificationsTask;
 
             Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[0].Action);
-            CollectionAssert.AreEqual(new[] { 2 }, notifications[0].OldItems.ToArray());
+            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notifications[0].OldItems.ToArray());
             Assert.AreEqual(1, notifications[0].Index);
 
             Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
-            CollectionAssert.AreEqual(new[] { 4 }, notifications[1].NewItems.ToArray());
+            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 4) }, notifications[1].NewItems.ToArray());
             Assert.AreEqual(2, notifications[1].Index);
 
-            CollectionAssert.AreEqual(new[] { 1, 3, 4 }, notifications[1].Current);
+            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key3", 3), new KeyValuePair<string, int>("Key2", 4) }, notifications[1].Current);
         }
         #endregion
 
