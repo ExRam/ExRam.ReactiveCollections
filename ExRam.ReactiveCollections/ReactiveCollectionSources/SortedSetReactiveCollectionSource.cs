@@ -31,7 +31,9 @@ namespace ExRam.ReactiveCollections
 
         public void Add(T value)
         {
-            this.Subject.OnNext(new SortedSetChangedNotification<T>(this.Current.Add(value), NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, ImmutableList.Create(value)));
+            var newSet = this.Current.Add(value);
+            if (newSet != this.Current)
+                this.Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, ImmutableList.Create(value)));
         }
 
         public void AddRange(IEnumerable<T> items)

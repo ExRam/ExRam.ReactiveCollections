@@ -42,7 +42,10 @@ namespace ExRam.ReactiveCollections
                                             {
                                                 case (NotifyCollectionChangedAction.Add):
                                                 {
-                                                    resultList.AddRange(notification.NewItems);
+                                                    if (notification.NewItems.Count == 1)
+                                                        resultList.Add(notification.NewItems[0]);
+                                                    else
+                                                        resultList.AddRange(notification.NewItems);
 
                                                     break;
                                                 }
