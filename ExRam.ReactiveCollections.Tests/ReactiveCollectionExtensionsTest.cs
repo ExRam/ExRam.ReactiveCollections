@@ -1230,9 +1230,9 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
-        #region ToObservableCollection_Add
+        #region List_ToObservableCollection_Add
         [TestMethod]
-        public async Task ToObservableCollection_Add()
+        public async Task List_ToObservableCollection_Add()
         {
             var list = new ListReactiveCollectionSource<int>();
             var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
@@ -1258,9 +1258,9 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
-        #region ToObservableCollection_Add_multiple
+        #region List_ToObservableCollection_Add_multiple
         [TestMethod]
-        public void ToObservableCollection_Add_multiple()
+        public void List_ToObservableCollection_Add_multiple()
         {
             var list = new ListReactiveCollectionSource<int>();
             var observableCollection = list.ReactiveCollection.ToObservableCollection();
@@ -1278,9 +1278,9 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
-        #region ToObservableCollection_Remove
+        #region List_ToObservableCollection_Remove
         [TestMethod]
-        public async Task ToObservableCollection_Remove()
+        public async Task List_ToObservableCollection_Remove()
         {
             var list = new ListReactiveCollectionSource<int>();
             var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
@@ -1304,9 +1304,9 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
-        #region ToObservableCollection_Remove_multiple
+        #region List_ToObservableCollection_Remove_multiple
         [TestMethod]
-        public void ToObservableCollection_Remove_multiple()
+        public void List_ToObservableCollection_Remove_multiple()
         {
             var list = new ListReactiveCollectionSource<int>();
             var observableCollection = list.ReactiveCollection.ToObservableCollection();
@@ -1323,9 +1323,9 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
-        #region ToObservableCollection_Replace
+        #region List_ToObservableCollection_Replace
         [TestMethod]
-        public async Task ToObservableCollection_Replace()
+        public async Task List_ToObservableCollection_Replace()
         {
             var list = new ListReactiveCollectionSource<int>();
             var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
@@ -1354,9 +1354,9 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
-        #region ToObservableCollection_Clear
+        #region List_ToObservableCollection_Clear
         [TestMethod]
-        public async Task ToObservableCollection_Clear()
+        public async Task List_ToObservableCollection_Clear()
         {
             var list = new ListReactiveCollectionSource<int>();
             var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
@@ -1378,11 +1378,155 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
-        #region ToObservableCollection_does_not_raise_events_on_event_subscription
+        #region List_ToObservableCollection_does_not_raise_events_on_event_subscription
         [TestMethod]
-        public async Task ToObservableCollection_does_not_raise_events_on_event_subscription()
+        public async Task List_ToObservableCollection_does_not_raise_events_on_event_subscription()
         {
             var list = new ListReactiveCollectionSource<int> {1, 2, 3};
+
+            var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
+
+            var eventsTask = Observable
+                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
+                .Select(x => x.EventArgs)
+                .FirstAsync()
+                .ToTask();
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, (ICollection)observableCollection);
+            list.Add(4);
+
+            var ev = await eventsTask;
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, ev.Action);
+            CollectionAssert.AreEqual(new[] { 4 }, ev.NewItems);
+            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4 }, (ICollection)observableCollection);
+        }
+        #endregion
+
+        #region SortedSet_ToObservableCollection_Add
+        [TestMethod]
+        public async Task SortedSet_ToObservableCollection_Add()
+        {
+            var list = new SortedSetReactiveCollectionSource<int>();
+            var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
+
+            var eventsTask = Observable
+                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
+                .Take(3)
+                .Select(x => x.EventArgs)
+                .ToArray()
+                .ToTask();
+
+            list.Add(1);
+            list.Add(2);
+            list.Add(3);
+
+            var events = await eventsTask;
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, events[0].Action);
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, events[1].Action);
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, events[2].Action);
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, (ICollection)observableCollection);
+        }
+        #endregion
+
+        #region SortedSet_ToObservableCollection_Add_multiple
+        [TestMethod]
+        public void SortedSet_ToObservableCollection_Add_multiple()
+        {
+            var list = new SortedSetReactiveCollectionSource<int>();
+            var observableCollection = list.ReactiveCollection.ToObservableCollection();
+
+            using (Observable
+                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => ((INotifyCollectionChanged)observableCollection).CollectionChanged += eh, eh => ((INotifyCollectionChanged)observableCollection).CollectionChanged -= eh)
+                .Subscribe())
+            {
+                list.AddRange(new[] { 2, 4, 6 });
+                CollectionAssert.AreEqual(new[] { 2, 4, 6 }, (ICollection)observableCollection);
+
+                list.AddRange(new[] { 1, 3, 5 });
+                CollectionAssert.AreEqual(new[] { 1, 2, 3, 4, 5, 6 }, (ICollection)observableCollection);
+            }
+        }
+        #endregion
+
+        #region SortedSet_ToObservableCollection_Remove
+        [TestMethod]
+        public async Task SortedSet_ToObservableCollection_Remove()
+        {
+            var list = new SortedSetReactiveCollectionSource<int>();
+            var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
+
+            var eventsTask = Observable
+                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
+                .Take(3)
+                .Select(x => x.EventArgs)
+                .ToArray()
+                .ToTask();
+
+            list.Add(1);
+            list.Add(2);
+            list.Remove(1);
+
+            var events = await eventsTask;
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, events[0].Action);
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, events[1].Action);
+            Assert.AreEqual(NotifyCollectionChangedAction.Remove, events[2].Action);
+        }
+        #endregion
+
+        #region SortedSet_ToObservableCollection_Remove_multiple
+        [TestMethod]
+        public void SortedSet_ToObservableCollection_Remove_multiple()
+        {
+            var list = new SortedSetReactiveCollectionSource<int>();
+            var observableCollection = list.ReactiveCollection.ToObservableCollection();
+
+            using (Observable
+                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => ((INotifyCollectionChanged)observableCollection).CollectionChanged += eh, eh => ((INotifyCollectionChanged)observableCollection).CollectionChanged -= eh)
+                .Subscribe())
+            {
+                list.AddRange(new[] { 1, 2, 3, 4, 5, 6, 7 });
+                list.Remove(3);
+                list.Remove(4);
+                list.Remove(5);
+
+                CollectionAssert.AreEqual(new[] { 1, 2, 6, 7 }, (ICollection)observableCollection);
+            }
+        }
+        #endregion
+
+        #region SortedSet_ToObservableCollection_Clear
+        [TestMethod]
+        public async Task SortedSet_ToObservableCollection_Clear()
+        {
+            var list = new ListReactiveCollectionSource<int>();
+            var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
+
+            var eventTask = Observable
+                .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
+                .Skip(1)
+                .Select(x => x.EventArgs)
+                .FirstAsync()
+                .ToTask();
+
+            list.AddRange(new[] { 1, 2, 3, 4, 5 });
+            list.RemoveAll(x => x > 2);
+
+            var ev = await eventTask;
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Reset, ev.Action);
+            CollectionAssert.AreEqual(new[] { 1, 2 }, (ICollection)observableCollection);
+        }
+        #endregion
+
+        #region SortedSet_ToObservableCollection_does_not_raise_events_on_event_subscription
+        [TestMethod]
+        public async Task SortedSet_ToObservableCollection_does_not_raise_events_on_event_subscription()
+        {
+            var list = new ListReactiveCollectionSource<int> { 1, 2, 3 };
 
             var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
 
