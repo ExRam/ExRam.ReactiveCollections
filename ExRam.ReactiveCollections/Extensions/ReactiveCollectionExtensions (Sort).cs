@@ -14,7 +14,7 @@ namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        #region SortReactiveSortedList
+        #region SortedReactiveCollection
         private sealed class SortedReactiveCollection<TSource> : IReactiveCollection<ListChangedNotification<TSource>>
         {
             public SortedReactiveCollection(IObservable<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer, IEqualityComparer<TSource> equalityComparer)

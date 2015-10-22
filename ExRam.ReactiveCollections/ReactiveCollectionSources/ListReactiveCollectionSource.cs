@@ -85,9 +85,6 @@ namespace ExRam.ReactiveCollections
 
         public void Insert(int index, T item)
         {
-            // Cannot add Requires
-            // Contract.Requires(index >= 0);
-
             this.Subject.OnNext(new ListChangedNotification<T>(this.Current.Insert(index, item), NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, ImmutableList.Create(item), index));
         }
 
