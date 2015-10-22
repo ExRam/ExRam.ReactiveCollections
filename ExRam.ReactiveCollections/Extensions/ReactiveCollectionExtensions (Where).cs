@@ -15,24 +15,21 @@ namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        #region WhereReactiveList
-        private sealed class WhereReactiveList<T> : IReactiveCollection<ListChangedNotification<T>>
+        #region WhereReactiveCollection
+        private abstract class WhereReactiveCollection<TCollection, TNotification, T> : IReactiveCollection<TNotification>
+            where TCollection : ReactiveCollectionSource<TNotification>, new()
+            where TNotification : ICollectionChangedNotification
         {
-            private readonly IEqualityComparer<T> _equalityComparer;
-
-            public WhereReactiveList(IObservable<ICollectionChangedNotification<T>> source, Predicate<T> filter, IEqualityComparer<T> equalityComparer)
+            protected WhereReactiveCollection(IObservable<ICollectionChangedNotification<T>> source, Predicate<T> filter)
             {
                 Contract.Requires(source != null);
                 Contract.Requires(filter != null);
-                Contract.Requires(equalityComparer != null);
-
-                this._equalityComparer = equalityComparer;
 
                 this.Changes = Observable
                     .Defer(() =>
                     {
                         var syncRoot = new object();
-                        var resultList = new ListReactiveCollectionSource<T>();
+                        var resultList = new TCollection();
 
                         return Observable
                             .Using(
@@ -45,14 +42,14 @@ namespace ExRam.ReactiveCollections
                                             {
                                                 case (NotifyCollectionChangedAction.Add):
                                                 {
-                                                    resultList.AddRange(notification.NewItems.Where(x => filter(x)));
+                                                    this.AddRange(resultList, notification.NewItems.Where(x => filter(x)));
 
                                                     break;
                                                 }
 
                                                 case (NotifyCollectionChangedAction.Remove):
                                                 {
-                                                    resultList.RemoveRange(notification.OldItems.Where(x => filter(x)), this._equalityComparer);
+                                                    this.RemoveRange(resultList, notification.OldItems.Where(x => filter(x)));
 
                                                     break;
                                                 }
@@ -65,19 +62,19 @@ namespace ExRam.ReactiveCollections
                                                         var getsIn = filter(notification.NewItems[0]);
 
                                                         if ((wasIn) && (getsIn))
-                                                            resultList.Replace(notification.OldItems[0], notification.NewItems[0], this._equalityComparer);
+                                                            this.Replace(resultList, notification.OldItems[0], notification.NewItems[0]);
                                                         else if (wasIn)
-                                                            resultList.Remove(notification.OldItems[0], this._equalityComparer);
+                                                            this.Remove(resultList, notification.OldItems[0]);
                                                         else if (getsIn)
-                                                            resultList.Add(notification.NewItems[0]);
+                                                            this.Add(resultList, notification.NewItems[0]);
                                                     }
                                                     else
                                                     {
-                                                        resultList
-                                                            .RemoveRange(notification.OldItems.Where(x => filter(x)), this._equalityComparer);
+                                                        this
+                                                            .RemoveRange(resultList, notification.OldItems.Where(x => filter(x)));
 
-                                                        resultList
-                                                            .AddRange(notification.NewItems.Where(x => filter(x)));
+                                                        this
+                                                            .AddRange(resultList, notification.NewItems.Where(x => filter(x)));
                                                     }
 
                                                     break;
@@ -85,8 +82,8 @@ namespace ExRam.ReactiveCollections
 
                                                 default:
                                                 {
-                                                    resultList.Clear();
-                                                    resultList.AddRange(notification.Current.Where(x => filter(x)));
+                                                    this.Clear(resultList);
+                                                    this.AddRange(resultList, notification.Current.Where(x => filter(x)));
 
                                                     break;
                                                 }
@@ -101,71 +98,102 @@ namespace ExRam.ReactiveCollections
                     .Normalize();
             }
 
-            public IObservable<ListChangedNotification<T>> Changes { get; }
+            protected abstract void Add(TCollection collection, T item);
+            protected abstract void AddRange(TCollection collection, IEnumerable<T> items);
+            protected abstract void RemoveRange(TCollection collection, IEnumerable<T> items);
+            protected abstract void Remove(TCollection collection, T oldItem);
+            protected abstract void Replace(TCollection collection, T oldItem, T newItem);
+            protected abstract void Clear(TCollection collection);
+
+            public IObservable<TNotification> Changes { get; }
+        }
+        #endregion
+
+        #region WhereReactiveList
+        private sealed class WhereReactiveList<T> : WhereReactiveCollection<ListReactiveCollectionSource<T>, ListChangedNotification<T>, T>
+        {
+            private readonly IEqualityComparer<T> _equalityComparer;
+
+            public WhereReactiveList(IObservable<ICollectionChangedNotification<T>> source, Predicate<T> filter, IEqualityComparer<T> equalityComparer) : base(source, filter)
+            {
+                Contract.Requires(source != null);
+                Contract.Requires(filter != null);
+                Contract.Requires(equalityComparer != null);
+
+                this._equalityComparer = equalityComparer;
+            }
+
+            protected override void Add(ListReactiveCollectionSource<T> collection, T item)
+            {
+                collection.Add(item);
+            }
+
+            protected override void Clear(ListReactiveCollectionSource<T> collection)
+            {
+                collection.Clear();
+            }
+
+            protected override void AddRange(ListReactiveCollectionSource<T> collection, IEnumerable<T> items)
+            {
+                collection.AddRange(items);
+            }
+
+            protected override void Remove(ListReactiveCollectionSource<T> collection, T oldItem)
+            {
+                collection.Remove(oldItem, this._equalityComparer);
+            }
+
+            protected override void RemoveRange(ListReactiveCollectionSource<T> collection, IEnumerable<T> items)
+            {
+                collection.RemoveRange(items, this._equalityComparer);
+            }
+
+            protected override void Replace(ListReactiveCollectionSource<T> collection, T oldItem, T newItem)
+            {
+                collection.Replace(oldItem, newItem, this._equalityComparer);
+            }
         }
         #endregion
 
         #region WhereReactiveDictionary
-        private sealed class WhereReactiveDictionary<TKey, TValue> : IReactiveCollection<DictionaryChangedNotification<TKey, TValue>>
+        private sealed class WhereReactiveDictionary<TKey, TValue> : WhereReactiveCollection<DictionaryReactiveCollectionSource<TKey, TValue>, DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>>
         {
-            public WhereReactiveDictionary(IObservable<DictionaryChangedNotification<TKey, TValue>> source, Predicate<KeyValuePair<TKey, TValue>> filter)
+            public WhereReactiveDictionary(IObservable<DictionaryChangedNotification<TKey, TValue>> source, Predicate<KeyValuePair<TKey, TValue>> filter) : base(source, filter)
             {
-                this.Changes = Observable
-                    .Defer(() =>
-                    {
-                        var syncRoot = new object();
-                        var resultList = new DictionaryReactiveCollectionSource<TKey, TValue>();
-
-                        return Observable
-                            .Using(
-                                () => source.Subscribe(
-                                    notification =>
-                                    {
-                                        lock (syncRoot)
-                                        {
-                                            switch (notification.Action)
-                                            {
-                                                case (NotifyCollectionChangedAction.Add):
-                                                {
-                                                    resultList.AddRange(notification.NewItems.Where(x => filter(x)));
-
-                                                    break;
-                                                }
-
-                                                case (NotifyCollectionChangedAction.Remove):
-                                                {
-                                                    resultList.RemoveRange(notification.OldItems.Where(x => filter(x)).Select(x => x.Key));
-
-                                                    break;
-                                                }
-
-                                                case (NotifyCollectionChangedAction.Replace):
-                                                {
-                                                    resultList.RemoveRange(notification.OldItems.Where(x => filter(x)).Select(x => x.Key));
-                                                    resultList.AddRange(notification.NewItems.Where(x => filter(x)));
-
-                                                    break;
-                                                }
-
-                                                default:
-                                                {
-                                                    resultList.Clear();
-                                                    resultList.AddRange(notification.Current.Where(x => filter(x)));
-
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }),
-
-                                _ => resultList.ReactiveCollection.Changes);
-                    })
-                    .Replay(1)
-                    .RefCount()
-                    .Normalize();
+                Contract.Requires(source != null);
+                Contract.Requires(filter != null);
             }
 
-            public IObservable<DictionaryChangedNotification<TKey, TValue>> Changes { get; }
+            protected override void RemoveRange(DictionaryReactiveCollectionSource<TKey, TValue> collection, IEnumerable<KeyValuePair<TKey, TValue>> items)
+            {
+                collection.RemoveRange(items.Select(x => x.Key));
+            }
+
+            protected override void Replace(DictionaryReactiveCollectionSource<TKey, TValue> collection, KeyValuePair<TKey, TValue> oldItem, KeyValuePair<TKey, TValue> newItem)
+            {
+                collection.Remove(oldItem.Key);
+                collection.Add(newItem.Key, newItem.Value);
+            }
+
+            protected override void Add(DictionaryReactiveCollectionSource<TKey, TValue> collection, KeyValuePair<TKey, TValue> item)
+            {
+                collection.Add(item.Key, item.Value);
+            }
+
+            protected override void AddRange(DictionaryReactiveCollectionSource<TKey, TValue> collection, IEnumerable<KeyValuePair<TKey, TValue>> items)
+            {
+                collection.AddRange(items);
+            }
+
+            protected override void Clear(DictionaryReactiveCollectionSource<TKey, TValue> collection)
+            {
+                collection.Clear();
+            }
+
+            protected override void Remove(DictionaryReactiveCollectionSource<TKey, TValue> collection, KeyValuePair<TKey, TValue> oldItem)
+            {
+                collection.Remove(oldItem.Key);
+            }
         }
         #endregion
 
