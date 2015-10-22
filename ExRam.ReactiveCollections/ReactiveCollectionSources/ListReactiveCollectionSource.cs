@@ -68,12 +68,15 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(items != null);
             Contract.Requires(index >= 0);
 
-            var immutableItems = ImmutableList<T>.Empty.AddRange(items);
+            var immutableItems = ImmutableList.CreateRange(items);
 
-            if (immutableItems.Count > 0)
+            if (!immutableItems.IsEmpty)
             {
-                var newList = this.Current.InsertRange(index, immutableItems);
-                this.Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, immutableItems, index));
+                var current = this.Current;
+                var newList = current.InsertRange(index, immutableItems);
+
+                if (newList != current)
+                    this.Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, immutableItems, index));
             }
         }
 
@@ -98,10 +101,8 @@ namespace ExRam.ReactiveCollections
 
             var oldList = this.Current;
             var index = oldList.IndexOf(item, equalityComparer);
-            if (index > -1)
-                this.RemoveAt(index);
 
-            return (this.Current != oldList);
+            return ((index > -1) && (this.RemoveAtInternal(index)));
         }
 
         public void RemoveAll(Predicate<T> match)
@@ -114,10 +115,22 @@ namespace ExRam.ReactiveCollections
 
         public void RemoveAt(int index)
         {
+            this.RemoveAtInternal(index);
+        }
+
+        private bool RemoveAtInternal(int index)
+        {
             var oldList = this.Current;
             var oldItem = oldList[index];
             var newList = oldList.RemoveAt(index);
-            this.Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Remove, ImmutableList.Create(oldItem), ImmutableList<T>.Empty, index));
+
+            if (oldList != newList)
+            {
+                this.Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Remove, ImmutableList.Create(oldItem), ImmutableList<T>.Empty, index));
+                return true;
+            }
+
+            return false;
         }
 
         public void RemoveRange(int index, int count)
@@ -127,7 +140,9 @@ namespace ExRam.ReactiveCollections
             var oldList = this.Current;
             var range = oldList.GetRange(index, count);
             var newList = oldList.RemoveRange(index, count);
-            this.Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Remove, range, ImmutableList<T>.Empty, index));
+
+            if (newList != oldList)
+                this.Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Remove, range, ImmutableList<T>.Empty, index));
         }
 
         public void RemoveRange(IEnumerable<T> items)
@@ -142,14 +157,16 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(items != null);
             Contract.Requires(equalityComparer != null);
 
-            var removedItems = ImmutableList<T>.Empty.AddRange(items);
+            var removedItems = ImmutableList.CreateRange(items);
 
             if (removedItems.Count > 0)
             {
                 if (removedItems.Count > 1)
                 {
-                    var newList = this.Current.RemoveRange(removedItems, equalityComparer);
-                    this.Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+                    var current = this.Current;
+                    var newList = current.RemoveRange(removedItems, equalityComparer);
+                    if (current != newList)
+                       this.Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
                 }
                 else
                     this.Remove(removedItems[0], equalityComparer);
@@ -180,9 +197,11 @@ namespace ExRam.ReactiveCollections
         {
             Contract.Requires(index >= 0);
 
-            var newList = this.Current.Reverse(index, count);
+            var current = this.Current;
+            var newList = current.Reverse(index, count);
 
-            this.Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+            if (newList != current)
+                this.Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
         public void SetItem(int index, T value)
@@ -193,7 +212,8 @@ namespace ExRam.ReactiveCollections
             var oldItem = oldList[index];
             var newList = oldList.SetItem(index, value);
 
-            this.Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Replace, ImmutableList.Create(oldItem), ImmutableList.Create(value), index));
+            if (oldList != newList)
+                this.Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Replace, ImmutableList.Create(oldItem), ImmutableList.Create(value), index));
         }
 
         public void Sort()
@@ -220,9 +240,11 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(index >= 0);
             Contract.Requires(comparer != null);
 
-            var newList = this.Current.Sort(index, count, comparer);
+            var current = this.Current;
+            var newList = current.Sort(index, count, comparer);
 
-            this.Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+            if (newList != current)
+                this.Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
         #region Explicit IList<T> implementation
