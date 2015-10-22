@@ -17,7 +17,7 @@ namespace ExRam.ReactiveCollections
     {
         #region WhereReactiveCollection
         private abstract class WhereReactiveCollection<TCollection, TNotification, T> : IReactiveCollection<TNotification>
-            where TCollection : ReactiveCollectionSource<TNotification>, new()
+            where TCollection : IReactiveCollectionSource<TNotification>, new()
             where TNotification : ICollectionChangedNotification
         {
             protected WhereReactiveCollection(IObservable<ICollectionChangedNotification<T>> source, Predicate<T> filter)
