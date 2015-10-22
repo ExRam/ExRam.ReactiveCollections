@@ -122,14 +122,11 @@ namespace ExRam.ReactiveCollections
             this.RemoveRange(items, EqualityComparer<T>.Default);
         }
 
-        public void RemoveRange(IEnumerable<T> items, IEqualityComparer<T> equalityComparer)
+        public void RemoveRange(IEnumerable<T> items, IEqualityComparer<T> itemsequalityComparer)
         {
             Contract.Requires(items != null);
 
-            foreach (var item in items)
-            {
-                this._innerList.Remove(item, equalityComparer);
-            }
+            this._innerList.RemoveRange(items);
         }
 
         public void Replace(T oldValue, T newValue)

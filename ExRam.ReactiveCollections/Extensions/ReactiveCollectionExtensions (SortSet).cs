@@ -14,20 +14,21 @@ namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        #region SortReactiveSortedList
-        private sealed class SortedSetReactiveCollection<TSource> : IReactiveCollection<SortedSetChangedNotification<TSource>>
+        #region SortedReactiveCollection
+        private abstract class SortedReactiveCollection<TCollection, TNotification, TSource> : IReactiveCollection<TNotification>
+            where TCollection : IReactiveCollectionSource<TNotification>, new()
+            where TNotification : ICollectionChangedNotification
         {
-            public SortedSetReactiveCollection(IObservable<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer)
+            protected SortedReactiveCollection(IObservable<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer)
             {
                 Contract.Requires(source != null);
-                Contract.Requires(comparer != null);
 
                 this.Changes = Observable
                     .Defer(
                         () =>
                         {
                             var syncRoot = new object();
-                            var resultList = new SortedSetReactiveCollectionSource<TSource>(comparer);
+                            var resultList = this.CreateCollection(comparer);
 
                             return Observable.Using(
                                 () => source.Subscribe(
@@ -40,39 +41,40 @@ namespace ExRam.ReactiveCollections
                                                 case (NotifyCollectionChangedAction.Add):
                                                 {
                                                     if (notification.NewItems.Count == 1)
-                                                        resultList.Add(notification.NewItems[0]);
+                                                        this.Add(resultList, notification.NewItems[0]);
                                                     else
-                                                        resultList.AddRange(notification.NewItems);
+                                                        this.AddRange(resultList, notification.NewItems);
 
                                                     break;
                                                 }
 
                                                 case (NotifyCollectionChangedAction.Remove):
                                                 {
-                                                    foreach (var value in notification.OldItems)
-                                                    {
-                                                        resultList.Remove(value);
-                                                    }
+                                                    if (notification.NewItems.Count == 1)
+                                                        this.Remove(resultList, notification.NewItems[0]);
+                                                    else
+                                                        this.RemoveRange(resultList, notification.OldItems);
 
                                                     break;
                                                 }
 
                                                 case (NotifyCollectionChangedAction.Replace):
                                                 {
-                                                    foreach (var value in notification.OldItems)
+                                                    if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
+                                                        this.Replace(resultList, notification.OldItems[0], notification.NewItems[0]);
+                                                    else
                                                     {
-                                                        resultList.Remove(value);
+                                                        this.RemoveRange(resultList, notification.OldItems);
+                                                        this.AddRange(resultList, notification.NewItems);
                                                     }
-
-                                                    resultList.AddRange(notification.NewItems);
 
                                                     break;
                                                 }
 
                                                 default:
                                                 {
-                                                    resultList.Clear();
-                                                    resultList.AddRange(notification.Current);
+                                                    this.Clear(resultList);
+                                                    this.AddRange(resultList, notification.Current);
 
                                                     break;
                                                 }
@@ -87,7 +89,65 @@ namespace ExRam.ReactiveCollections
                     .Normalize();
             }
 
-            public IObservable<SortedSetChangedNotification<TSource>> Changes { get; }
+            protected abstract TCollection CreateCollection(IComparer<TSource> comparer);
+            protected abstract void Add(TCollection collection, TSource item);
+            protected abstract void AddRange(TCollection collection, IEnumerable<TSource> items);
+            protected abstract void RemoveRange(TCollection collection, IEnumerable<TSource> items);
+            protected abstract void Remove(TCollection collection, TSource oldItem);
+            protected abstract void Replace(TCollection collection, TSource oldItem, TSource newItem);
+            protected abstract void Clear(TCollection collection);
+
+            public IObservable<TNotification> Changes { get; }
+        }
+        #endregion
+
+        #region SortedSetReactiveCollection
+        private sealed class SortedSetReactiveCollection<TSource> : SortedReactiveCollection<SortedSetReactiveCollectionSource<TSource>, SortedSetChangedNotification<TSource>, TSource>
+        {
+            public SortedSetReactiveCollection(IObservable<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer) : base(source, comparer)
+            {
+                Contract.Requires(source != null);
+                Contract.Requires(comparer != null);
+            }
+
+            protected override void Add(SortedSetReactiveCollectionSource<TSource> collection, TSource item)
+            {
+                collection.Add(item);
+            }
+
+            protected override void AddRange(SortedSetReactiveCollectionSource<TSource> collection, IEnumerable<TSource> items)
+            {
+                collection.AddRange(items);
+            }
+
+            protected override void RemoveRange(SortedSetReactiveCollectionSource<TSource> collection, IEnumerable<TSource> items)
+            {
+                foreach(var item in items)
+                {
+                    collection.Remove(item);
+                }
+            }
+
+            protected override void Remove(SortedSetReactiveCollectionSource<TSource> collection, TSource oldItem)
+            {
+                collection.Remove(oldItem);
+            }
+
+            protected override void Clear(SortedSetReactiveCollectionSource<TSource> collection)
+            {
+                collection.Clear();
+            }
+
+            protected override void Replace(SortedSetReactiveCollectionSource<TSource> collection, TSource oldItem, TSource newItem)
+            {
+                collection.Remove(oldItem);
+                collection.Add(newItem);
+            }
+
+            protected override SortedSetReactiveCollectionSource<TSource> CreateCollection(IComparer<TSource> comparer)
+            {
+                return new SortedSetReactiveCollectionSource<TSource>(comparer);
+            }
         }
         #endregion
 

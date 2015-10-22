@@ -1132,33 +1132,19 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notificationsTask = projectedList.Changes
                 .Skip(2)
-                .Take(4)
+                .Take(2)
                 .ToArray()
                 .ToTask();
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(0, notifications[0].Index);
-            Assert.AreEqual(0, notifications[0].NewItems.Count);
-            CollectionAssert.AreEqual(new[] { 1 }, notifications[0].OldItems.ToArray());
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[0].Action);
+            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notifications[0].Action);
 
             Assert.AreEqual(0, notifications[1].Index);
-            Assert.AreEqual(0, notifications[1].NewItems.Count);
-            CollectionAssert.AreEqual(new[] { 2 }, notifications[1].OldItems.ToArray());
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[1].Action);
-
-            Assert.AreEqual(0, notifications[2].Index);
-            Assert.AreEqual(0, notifications[2].OldItems.Count);
-            CollectionAssert.AreEqual(new[] { 3 }, notifications[2].NewItems.ToArray());
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[2].Action);
-
-            Assert.AreEqual(1, notifications[3].Index);
-            Assert.AreEqual(0, notifications[3].OldItems.Count);
-            CollectionAssert.AreEqual(new[] { 4 }, notifications[3].NewItems.ToArray());
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[3].Action);
-
-            CollectionAssert.AreEqual(ImmutableList.Create(3, 4), notifications[3].Current);
+            Assert.AreEqual(0, notifications[1].OldItems.Count);
+            CollectionAssert.AreEqual(new[] { 3, 4 }, notifications[1].NewItems.ToArray());
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
+            CollectionAssert.AreEqual(ImmutableList.Create(3, 4), notifications[1].Current);
         }
         #endregion
 

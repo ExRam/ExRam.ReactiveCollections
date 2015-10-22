@@ -14,86 +14,54 @@ namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        #region SortedReactiveCollection
-        private sealed class SortedReactiveCollection<TSource> : IReactiveCollection<ListChangedNotification<TSource>>
+        #region SortedListReactiveCollection
+        private sealed class SortedListReactiveCollection<TSource> : SortedReactiveCollection<SortedListReactiveCollectionSource<TSource>, ListChangedNotification<TSource>, TSource>
         {
-            public SortedReactiveCollection(IObservable<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer, IEqualityComparer<TSource> equalityComparer)
+            private readonly IEqualityComparer<TSource> _equalityComparer;
+
+            public SortedListReactiveCollection(IObservable<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer, IEqualityComparer<TSource> equalityComparer) : base(source, comparer)
             {
                 Contract.Requires(source != null);
                 Contract.Requires(comparer != null);
                 Contract.Requires(equalityComparer != null);
 
-                this.Changes = Observable
-                    .Defer(
-                        () =>
-                        {
-                            var syncRoot = new object();
-                            var resultList = new SortedListReactiveCollectionSource<TSource>(comparer);
-
-                            return Observable.Using(
-                                () => source.Subscribe(
-                                    notification =>
-                                    {
-                                        lock (syncRoot)
-                                        {
-                                            switch (notification.Action)
-                                            {
-                                                case (NotifyCollectionChangedAction.Add):
-                                                {
-                                                    if (notification.NewItems.Count == 1)
-                                                        resultList.Add(notification.NewItems[0]);
-                                                    else
-                                                        resultList.AddRange(notification.NewItems);
-
-                                                    break;
-                                                }
-
-                                                case (NotifyCollectionChangedAction.Remove):
-                                                {
-                                                    resultList.RemoveRange(notification.OldItems, equalityComparer);
-
-                                                    break;
-                                                }
-
-                                                case (NotifyCollectionChangedAction.Replace):
-                                                {
-                                                    if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
-                                                        resultList.Replace(notification.OldItems[0], notification.NewItems[0], equalityComparer);
-                                                    else
-                                                    {
-                                                        foreach (var value in notification.OldItems)
-                                                        {
-                                                            resultList.Remove(value, equalityComparer);
-                                                        }
-
-                                                        foreach (var value in notification.NewItems)
-                                                        {
-                                                            resultList.Add(value);
-                                                        }
-                                                    }
-
-                                                    break;
-                                                }
-
-                                                default:
-                                                {
-                                                    resultList.Clear();
-                                                    resultList.AddRange(notification.Current);
-
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }),
-
-                                    _ => resultList.ReactiveCollection.Changes);
-                        })
-                    .Replay(1)
-                    .RefCount()
-                    .Normalize();
+                this._equalityComparer = equalityComparer;
             }
 
-            public IObservable<ListChangedNotification<TSource>> Changes { get; }
+            protected override void Add(SortedListReactiveCollectionSource<TSource> collection, TSource item)
+            {
+                collection.Add(item);
+            }
+
+            protected override void AddRange(SortedListReactiveCollectionSource<TSource> collection, IEnumerable<TSource> items)
+            {
+                collection.AddRange(items);
+            }
+
+            protected override void RemoveRange(SortedListReactiveCollectionSource<TSource> collection, IEnumerable<TSource> items)
+            {
+                collection.RemoveRange(items, this._equalityComparer);
+            }
+
+            protected override void Remove(SortedListReactiveCollectionSource<TSource> collection, TSource oldItem)
+            {
+                collection.Remove(oldItem, this._equalityComparer);
+            }
+
+            protected override void Replace(SortedListReactiveCollectionSource<TSource> collection, TSource oldItem, TSource newItem)
+            {
+                collection.Replace(oldItem, newItem);
+            }
+
+            protected override SortedListReactiveCollectionSource<TSource> CreateCollection(IComparer<TSource> comparer)
+            {
+                return new SortedListReactiveCollectionSource<TSource>(comparer);
+            }
+
+            protected override void Clear(SortedListReactiveCollectionSource<TSource> collection)
+            {
+                collection.Clear();
+            }
         }
         #endregion
 
@@ -130,7 +98,7 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(equalityComparer != null);
             Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
 
-            return new SortedReactiveCollection<TSource>(source.Changes, comparer, equalityComparer);
+            return new SortedListReactiveCollection<TSource>(source.Changes, comparer, equalityComparer);
         }
     }
 }

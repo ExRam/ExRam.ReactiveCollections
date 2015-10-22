@@ -306,7 +306,7 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notificationsTask = list.ReactiveCollection.Changes
                 .Skip(2)
-                .Take(2)
+                .Take(1)
                 .ToArray()
                 .ToTask();
 
@@ -315,15 +315,8 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[0].Action);
-            Assert.AreEqual(0, notifications[0].NewItems.Count);
-            CollectionAssert.AreEqual(new[] { 2 }, notifications[0].OldItems.ToArray());
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[1].Action);
-            Assert.AreEqual(0, notifications[1].NewItems.Count);
-            CollectionAssert.AreEqual(new[] { 4 }, notifications[1].OldItems.ToArray());
-
-            CollectionAssert.AreEqual(new[] { 1, 3 }, notifications[1].Current);
+            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notifications[0].Action);
+            CollectionAssert.AreEqual(new[] { 1, 3 }, notifications[0].Current.ToArray());
         }
         #endregion
 
