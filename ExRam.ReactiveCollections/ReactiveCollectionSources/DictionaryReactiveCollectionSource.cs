@@ -26,9 +26,7 @@ namespace ExRam.ReactiveCollections
         #region IImmutableDictionary<TKey, TValue> implementation
         public void Add(TKey key, TValue value)
         {
-            var newList = this.Current.Add(key, value);
-
-            this.Subject.OnNext(new DictionaryChangedNotification<TKey, TValue>(newList, NotifyCollectionChangedAction.Add, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList.Create(new KeyValuePair<TKey, TValue>(key, value))));
+            this.Subject.OnNext(new DictionaryChangedNotification<TKey, TValue>(this.Current.Add(key, value), NotifyCollectionChangedAction.Add, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList.Create(new KeyValuePair<TKey, TValue>(key, value))));
         }
 
         public void AddRange(IEnumerable<TValue> values, Func<TValue, TKey> keySelector)
@@ -43,13 +41,15 @@ namespace ExRam.ReactiveCollections
         {
             Contract.Requires(pairs != null);
 
-            var immutablePairs = ImmutableList<KeyValuePair<TKey, TValue>>.Empty.AddRange(pairs);
+            var immutablePairs = ImmutableList.CreateRange(pairs);
 
-            if (immutablePairs.Count != 0)
+            if (!immutablePairs.IsEmpty)
             {
-                var newList = this.Current.AddRange(immutablePairs);
+                var current = this.Current;
+                var newDict = current.AddRange(immutablePairs);
 
-                this.Subject.OnNext(new DictionaryChangedNotification<TKey, TValue>(newList, NotifyCollectionChangedAction.Add, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, immutablePairs));
+                if (newDict != current)
+                    this.Subject.OnNext(new DictionaryChangedNotification<TKey, TValue>(newDict, NotifyCollectionChangedAction.Add, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, immutablePairs));
             }
         }
 
@@ -72,7 +72,6 @@ namespace ExRam.ReactiveCollections
             if (oldList != newList)
             {
                 var oldValue = oldList[key];
-
                 this.Subject.OnNext(new DictionaryChangedNotification<TKey, TValue>(newList, NotifyCollectionChangedAction.Remove, ImmutableList.Create(new KeyValuePair<TKey, TValue>(key, oldValue)), ImmutableList<KeyValuePair<TKey, TValue>>.Empty));
             }
         }
@@ -108,9 +107,7 @@ namespace ExRam.ReactiveCollections
             var newList = oldList.SetItems(items);
 
             if (oldList != newList)
-            {
                 this.Subject.OnNext(new DictionaryChangedNotification<TKey, TValue>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList<KeyValuePair<TKey, TValue>>.Empty));
-            }
         }
 
         public bool ContainsKey(TKey key)
@@ -129,7 +126,6 @@ namespace ExRam.ReactiveCollections
             {
                 return this.Current[key];
             }
-
             set
             {
                 this.SetItem(key, value);
