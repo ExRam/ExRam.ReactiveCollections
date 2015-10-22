@@ -42,14 +42,28 @@ namespace ExRam.ReactiveCollections
                                             {
                                                 case (NotifyCollectionChangedAction.Add):
                                                 {
-                                                    this.AddRange(resultList, notification.NewItems.Where(x => filter(x)));
+                                                    if (notification.NewItems.Count == 1)
+                                                    {
+                                                        var newItem = notification.NewItems[0];
+                                                        if (filter(newItem))
+                                                            this.Add(resultList, newItem);
+                                                    }
+                                                    else
+                                                        this.AddRange(resultList, notification.NewItems.Where(x => filter(x)));
 
                                                     break;
                                                 }
 
                                                 case (NotifyCollectionChangedAction.Remove):
                                                 {
-                                                    this.RemoveRange(resultList, notification.OldItems.Where(x => filter(x)));
+                                                    if (notification.OldItems.Count == 1)
+                                                    {
+                                                        var oldItem = notification.OldItems[0];
+                                                        if (filter(oldItem))
+                                                            this.Remove(resultList, oldItem);
+                                                    }
+                                                    else
+                                                        this.RemoveRange(resultList, notification.OldItems.Where(x => filter(x)));
 
                                                     break;
                                                 }
