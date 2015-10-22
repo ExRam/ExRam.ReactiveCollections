@@ -30,8 +30,9 @@ namespace ExRam.ReactiveCollections
 
         public void Add(T value)
         {
-            var newSet = this.Current.Add(value);
-            if (newSet != this.Current)
+            var current = this.Current;
+            var newSet = current.Add(value);
+            if (newSet != current)
                 this.Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, ImmutableList.Create(value), newSet.IndexOf(value)));
         }
 
@@ -47,22 +48,32 @@ namespace ExRam.ReactiveCollections
 
         public void Clear()
         {
-            if (!this.Current.IsEmpty)
-                this.Subject.OnNext(new SortedSetChangedNotification<T>(this.Current.Clear(), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+            var current = this.Current;
+
+            if (!current.IsEmpty)
+                this.Subject.OnNext(new SortedSetChangedNotification<T>(ImmutableSortedSet<T>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
         public void Except(IEnumerable<T> other)
         {
             Contract.Requires(other != null);
 
-            this.Subject.OnNext(new SortedSetChangedNotification<T>(this.Current.Except(other), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+            var current = this.Current;
+            var newSet = current.Except(other);
+
+            if (newSet != current)
+                this.Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
         public void Intersect(IEnumerable<T> other)
         {
             Contract.Requires(other != null);
 
-            this.Subject.OnNext(new SortedSetChangedNotification<T>(this.Current.Intersect(other), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+            var current = this.Current;
+            var newSet = current.Intersect(other);
+
+            if (newSet != current)
+                this.Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
         public bool IsProperSubsetOf(IEnumerable<T> other)
@@ -92,9 +103,11 @@ namespace ExRam.ReactiveCollections
 
         public void Remove(T value)
         {
-            var newSet = this.Current.Remove(value);
-            if (newSet != this.Current)
-                this.Subject.OnNext(new SortedSetChangedNotification<T>(this.Current.Remove(value), NotifyCollectionChangedAction.Remove, ImmutableList.Create(value), ImmutableList<T>.Empty, this.Current.IndexOf(value)));
+            var current = this.Current;
+            var newSet = current.Remove(value);
+
+            if (newSet != current)
+                this.Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Remove, ImmutableList.Create(value), ImmutableList<T>.Empty, this.Current.IndexOf(value)));
         }
 
         public bool SetEquals(IEnumerable<T> other)
@@ -106,7 +119,11 @@ namespace ExRam.ReactiveCollections
         {
             Contract.Requires(other != null);
 
-            this.Subject.OnNext(new SortedSetChangedNotification<T>(this.Current.SymmetricExcept(other), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+            var current = this.Current;
+            var newSet = current.SymmetricExcept(other);
+
+            if (newSet != current)
+                this.Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
         public bool TryGetValue(T equalValue, out T actualValue)
@@ -118,7 +135,11 @@ namespace ExRam.ReactiveCollections
         {
             Contract.Requires(other != null);
 
-            this.Subject.OnNext(new SortedSetChangedNotification<T>(this.Current.Union(other), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+            var current = this.Current;
+            var newSet = current.Union(other);
+
+            if (newSet != current)
+                this.Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
         #region IList<T> implementation
