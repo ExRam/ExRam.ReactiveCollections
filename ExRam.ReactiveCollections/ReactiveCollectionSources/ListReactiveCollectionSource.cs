@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Diagnostics.Contracts;
-using System.Linq;
 
 namespace ExRam.ReactiveCollections
 {

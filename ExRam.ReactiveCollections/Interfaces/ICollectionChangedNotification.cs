@@ -78,13 +78,7 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        NotifyCollectionChangedAction ICollectionChangedNotification.Action
-        {
-            get
-            {
-                return default(NotifyCollectionChangedAction);
-            }
-        }
+        NotifyCollectionChangedAction ICollectionChangedNotification.Action => default(NotifyCollectionChangedAction);
 
         IEnumerable ICollectionChangedNotification.OldItems
         {
@@ -142,10 +136,7 @@ namespace ExRam.ReactiveCollections
             get;
         }
 
-        IEnumerable ICollectionChangedNotification.Current
-        {
-            get { return Current; }
-        }
+        IEnumerable ICollectionChangedNotification.Current => this.Current;
 
         public IReadOnlyCollection<T> Current
         {
@@ -157,21 +148,9 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        IEnumerable ICollectionChangedNotification.OldItems
-        {
-            get
-            {
-                return default(IEnumerable<T>);
-            }
-        }
+        IEnumerable ICollectionChangedNotification.OldItems => default(IEnumerable<T>);
 
-        IEnumerable ICollectionChangedNotification.NewItems
-        {
-            get
-            {
-                return default(IEnumerable<T>);
-            }
-        }
+        IEnumerable ICollectionChangedNotification.NewItems => default(IEnumerable<T>);
 
         ICollectionChangedNotification ICollectionChangedNotification.ToResetNotification()
         {
