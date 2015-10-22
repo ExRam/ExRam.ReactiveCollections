@@ -13,7 +13,7 @@ using System.Linq;
 namespace ExRam.ReactiveCollections
 {
     public class SortedListReactiveCollectionSource<T> : 
-        IReactiveCollectionSource<ListChangedNotification<T>, T>,
+        IReactiveCollectionSource<ListChangedNotification<T>>,
         IList<T>,
         IList
     {

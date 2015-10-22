@@ -8,9 +8,9 @@ using System.Diagnostics.Contracts;
 
 namespace ExRam.ReactiveCollections
 {
-    [ContractClass(typeof(ReactiveCollectionSourceContracts<,>))]
-    public interface IReactiveCollectionSource<out TNotification, T>
-         where TNotification : ICollectionChangedNotification<T>
+    [ContractClass(typeof(ReactiveCollectionSourceContracts<>))]
+    public interface IReactiveCollectionSource<out TNotification>
+         where TNotification : ICollectionChangedNotification
     {
         IReactiveCollection<TNotification> ReactiveCollection
         {
@@ -18,11 +18,11 @@ namespace ExRam.ReactiveCollections
         }
     }
 
-    [ContractClassFor(typeof(IReactiveCollectionSource<,>))]
-    public abstract class ReactiveCollectionSourceContracts<TNotification, T> : IReactiveCollectionSource<TNotification, T>
-        where TNotification : ICollectionChangedNotification<T>
+    [ContractClassFor(typeof(IReactiveCollectionSource<>))]
+    public abstract class ReactiveCollectionSourceContracts<TNotification> : IReactiveCollectionSource<TNotification>
+        where TNotification : ICollectionChangedNotification
     {
-        IReactiveCollection<TNotification> IReactiveCollectionSource<TNotification, T>.ReactiveCollection
+        IReactiveCollection<TNotification> IReactiveCollectionSource<TNotification>.ReactiveCollection
         {
             get 
             {

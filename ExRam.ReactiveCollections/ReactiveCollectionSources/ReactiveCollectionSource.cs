@@ -11,7 +11,7 @@ using System.Reactive.Subjects;
 
 namespace ExRam.ReactiveCollections
 {
-    public abstract class ReactiveCollectionSource<TNotification>
+    public abstract class ReactiveCollectionSource<TNotification> : IReactiveCollectionSource<TNotification>
         where TNotification : ICollectionChangedNotification
     {
         #region ReactiveCollectionImpl

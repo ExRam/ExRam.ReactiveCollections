@@ -64,10 +64,7 @@ namespace ExRam.ReactiveCollections
                                                         resultList.Remove(value);
                                                     }
 
-                                                    foreach (var value in notification.NewItems)
-                                                    {
-                                                        resultList.Add(value);
-                                                    }
+                                                    resultList.AddRange(notification.NewItems);
 
                                                     break;
                                                 }
