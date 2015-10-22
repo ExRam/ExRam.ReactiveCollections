@@ -108,7 +108,7 @@ namespace ExRam.ReactiveCollections
         #region WhereReactiveDictionary
         private sealed class WhereReactiveDictionary<TKey, TValue> : IReactiveCollection<DictionaryChangedNotification<TKey, TValue>>
         {
-            public WhereReactiveDictionary(IObservable<DictionaryChangedNotification<TKey, TValue>> source, Predicate<TValue> filter)
+            public WhereReactiveDictionary(IObservable<DictionaryChangedNotification<TKey, TValue>> source, Predicate<KeyValuePair<TKey, TValue>> filter)
             {
                 this.Changes = Observable
                     .Defer(() =>
@@ -127,22 +127,22 @@ namespace ExRam.ReactiveCollections
                                             {
                                                 case (NotifyCollectionChangedAction.Add):
                                                 {
-                                                    resultList.AddRange(notification.NewItems.Where(x => filter(x.Value)));
+                                                    resultList.AddRange(notification.NewItems.Where(x => filter(x)));
 
                                                     break;
                                                 }
 
                                                 case (NotifyCollectionChangedAction.Remove):
                                                 {
-                                                    resultList.RemoveRange(notification.OldItems.Where(x => filter(x.Value)).Select(x => x.Key));
+                                                    resultList.RemoveRange(notification.OldItems.Where(x => filter(x)).Select(x => x.Key));
 
                                                     break;
                                                 }
 
                                                 case (NotifyCollectionChangedAction.Replace):
                                                 {
-                                                    resultList.RemoveRange(notification.OldItems.Where(x => filter(x.Value)).Select(x => x.Key));
-                                                    resultList.AddRange(notification.NewItems.Where(x => filter(x.Value)));
+                                                    resultList.RemoveRange(notification.OldItems.Where(x => filter(x)).Select(x => x.Key));
+                                                    resultList.AddRange(notification.NewItems.Where(x => filter(x)));
 
                                                     break;
                                                 }
@@ -150,7 +150,7 @@ namespace ExRam.ReactiveCollections
                                                 default:
                                                 {
                                                     resultList.Clear();
-                                                    resultList.AddRange(notification.Current.Where(x => filter(x.Value)));
+                                                    resultList.AddRange(notification.Current.Where(x => filter(x)));
 
                                                     break;
                                                 }
@@ -188,7 +188,7 @@ namespace ExRam.ReactiveCollections
             return new WhereReactiveList<TSource>(source.Changes, filter, equalityComparer);
         }
 
-        public static IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> Where<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> source, Predicate<TValue> filter)
+        public static IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> Where<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> source, Predicate<KeyValuePair<TKey, TValue>> filter)
         {
             Contract.Requires(source != null);
             Contract.Requires(filter != null);

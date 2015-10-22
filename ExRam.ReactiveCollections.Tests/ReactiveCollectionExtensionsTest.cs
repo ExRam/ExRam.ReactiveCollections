@@ -438,7 +438,7 @@ namespace ExRam.ReactiveCollections.Tests
 
             var projectedList = list
                 .ReactiveCollection
-                .Where(x => x % 2 == 0);
+                .Where(x => x.Value % 2 == 0);
 
             var notificationTask = projectedList.Changes
                 .Skip(1)
@@ -527,7 +527,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new DictionaryReactiveCollectionSource<string, int>();
 
             var projectedList = list.ReactiveCollection
-                .Where(x => x % 2 == 0);
+                .Where(x => x.Value % 2 == 0);
 
             var notificationTask = projectedList.Changes
                 .Skip(2)
@@ -671,7 +671,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new DictionaryReactiveCollectionSource<string, int>();
 
             var projectedList = list.ReactiveCollection
-                .Where(x => x % 2 == 0);
+                .Where(x => x.Value % 2 == 0);
 
             var notificationTask = projectedList.Changes
                 .Skip(2)
@@ -702,7 +702,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new DictionaryReactiveCollectionSource<string, int>();
 
             var projectedList = list.ReactiveCollection
-                .Where(x => x % 2 == 0);
+                .Where(x => x.Value % 2 == 0);
 
             var notificationTask = projectedList.Changes
                 .Skip(2)
@@ -731,7 +731,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new DictionaryReactiveCollectionSource<string, int>();
 
             var projectedList = list.ReactiveCollection
-                .Where(x => x % 2 == 0);
+                .Where(x => x.Value % 2 == 0);
 
             var notificationsTask = projectedList.Changes
                 .Skip(2)
