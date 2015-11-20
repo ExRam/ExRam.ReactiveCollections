@@ -6,6 +6,7 @@ using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -1553,6 +1554,246 @@ namespace ExRam.ReactiveCollections.Tests
             dict[1] = 3;
 
             CollectionAssert.AreEqual(new[] { 1, 1, 2, 3 }, await arrayTask);
+        }
+        #endregion
+
+        #region Concat_Add
+        [TestMethod]
+        public async Task Concat_Add()
+        {
+            var source1 = new ListReactiveCollectionSource<int>();
+            var source2 = new ListReactiveCollectionSource<int>();
+
+            var concat = source1.ReactiveCollection.Concat(source2.ReactiveCollection);
+
+            var notificationsTask = concat.Changes
+                .Take(3)
+                .ToArray()
+                .ToTask();
+
+            source1.Add(1);
+            source2.Add(2);
+
+            var notifications = await notificationsTask;
+
+            Assert.AreEqual(3, notifications.Length);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notifications[0].Action);
+            Assert.AreEqual(0, notifications[0].Current.Count);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
+            Assert.AreEqual(0, notifications[1].Index);
+            CollectionAssert.AreEqual(new[] { 1 }, notifications[1].Current);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[2].Action);
+            Assert.AreEqual(1, notifications[2].Index);
+            CollectionAssert.AreEqual(new[] { 1, 2 }, notifications[2].Current);
+        }
+        #endregion
+
+        #region Concat_Remove
+        [TestMethod]
+        public async Task Concat_Remove()
+        {
+            var source1 = new ListReactiveCollectionSource<int>();
+            var source2 = new ListReactiveCollectionSource<int>();
+
+            var concat = source1.ReactiveCollection.Concat(source2.ReactiveCollection);
+
+            var notificationsTask = concat.Changes
+                .Skip(2)
+                .Take(3)
+                .ToArray()
+                .ToTask();
+
+            source1.Add(1);
+            source2.Add(2);
+            source1.RemoveAt(0);
+            source2.RemoveAt(0);
+
+            var notifications = await notificationsTask;
+
+            Assert.AreEqual(3, notifications.Length);
+
+            CollectionAssert.AreEqual(new[] { 1, 2 }, notifications[0].Current);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[1].Action);
+            Assert.AreEqual(0, notifications[1].Index);
+            CollectionAssert.AreEqual(new[] { 2 }, notifications[1].Current);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[2].Action);
+            Assert.AreEqual(0, notifications[2].Index);
+            Assert.AreEqual(0, notifications[2].Current.Count);
+        }
+        #endregion
+
+        #region Concat_Clear
+        [TestMethod]
+        public async Task Concat_Clear()
+        {
+            var source1 = new ListReactiveCollectionSource<int>();
+            var source2 = new ListReactiveCollectionSource<int>();
+
+            var concat = source1.ReactiveCollection.Concat(source2.ReactiveCollection);
+
+            var notificationsTask = concat.Changes
+                .Skip(2)
+                .Take(3)
+                .ToArray()
+                .ToTask();
+
+            source1.Add(1);
+            source2.Add(2);
+            source1.Clear();
+            source2.Clear();
+
+            var notifications = await notificationsTask;
+
+            Assert.AreEqual(3, notifications.Length);
+
+            CollectionAssert.AreEqual(new[] { 1, 2 }, notifications[0].Current);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[1].Action);
+            Assert.AreEqual(0, notifications[1].Index);
+            CollectionAssert.AreEqual(new[] { 1 }, notifications[1].OldItems.ToArray());
+            CollectionAssert.AreEqual(new[] { 2 }, notifications[1].Current);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[2].Action);
+            Assert.AreEqual(0, notifications[2].Index);
+            CollectionAssert.AreEqual(new[] { 2 }, notifications[2].OldItems.ToArray());
+            Assert.AreEqual(0, notifications[2].Current.Count);
+        }
+        #endregion
+
+        #region Concat_Replace_single
+        [TestMethod]
+        public async Task Concat_Replace_single()
+        {
+            var source1 = new ListReactiveCollectionSource<int>();
+            var source2 = new ListReactiveCollectionSource<int>();
+
+            var concat = source1.ReactiveCollection.Concat(source2.ReactiveCollection);
+
+            var notificationsTask = concat.Changes
+                .Skip(2)
+                .Take(3)
+                .ToArray()
+                .ToTask();
+
+            source1.AddRange(new[] { 1, 2, 3 });
+            source2.AddRange(new[] { 4, 5, 6 });
+            source1.Replace(2, -2);
+            source2.Replace(5, -5);
+
+            var notifications = await notificationsTask;
+
+            Assert.AreEqual(3, notifications.Length);
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4, 5, 6 }, notifications[0].Current);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Replace, notifications[1].Action);
+            Assert.AreEqual(1, notifications[1].Index);
+            CollectionAssert.AreEqual(new[] { 2 }, notifications[1].OldItems.ToArray());
+            CollectionAssert.AreEqual(new[] { -2 }, notifications[1].NewItems.ToArray());
+            CollectionAssert.AreEqual(new[] { 1, -2, 3, 4, 5, 6 }, notifications[1].Current);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Replace, notifications[2].Action);
+            Assert.AreEqual(4, notifications[2].Index);
+            CollectionAssert.AreEqual(new[] { 5 }, notifications[2].OldItems.ToArray());
+            CollectionAssert.AreEqual(new[] { -5 }, notifications[2].NewItems.ToArray());
+            CollectionAssert.AreEqual(new[] { 1, -2, 3, 4, -5, 6 }, notifications[2].Current);
+        }
+        #endregion
+
+        #region Concat_Replace_multiple
+        [TestMethod]
+        public async Task Concat_Replace_multiple()
+        {
+            var changesSubject1 = new Subject<ListChangedNotification<int>>();
+            var changesSubject2 = new Subject<ListChangedNotification<int>>();
+
+            var reactiveCollection1 = changesSubject1.ToReactiveCollection();
+            var reactiveCollection2 = changesSubject2.ToReactiveCollection();
+
+            var concat = reactiveCollection1.Concat(reactiveCollection2);
+
+            var notificationsTask = concat.Changes
+                .Skip(2)
+                .Take(3)
+                .ToArray()
+                .ToTask();
+
+            changesSubject1.OnNext(new ListChangedNotification<int>(ImmutableList<int>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<int>.Empty, ImmutableList<int>.Empty, null));
+            changesSubject2.OnNext(new ListChangedNotification<int>(ImmutableList<int>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<int>.Empty, ImmutableList<int>.Empty, null));
+
+            changesSubject1.OnNext(new ListChangedNotification<int>(new[] { 1, 2, 3 }.ToImmutableList(), NotifyCollectionChangedAction.Add, ImmutableList<int>.Empty, new[] { 1, 2, 3 }.ToImmutableList(), 0));
+            changesSubject2.OnNext(new ListChangedNotification<int>(new[] { 4, 5, 6 }.ToImmutableList(), NotifyCollectionChangedAction.Add, ImmutableList<int>.Empty, new[] { 4, 5, 6 }.ToImmutableList(), 0));
+
+            changesSubject1.OnNext(new ListChangedNotification<int>(new[] { 1, -2, -3 }.ToImmutableList(), NotifyCollectionChangedAction.Replace, new[] { 2, 3 }.ToImmutableList(), new[] { -2, -3 }.ToImmutableList(), 1));
+            changesSubject2.OnNext(new ListChangedNotification<int>(new[] { 4, -5, -6 }.ToImmutableList(), NotifyCollectionChangedAction.Replace, new[] { 5, 6 }.ToImmutableList(), new[] { -5, -6 }.ToImmutableList(), 1));
+
+            var notifications = await notificationsTask;
+
+            Assert.AreEqual(3, notifications.Length);
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4, 5, 6 }, notifications[0].Current);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Replace, notifications[1].Action);
+            Assert.AreEqual(1, notifications[1].Index);
+            CollectionAssert.AreEqual(new[] { 2, 3 }, notifications[1].OldItems.ToArray());
+            CollectionAssert.AreEqual(new[] { -2, -3 }, notifications[1].NewItems.ToArray());
+            CollectionAssert.AreEqual(new[] { 1, -2, -3, 4, 5, 6 }, notifications[1].Current);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Replace, notifications[2].Action);
+            Assert.AreEqual(4, notifications[2].Index);
+            CollectionAssert.AreEqual(new[] { 5, 6 }, notifications[2].OldItems.ToArray());
+            CollectionAssert.AreEqual(new[] { -5, -6 }, notifications[2].NewItems.ToArray());
+            CollectionAssert.AreEqual(new[] { 1, -2, -3, 4, -5, -6 }, notifications[2].Current);
+        }
+        #endregion
+
+        #region Concat_Delayed
+        [TestMethod]
+        public async Task Concat_Add_Delayed()
+        {
+            var source1 = new ListReactiveCollectionSource<int>();
+            var source2 = new ListReactiveCollectionSource<int>();
+
+            source1.Add(1);
+            source2.Add(2);
+
+            var concat = source1.ReactiveCollection.Concat(source2.ReactiveCollection);
+
+            var notification = await concat.Changes
+                .FirstAsync()
+                .ToTask();
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notification.Action);
+            CollectionAssert.AreEqual(new[] { 1, 2 }, notification.Current);
+        }
+        #endregion
+
+        #region Concat_Delayed2
+        [TestMethod]
+        public async Task Concat_Add_Delayed2()
+        {
+            var sources = Enumerable
+                .Range(0, 7)
+                .Select(_ => new ListReactiveCollectionSource<int>())
+                .Select((collection, i) =>
+                {
+                    collection.Add(i);
+                    return collection.ReactiveCollection;
+                });
+
+            var concat = sources.Concat();
+
+            var notification = await concat.Changes
+                .FirstAsync()
+                .ToTask();
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notification.Action);
+            CollectionAssert.AreEqual(new[] { 0, 1, 2, 3, 4, 5, 6 }, notification.Current);
         }
         #endregion
     }
