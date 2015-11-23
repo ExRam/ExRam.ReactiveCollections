@@ -200,7 +200,20 @@ namespace ExRam.ReactiveCollections
 
         public static IReactiveCollection<ListChangedNotification<T>> Concat<T>(this IEnumerable<IReactiveCollection<ListChangedNotification<T>>> collections)
         {
-            return new ConcatListReactiveCollection<T>(collections.Select(x => x.Changes).ToArray(), EqualityComparer<T>.Default);
+            var sourcesArray = collections
+                .Select(x => x.Changes)
+                .ToArray();
+
+            if (sourcesArray.Length == 0)
+            {
+                return Observable
+                    .Return(new ListChangedNotification<T>(ImmutableList<T>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null))
+                    .ToReactiveCollection();
+            }
+
+            return sourcesArray.Length == 1
+                ? sourcesArray[0].ToReactiveCollection() 
+                : new ConcatListReactiveCollection<T>(sourcesArray, EqualityComparer<T>.Default);
         }
 
         public static IReactiveCollection<ListChangedNotification<T>> Concat<T>(this IReactiveCollection<ListChangedNotification<T>> source1, IReactiveCollection<ListChangedNotification<T>> source2)
