@@ -17,6 +17,7 @@ namespace ExRam.ReactiveCollections
     public static partial class ReactiveCollectionExtensions
     {
         #region Node
+        [ContractClass(typeof(NodeContracts<>))]
         private abstract class Node<T>
         {
             protected Node(ImmutableList<T> list, int maxIndex)
@@ -31,7 +32,25 @@ namespace ExRam.ReactiveCollections
             public ImmutableList<T> List { get; }
         }
 
-        private class InnerNode<T> : Node<T>
+        [ContractClassFor(typeof(Node<>))]
+        private abstract class NodeContracts<T> : Node<T>
+        {
+            protected NodeContracts(ImmutableList<T> list, int maxIndex) : base(list, maxIndex)
+            {
+            }
+
+            public override Node<T> ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
+            {
+                Contract.Ensures(Contract.Result<Node<T>>() != null);
+
+                replacementOffset = default(int);
+                oldList = default(ImmutableList<T>);
+
+                return default(Node<T>);
+            }
+        }
+
+        private sealed class InnerNode<T> : Node<T>
         {
             private readonly Node<T> _left;
             private readonly Node<T> _right;
@@ -42,6 +61,9 @@ namespace ExRam.ReactiveCollections
                     : null,
                 Math.Max(left.MaxIndex, right.MaxIndex))
             {
+                Contract.Requires(left != null);
+                Contract.Requires(right != null);
+
                 this._left = left;
                 this._right = right;
             }
@@ -61,7 +83,7 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        private class TerminalNode<T> : Node<T>
+        private sealed class TerminalNode<T> : Node<T>
         {
             public TerminalNode(ImmutableList<T> list, int maxIndex) : base(list, maxIndex)
             {
