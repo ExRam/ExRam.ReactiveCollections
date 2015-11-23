@@ -77,6 +77,20 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
+        #region IndexedNotification
+        private struct IndexedNotification<T>
+        {
+            public int Index { get; }
+            public ListChangedNotification<T> Notification { get; }
+
+            public IndexedNotification(int index, ListChangedNotification<T> notification)
+            {
+                this.Index = index;
+                this.Notification = notification;
+            }
+        }
+        #endregion
+
         #region ConcatListReactiveCollection
         private sealed class ConcatListReactiveCollection<T> : IReactiveCollection<ListChangedNotification<T>>
         {
@@ -91,18 +105,12 @@ namespace ExRam.ReactiveCollections
                     .Defer(() =>
                     {
                         var syncRoot = new object();
-                        var merged = sources
-                            .Select((observable, i) => observable
-                                .Select(notification => new
-                                {
-                                    Index = i,
-                                    Notification = notification
-                                }))
-                            .Merge();
-
                         var rootNode = this.GetTree(0, sources.Length - 1);
 
-                        return merged
+                        return sources
+                            .Select((observable, i) => observable
+                                .Select(notification => new IndexedNotification<T>(i, notification)))
+                            .Merge()
                             .Select(tuple =>
                             {
                                 lock(syncRoot)
