@@ -200,6 +200,11 @@ namespace ExRam.ReactiveCollections
 
         public static IReactiveCollection<ListChangedNotification<T>> Concat<T>(this IEnumerable<IReactiveCollection<ListChangedNotification<T>>> collections)
         {
+            return collections.Concat(EqualityComparer<T>.Default);
+        }
+
+        public static IReactiveCollection<ListChangedNotification<T>> Concat<T>(this IEnumerable<IReactiveCollection<ListChangedNotification<T>>> collections, IEqualityComparer<T> equalityComparer)
+        {
             var sourcesArray = collections
                 .Select(x => x.Changes)
                 .ToArray();
@@ -213,7 +218,7 @@ namespace ExRam.ReactiveCollections
 
             return sourcesArray.Length == 1
                 ? sourcesArray[0].ToReactiveCollection() 
-                : new ConcatListReactiveCollection<T>(sourcesArray, EqualityComparer<T>.Default);
+                : new ConcatListReactiveCollection<T>(sourcesArray, equalityComparer);
         }
 
         public static IReactiveCollection<ListChangedNotification<T>> Concat<T>(this IReactiveCollection<ListChangedNotification<T>> source1, IReactiveCollection<ListChangedNotification<T>> source2)
