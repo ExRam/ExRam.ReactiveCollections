@@ -82,7 +82,7 @@ namespace System.Reactive.Linq
             return new MulticastConnectableObservable<T>(source, subjectFactory);
         }
 
-        public static IConnectableObservable<T> ReplayFresh<T>(this IObservable<T> observable, int bufferSize)
+        internal static IConnectableObservable<T> ReplayFresh<T>(this IObservable<T> observable, int bufferSize)
         {
             return observable
                 .Multicast(() => new ReplaySubject<T>(bufferSize));
