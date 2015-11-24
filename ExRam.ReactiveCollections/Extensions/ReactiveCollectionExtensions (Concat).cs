@@ -179,7 +179,7 @@ namespace ExRam.ReactiveCollections
                             })
                             .Where(x => x != null);
                     })
-                    .Replay(1)
+                    .ReplayFresh(1)
                     .RefCount()
                     .Normalize();
             }

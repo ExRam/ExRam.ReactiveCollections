@@ -107,7 +107,7 @@ namespace ExRam.ReactiveCollections
 
                                 _ => resultList.ReactiveCollection.Changes);
                     })
-                    .Replay(1)
+                    .ReplayFresh(1)
                     .RefCount()
                     .Normalize();
             }
