@@ -73,6 +73,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="CollectionChangedNotificationTest.cs" />
+    <Compile Include="ObservableExtensionsTest.cs" />
     <Compile Include="PerformanceTest.cs" />
     <Compile Include="SortedListReactiveCollectionSourceTest.cs" />
     <Compile Include="SortedSetReactiveCollectionSourceTest.cs" />
