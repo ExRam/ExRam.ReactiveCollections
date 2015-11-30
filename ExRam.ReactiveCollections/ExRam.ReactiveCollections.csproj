@@ -131,6 +131,7 @@
     <Compile Include="Extensions\ReactiveCollectionExtensions %28WithChanges%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28ToObservableCollection%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28GetValueObservable%29.cs" />
+    <Compile Include="Extensions\Transformation\SortedListNotificationTransformationListReactiveCollection.cs" />
     <Compile Include="Extensions\Transformation\SortedSetNotificationTransformationListReactiveCollection.cs" />
     <Compile Include="Extensions\Transformation\TransformationListReactiveCollection.cs" />
     <Compile Include="Interfaces\IConnectableReactiveCollection.cs" />
