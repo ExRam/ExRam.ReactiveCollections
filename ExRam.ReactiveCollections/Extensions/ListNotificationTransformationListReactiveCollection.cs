@@ -16,6 +16,11 @@ namespace ExRam.ReactiveCollections
             this._equalityComparer = equalityComparer;
         }
 
+        public ListNotificationTransformationListReactiveCollection<TSource, TResult> AddWhere(Predicate<TSource> predicate)
+        {
+            return new ListNotificationTransformationListReactiveCollection<TSource, TResult>(this.Source, x => this.Filter(x) && predicate(x), null, this._equalityComparer);
+        }
+
         protected override void SetItem(ListReactiveCollectionSource<TResult> collection, int index, TResult item)
         {
             collection.SetItem(index, item);

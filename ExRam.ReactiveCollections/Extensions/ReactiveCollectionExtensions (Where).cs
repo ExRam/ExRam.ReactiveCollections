@@ -181,6 +181,10 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(equalityComparer != null);
             Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
 
+            var transformedReactiveCollection = source as ListNotificationTransformationListReactiveCollection<TSource, TSource>;
+            if (transformedReactiveCollection != null && transformedReactiveCollection.CanAddWhere())
+                return transformedReactiveCollection.AddWhere(filter);
+
             return new ListNotificationTransformationListReactiveCollection<TSource, TSource>(source, filter, null, equalityComparer);
         }
 
