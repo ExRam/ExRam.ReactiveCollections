@@ -1840,6 +1840,25 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
+        #region Select_after_Select_squashes_both_operators
+        [TestMethod]
+        public void Select_after_Select_squashes_both_operators()
+        {
+            var list = new ListReactiveCollectionSource<int>();
+
+            var projectedList = list.ReactiveCollection
+                .Select(x => x.ToString())
+                .Select(int.Parse);
+
+            var transformed = projectedList as ListNotificationTransformationListReactiveCollection<int, int>;
+            Assert.IsNotNull(transformed);
+
+            Assert.AreSame(transformed.Source, list.ReactiveCollection);
+            Assert.IsNotNull(transformed.Selector);
+            Assert.IsNull(transformed.Filter);
+        }
+        #endregion
+
         #region Select_after_Where_behaves_correctly
         [TestMethod]
         public async Task Select_after_Where_behaves_correctly()

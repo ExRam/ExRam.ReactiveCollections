@@ -12,6 +12,11 @@ namespace ExRam.ReactiveCollections
         IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate);
     }
 
+    internal interface ICanProject<out TSource>
+    {
+        IReactiveCollection<ICollectionChangedNotification> TrySelect<TResult>(Func<TSource, TResult> selector, IEqualityComparer<TResult> equalityComparer);
+    }
+
     internal abstract class TransformationListReactiveCollection<TSource, TResult, TCollection, TNotification> : IReactiveCollection<TNotification>, ICanFilter<TSource>
         where TCollection : IReactiveCollectionSource<TNotification>
         where TNotification : ICollectionChangedNotification<TResult>
@@ -161,11 +166,6 @@ namespace ExRam.ReactiveCollections
         }
 
         public abstract IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate);
-
-        public bool CanAddSelect()
-        {
-            return true;
-        }
 
         public Predicate<TSource> Filter { get; }
         public Func<TSource, TResult> Selector { get; }

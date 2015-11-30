@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 
 namespace ExRam.ReactiveCollections
 {
-    internal sealed class ListNotificationTransformationListReactiveCollection<TSource, TResult> : TransformationListReactiveCollection<TSource, TResult, ListReactiveCollectionSource<TResult>, ListChangedNotification<TResult>>
+    internal sealed class ListNotificationTransformationListReactiveCollection<TSource, TResult> : TransformationListReactiveCollection<TSource, TResult, ListReactiveCollectionSource<TResult>, ListChangedNotification<TResult>>, ICanProject<TResult>
     {
         private readonly IEqualityComparer<TResult> _equalityComparer;
 
@@ -23,12 +23,12 @@ namespace ExRam.ReactiveCollections
                 : null;
         }
 
-        public ListNotificationTransformationListReactiveCollection<TSource, TChainedResult> AddSelect<TChainedResult>(Func<TResult, TChainedResult> selector, IEqualityComparer<TChainedResult> equalityComparer)
+        public IReactiveCollection<ICollectionChangedNotification> TrySelect<TChainedResult>(Func<TResult, TChainedResult> selector, IEqualityComparer<TChainedResult> equalityComparer)
         {
             return new ListNotificationTransformationListReactiveCollection<TSource, TChainedResult>(
                 this.Source,
                 this.Filter,
-                this.Selector != null 
+                this.Selector != null
                     ? (Func<TSource, TChainedResult>)(x => selector(this.Selector(x)))
                     : x => selector((TResult)(object)x),
                 equalityComparer);
