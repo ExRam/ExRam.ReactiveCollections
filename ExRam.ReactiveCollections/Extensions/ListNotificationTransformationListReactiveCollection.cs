@@ -67,6 +67,11 @@ namespace ExRam.ReactiveCollections
             collection.Replace(oldItem, newItem, this._equalityComparer);
         }
 
+        protected override ListReactiveCollectionSource<TResult> CreateCollection()
+        {
+            return new ListReactiveCollectionSource<TResult>();
+        }
+
         protected override bool CanHandleIndexes => true;
     }
 }

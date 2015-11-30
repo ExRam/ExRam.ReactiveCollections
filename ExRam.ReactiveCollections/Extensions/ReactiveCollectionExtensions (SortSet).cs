@@ -101,56 +101,6 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
-        #region SortedSetReactiveCollection
-        private sealed class SortedSetReactiveCollection<TSource> : SortedReactiveCollection<SortedSetReactiveCollectionSource<TSource>, SortedSetChangedNotification<TSource>, TSource>
-        {
-            public SortedSetReactiveCollection(IObservable<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer) : base(source, comparer)
-            {
-                Contract.Requires(source != null);
-                Contract.Requires(comparer != null);
-            }
-
-            protected override void Add(SortedSetReactiveCollectionSource<TSource> collection, TSource item)
-            {
-                collection.Add(item);
-            }
-
-            protected override void AddRange(SortedSetReactiveCollectionSource<TSource> collection, IEnumerable<TSource> items)
-            {
-                collection.AddRange(items);
-            }
-
-            protected override void RemoveRange(SortedSetReactiveCollectionSource<TSource> collection, IEnumerable<TSource> items)
-            {
-                foreach(var item in items)
-                {
-                    collection.Remove(item);
-                }
-            }
-
-            protected override void Remove(SortedSetReactiveCollectionSource<TSource> collection, TSource oldItem)
-            {
-                collection.Remove(oldItem);
-            }
-
-            protected override void Clear(SortedSetReactiveCollectionSource<TSource> collection)
-            {
-                collection.Clear();
-            }
-
-            protected override void Replace(SortedSetReactiveCollectionSource<TSource> collection, TSource oldItem, TSource newItem)
-            {
-                collection.Remove(oldItem);
-                collection.Add(newItem);
-            }
-
-            protected override SortedSetReactiveCollectionSource<TSource> CreateCollection(IComparer<TSource> comparer)
-            {
-                return new SortedSetReactiveCollectionSource<TSource>(comparer);
-            }
-        }
-        #endregion
-
         public static IReactiveCollection<SortedSetChangedNotification<TSource>> SortSet<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source)
         {
             Contract.Requires(source != null);
@@ -165,7 +115,7 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(comparer != null);
             Contract.Ensures(Contract.Result<IReactiveCollection<SortedSetChangedNotification<TSource>>>() != null);
 
-            return new SortedSetReactiveCollection<TSource>(source.Changes, comparer);
+            return new SortedSetNotificationTransformationListReactiveCollection<TSource, TSource>(source, null, null, comparer);
         }
     }
 }

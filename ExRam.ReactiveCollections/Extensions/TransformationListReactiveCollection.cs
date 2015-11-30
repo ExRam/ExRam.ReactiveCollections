@@ -8,7 +8,7 @@ using System.Reactive.Linq;
 namespace ExRam.ReactiveCollections
 {
     internal abstract class TransformationListReactiveCollection<TSource, TResult, TCollection, TNotification> : IReactiveCollection<TNotification>
-        where TCollection : IReactiveCollectionSource<TNotification>, new()
+        where TCollection : IReactiveCollectionSource<TNotification>
         where TNotification : ICollectionChangedNotification
     {
         protected TransformationListReactiveCollection(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TResult> selector)
@@ -23,7 +23,7 @@ namespace ExRam.ReactiveCollections
                 .Defer(() =>
                 {
                     var syncRoot = new object();
-                    var resultList = new TCollection();
+                    var resultList = this.CreateCollection();
 
                     return Observable
                         .Using(
@@ -175,5 +175,7 @@ namespace ExRam.ReactiveCollections
         protected abstract void RemoveRange(TCollection collection, IEnumerable<TResult> items);
         protected abstract void Replace(TCollection collection, TResult oldItem, TResult newItem);
         protected abstract void Clear(TCollection collection);
+
+        protected abstract TCollection CreateCollection();
     }
 }
