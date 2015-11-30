@@ -144,10 +144,10 @@ namespace ExRam.ReactiveCollections
                 .Normalize();
         }
 
-        public Predicate<TSource> Filter { get; set; }
-        public Func<TSource, TResult> Selector { get; set; }
+        public Predicate<TSource> Filter { get; }
+        public Func<TSource, TResult> Selector { get; }
         public IObservable<TNotification> Changes { get; }
-        public IReactiveCollection<ICollectionChangedNotification<TSource>> Source { get; set; }
+        public IReactiveCollection<ICollectionChangedNotification<TSource>> Source { get; }
 
         protected abstract void SetItem(TCollection collection, int index, TResult item);
         protected abstract void AddRange(TCollection collection, IEnumerable<TResult> items);
