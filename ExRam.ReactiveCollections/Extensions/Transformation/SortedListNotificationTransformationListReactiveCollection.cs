@@ -6,16 +6,14 @@ namespace ExRam.ReactiveCollections
 {
     internal sealed class SortedListNotificationTransformationListReactiveCollection<TSource, TResult> : TransformationListReactiveCollection<TSource, TResult, SortedListReactiveCollectionSource<TResult>, ListChangedNotification<TResult>>
     {
-        private readonly IComparer<TResult> _comparer;
         private readonly IEqualityComparer<TResult> _equalityComparer;
 
-        public SortedListNotificationTransformationListReactiveCollection(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TResult> selector, IComparer<TResult> comparer, IEqualityComparer<TResult> equalityComparer) : base(source, filter, selector)
+        public SortedListNotificationTransformationListReactiveCollection(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TResult> selector, IComparer<TResult> comparer, IEqualityComparer<TResult> equalityComparer) : base(source, filter, selector, comparer)
         {
             Contract.Requires(source != null);
             Contract.Requires(comparer != null);
             Contract.Requires(equalityComparer != null);
 
-            this._comparer = comparer;
             this._equalityComparer = equalityComparer;
         }
 
@@ -31,7 +29,7 @@ namespace ExRam.ReactiveCollections
 
         protected override SortedListReactiveCollectionSource<TResult> CreateCollection()
         {
-            return new SortedListReactiveCollectionSource<TResult>(this._comparer);
+            return new SortedListReactiveCollectionSource<TResult>(this.Comparer);
         }
 
         protected override void InsertRange(SortedListReactiveCollectionSource<TResult> collection, int index, IEnumerable<TResult> items)
@@ -62,7 +60,7 @@ namespace ExRam.ReactiveCollections
         public override IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate)
         {
             return this.Selector == null
-                ? new SortedListNotificationTransformationListReactiveCollection<TSource, TResult>(this.Source, x => this.Filter(x) && predicate(x), null, this._comparer, this._equalityComparer)
+                ? new SortedListNotificationTransformationListReactiveCollection<TSource, TResult>(this.Source, x => this.Filter(x) && predicate(x), null, this.Comparer, this._equalityComparer)
                 : null;
         }
 

@@ -24,13 +24,15 @@ namespace ExRam.ReactiveCollections
         protected TransformationListReactiveCollection(
             IReactiveCollection<ICollectionChangedNotification<TSource>> source, 
             Predicate<TSource> filter,
-            Func<TSource, TResult> selector)
+            Func<TSource, TResult> selector,
+            IComparer<TResult> comparer)
         {
             Contract.Requires(source != null);
 
             this.Source = source;
             this.Filter = filter;
             this.Selector = selector;
+            this.Comparer = comparer;
 
             this.Changes = Observable
                 .Defer(() =>
@@ -169,6 +171,7 @@ namespace ExRam.ReactiveCollections
 
         public Predicate<TSource> Filter { get; }
         public Func<TSource, TResult> Selector { get; }
+        public IComparer<TResult> Comparer { get; }
         public IObservable<TNotification> Changes { get; }
         public IReactiveCollection<ICollectionChangedNotification<TSource>> Source { get; }
 
