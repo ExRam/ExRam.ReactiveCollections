@@ -18,11 +18,18 @@ namespace ExRam.ReactiveCollections
         void Replace(T oldValue, T newValue, IEqualityComparer<T> equalityComparer);
     }
 
+    internal interface ICanInsertAndRemoveRangesAtIndex<in T>
+    {
+        void InsertRange(int index, IEnumerable<T> items);
+        void RemoveRange(int index, int count);
+    }
+
     public class ListReactiveCollectionSource<T> : 
         ReactiveCollectionSource<ListChangedNotification<T>>,
         IList<T>,
         IList,
-        ICanReplaceValue<T>
+        ICanReplaceValue<T>,
+        ICanInsertAndRemoveRangesAtIndex<T>
     {
         public ListReactiveCollectionSource() : this(ImmutableList<T>.Empty)
         {

@@ -43,6 +43,7 @@ namespace ExRam.ReactiveCollections
                     var resultList = this.CreateCollection();
 
                     var isList = resultList is IList<TResult>;
+                    var canInsertAndRemoveRangesAtIndex = resultList is ICanInsertAndRemoveRangesAtIndex<TResult>;
 
                     return Observable
                         .Using(
@@ -67,8 +68,8 @@ namespace ExRam.ReactiveCollections
                                                 
                                                     var selectedItems = filteredItems.Select(localSelector);
 
-                                                    if ((filter == null) && listNotification?.Index != null && isList)
-                                                        this.InsertRange(resultList, listNotification.Index.Value, selectedItems);
+                                                    if ((filter == null) && listNotification?.Index != null && canInsertAndRemoveRangesAtIndex)
+                                                        ((ICanInsertAndRemoveRangesAtIndex<TResult>)resultList).InsertRange(listNotification.Index.Value, selectedItems);
                                                     else
                                                         this.AddRange(resultList, selectedItems);
 
@@ -79,8 +80,8 @@ namespace ExRam.ReactiveCollections
                                                 #region Remove
                                                 case NotifyCollectionChangedAction.Remove:
                                                 {
-                                                    if ((filter == null) && (listNotification?.Index != null) && isList)
-                                                        this.RemoveRange(resultList, listNotification.Index.Value, notification.OldItems.Count);
+                                                    if ((filter == null) && (listNotification?.Index != null) && canInsertAndRemoveRangesAtIndex)
+                                                        ((ICanInsertAndRemoveRangesAtIndex<TResult>)resultList).RemoveRange(listNotification.Index.Value, notification.OldItems.Count);
                                                     else
                                                     {
                                                         var filtered = filter != null
@@ -129,10 +130,10 @@ namespace ExRam.ReactiveCollections
                                                     }
                                                     else
                                                     {
-                                                        if ((filter == null) && (listNotification?.Index != null) && isList)
+                                                        if ((filter == null) && (listNotification?.Index != null) && canInsertAndRemoveRangesAtIndex)
                                                         {
-                                                            this.RemoveRange(resultList, listNotification.Index.Value, notification.OldItems.Count);
-                                                            this.InsertRange(resultList, listNotification.Index.Value, notification.NewItems.Select(localSelector));
+                                                            ((ICanInsertAndRemoveRangesAtIndex<TResult>)resultList).RemoveRange(listNotification.Index.Value, notification.OldItems.Count);
+                                                            ((ICanInsertAndRemoveRangesAtIndex<TResult>)resultList).InsertRange(listNotification.Index.Value, notification.NewItems.Select(localSelector));
                                                         }
                                                         else
                                                         {
@@ -187,8 +188,6 @@ namespace ExRam.ReactiveCollections
         public IReactiveCollection<ICollectionChangedNotification<TSource>> Source { get; }
 
         protected abstract void AddRange(TCollection collection, IEnumerable<TResult> items);
-        protected abstract void InsertRange(TCollection collection, int index, IEnumerable<TResult> items);
-        protected abstract void RemoveRange(TCollection collection, int index, int count);
         protected abstract void RemoveRange(TCollection collection, IEnumerable<TResult> items);
 
         protected abstract TCollection CreateCollection();

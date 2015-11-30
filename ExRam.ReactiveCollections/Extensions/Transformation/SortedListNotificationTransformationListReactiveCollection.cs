@@ -27,16 +27,6 @@ namespace ExRam.ReactiveCollections
             return new SortedListReactiveCollectionSource<TResult>(this.Comparer);
         }
 
-        protected override void InsertRange(SortedListReactiveCollectionSource<TResult> collection, int index, IEnumerable<TResult> items)
-        {
-            throw new InvalidOperationException();
-        }
-       
-        protected override void RemoveRange(SortedListReactiveCollectionSource<TResult> collection, int index, int count)
-        {
-            throw new InvalidOperationException();
-        }
-
         protected override void RemoveRange(SortedListReactiveCollectionSource<TResult> collection, IEnumerable<TResult> items)
         {
             collection.RemoveRange(items, this._equalityComparer);

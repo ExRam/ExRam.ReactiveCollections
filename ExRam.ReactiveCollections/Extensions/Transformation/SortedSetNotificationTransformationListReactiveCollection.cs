@@ -22,22 +22,12 @@ namespace ExRam.ReactiveCollections
             return new SortedSetReactiveCollectionSource<TResult>(this.Comparer);
         }
 
-        protected override void InsertRange(SortedSetReactiveCollectionSource<TResult> collection, int index, IEnumerable<TResult> items)
-        {
-            throw new InvalidOperationException();
-        }
-
         protected override void RemoveRange(SortedSetReactiveCollectionSource<TResult> collection, IEnumerable<TResult> items)
         {
             foreach (var item in items)
             {
                 collection.Remove(item);
             }
-        }
-
-        protected override void RemoveRange(SortedSetReactiveCollectionSource<TResult> collection, int index, int count)
-        {
-            throw new InvalidOperationException();
         }
 
         public override IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate)
