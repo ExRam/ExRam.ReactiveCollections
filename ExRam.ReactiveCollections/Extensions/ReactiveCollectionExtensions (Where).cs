@@ -124,11 +124,11 @@ namespace ExRam.ReactiveCollections
         #endregion
 
         #region WhereReactiveList
-        private sealed class WhereReactiveList<T> : WhereReactiveCollection<ListReactiveCollectionSource<T>, ListChangedNotification<T>, T>
+        private sealed class WhereReactiveList<T> : TransformationListReactiveCollection<T, T, ListReactiveCollectionSource<T>, ListChangedNotification<T>>
         {
             private readonly IEqualityComparer<T> _equalityComparer;
 
-            public WhereReactiveList(IObservable<ICollectionChangedNotification<T>> source, Predicate<T> filter, IEqualityComparer<T> equalityComparer) : base(source, filter)
+            public WhereReactiveList(IObservable<ICollectionChangedNotification<T>> source, Predicate<T> filter, IEqualityComparer<T> equalityComparer) : base(source, filter, null)
             {
                 Contract.Requires(source != null);
                 Contract.Requires(filter != null);
@@ -137,24 +137,19 @@ namespace ExRam.ReactiveCollections
                 this._equalityComparer = equalityComparer;
             }
 
-            protected override void Add(ListReactiveCollectionSource<T> collection, T item)
-            {
-                collection.Add(item);
-            }
-
             protected override void Clear(ListReactiveCollectionSource<T> collection)
             {
                 collection.Clear();
             }
 
-            protected override void AddRange(ListReactiveCollectionSource<T> collection, IEnumerable<T> items)
+            protected override void InsertRange(ListReactiveCollectionSource<T> collection, int? index, IEnumerable<T> items)
             {
-                collection.AddRange(items);
+                collection.InsertRange(index ?? collection.Count, items);
             }
 
-            protected override void Remove(ListReactiveCollectionSource<T> collection, T oldItem)
+            protected override void RemoveRange(ListReactiveCollectionSource<T> collection, int index, int count)
             {
-                collection.Remove(oldItem, this._equalityComparer);
+                collection.RemoveRange(index, count);
             }
 
             protected override void RemoveRange(ListReactiveCollectionSource<T> collection, IEnumerable<T> items)
