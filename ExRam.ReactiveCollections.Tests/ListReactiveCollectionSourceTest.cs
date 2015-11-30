@@ -250,18 +250,6 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
-        #region Item
-        [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
-        public void Item_set_throws()
-        {
-            var list = (IList)new ListReactiveCollectionSource<int>();
-            list.Add(0);
-
-            list[0] = 1;
-        }
-        #endregion
-
         #region Remove
         [TestMethod]
         public async Task Remove()

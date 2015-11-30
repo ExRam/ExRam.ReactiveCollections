@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Linq;
@@ -171,56 +172,14 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
-        #region Insert
-        [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
-        public void Insert()
-        {
-            var list = new SortedListReactiveCollectionSource<int>();
-            list.Insert(0, 2);
-        }
-        #endregion
-
-        #region InsertRange
-        [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
-        public void InsertRange()
-        {
-            var list = new SortedListReactiveCollectionSource<int>();
-            list.InsertRange(1, new[] { 1, 2, 3 });
-        }
-        #endregion
-
-        #region IsReadOnly
-        [TestMethod]
-        public void IsReadOnly()
-        {
-            var list = (IList)new SortedListReactiveCollectionSource<int>();
-
-            Assert.IsFalse(list.IsReadOnly);
-        }
-        #endregion
-
         #region Item
         [TestMethod]
         public void Item()
         {
-            var list = (IList)new SortedListReactiveCollectionSource<int>();
+            var list = new SortedListReactiveCollectionSource<int>();
             list.Add(1);
 
             Assert.AreEqual(1, list[0]);
-        }
-        #endregion
-
-        #region Item
-        [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
-        public void Item_set_throws()
-        {
-            var list = (IList)new SortedListReactiveCollectionSource<int>();
-            list.Add(0);
-
-            list[0] = 1;
         }
         #endregion
 
@@ -371,52 +330,5 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
-        #region Reverse
-        [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
-        public void Reverse()
-        {
-            var list = new SortedListReactiveCollectionSource<int>();
-
-            list.AddRange(new[] { 1, 2, 3, 4, 5 });
-            list.Reverse();
-        }
-        #endregion
-
-        #region SetItem
-        [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
-        public void SetItem()
-        {
-            var list = new SortedListReactiveCollectionSource<int>();
-
-            list.AddRange(new[] { 1, 2, 3, 4, 5 });
-            list.SetItem(2, 6);
-        }
-        #endregion
-
-        #region Sort
-        [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
-        public void Sort()
-        {
-            var list = new SortedListReactiveCollectionSource<int>();
-
-            list.AddRange(new[] { 2, 1, 3, 5, 0 });
-            list.Sort();
-        }
-        #endregion
-
-        #region Sort_with_comparison
-        [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
-        public void Sort_with_comparison()
-        {
-            var list = new SortedListReactiveCollectionSource<int>();
-
-            list.AddRange(new[] { 2, 1, 3, 5, 0 });
-            list.Sort((x, y) => y.CompareTo(x));
-        }
-        #endregion
     }
 }

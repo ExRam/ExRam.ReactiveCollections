@@ -257,7 +257,7 @@ namespace ExRam.ReactiveCollections
 
             set
             {
-                throw new NotSupportedException();
+                this.SetItem(index, value);
             }
         }
 
@@ -322,7 +322,7 @@ namespace ExRam.ReactiveCollections
 
             set
             {
-                throw new NotSupportedException();
+                this.SetItem(index, (T)value);
             }
         }
 

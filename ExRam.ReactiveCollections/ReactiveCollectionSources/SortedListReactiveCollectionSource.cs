@@ -14,8 +14,8 @@ namespace ExRam.ReactiveCollections
 {
     public class SortedListReactiveCollectionSource<T> : 
         IReactiveCollectionSource<ListChangedNotification<T>>,
-        IList<T>,
-        IList
+        ICollection<T>,
+        ICollection
     {
         private readonly IComparer<T> _comparer;
         private readonly ListReactiveCollectionSource<T> _innerList = new ListReactiveCollectionSource<T>();
@@ -69,19 +69,9 @@ namespace ExRam.ReactiveCollections
             return this._innerList.GetEnumerator();
         }
 
-        public void InsertRange(int index, IEnumerable<T> items)
-        {
-            throw new NotSupportedException();
-        }
-
         public int IndexOf(T item)
         {
             return this._innerList.IndexOf(item);
-        }
-
-        public void Insert(int index, T item)
-        {
-            throw new NotSupportedException();
         }
 
         public bool Remove(T item)
@@ -142,123 +132,14 @@ namespace ExRam.ReactiveCollections
             this.Add(newValue);
         }
 
-        public void Reverse()
-        {
-            this.Reverse(0, this.Count);
-        }
-
-        public void Reverse(int index, int count)
-        {
-            throw new NotSupportedException();
-        }
-
-        public void SetItem(int index, T value)
-        {
-            throw new NotSupportedException();
-        }
-
-        public void Sort()
-        {
-            this.Sort(Comparer<T>.Default);
-        }
-
-        public void Sort(Comparison<T> comparison)
-        {
-            Contract.Requires(comparison != null);
-
-            this.Sort(comparison.ToComparer());
-        }
-
-        public void Sort(IComparer<T> comparer)
-        {
-            Contract.Requires(comparer != null);
-
-            this.Sort(0, this.Count, comparer);
-        }
-
-        public void Sort(int index, int count, IComparer<T> comparer)
-        {
-            throw new NotSupportedException();
-        }
-
-        #region Explicit IList<T> implementation
-        T IList<T>.this[int index]
-        {
-            get
-            {
-                return this[index];
-            }
-
-            set
-            {
-                throw new NotSupportedException();
-            }
-        }
-
+        #region Explicit ICollection implementation
         bool ICollection<T>.IsReadOnly => false;
-
-        #endregion
-
-        #region Explicit IList implementation
-        int IList.Add(object value)
-        {
-            var insertionIndex = this.FindInsertionIndex((T)value);
-            this._innerList.Insert(insertionIndex, (T)value);
-
-            return insertionIndex;
-        }
-
-        void IList.Clear()
-        {
-            this.Clear();
-        }
-
-        bool IList.Contains(object value)
-        {
-            return this.Contains((T)value);
-        }
-
-        int IList.IndexOf(object value)
-        {
-            return this.IndexOf((T)value);
-        }
-
-        void IList.Insert(int index, object value)
-        {
-            this.Insert(index, (T)value);
-        }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
         }
 
-        bool IList.IsFixedSize => false;
-
-        bool IList.IsReadOnly => false;
-
-        void IList.Remove(object value)
-        {
-            this.Remove((T)value);
-        }
-
-        void IList<T>.RemoveAt(int index)
-        {
-            this.RemoveAt(index);
-        }
-
-        object IList.this[int index]
-        {
-            get
-            {
-                return this[index];
-            }
-
-            set
-            {
-                throw new NotSupportedException();
-            }
-        }
 
         void ICollection.CopyTo(Array array, int index)
         {
