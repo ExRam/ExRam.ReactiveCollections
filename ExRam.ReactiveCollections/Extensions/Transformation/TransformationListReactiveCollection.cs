@@ -40,6 +40,8 @@ namespace ExRam.ReactiveCollections
                     var syncRoot = new object();
                     var resultList = this.CreateCollection();
 
+                    var isList = resultList is IList<TResult>;
+
                     return Observable
                         .Using(
                             () => source
@@ -63,7 +65,7 @@ namespace ExRam.ReactiveCollections
                                                 
                                                     var selectedItems = filteredItems.Select(localSelector);
 
-                                                    if ((filter == null) && listNotification?.Index != null && this.CanHandleIndexes)
+                                                    if ((filter == null) && listNotification?.Index != null && isList)
                                                         this.InsertRange(resultList, listNotification.Index.Value, selectedItems);
                                                     else
                                                         this.AddRange(resultList, selectedItems);
@@ -75,7 +77,7 @@ namespace ExRam.ReactiveCollections
                                                 #region Remove
                                                 case NotifyCollectionChangedAction.Remove:
                                                 {
-                                                    if ((filter == null) && (listNotification?.Index != null) && this.CanHandleIndexes)
+                                                    if ((filter == null) && (listNotification?.Index != null) && isList)
                                                         this.RemoveRange(resultList, listNotification.Index.Value, notification.OldItems.Count);
                                                     else
                                                     {
@@ -102,8 +104,8 @@ namespace ExRam.ReactiveCollections
                                                         {
                                                             var newItem = localSelector(notification.NewItems[0]);
                                                         
-                                                            if ((filter == null) && (listNotification?.Index != null) && this.CanHandleIndexes)
-                                                                this.SetItem(resultList, listNotification.Index.Value, newItem);
+                                                            if ((filter == null) && (listNotification?.Index != null) && isList)
+                                                                ((IList<TResult>)resultList)[listNotification.Index.Value] = newItem;
                                                             else
                                                             {
                                                                 var oldItem = localSelector(notification.OldItems[0]);
@@ -118,7 +120,7 @@ namespace ExRam.ReactiveCollections
                                                     }
                                                     else
                                                     {
-                                                        if ((filter == null) && (listNotification?.Index != null) && this.CanHandleIndexes)
+                                                        if ((filter == null) && (listNotification?.Index != null) && isList)
                                                         {
                                                             this.RemoveRange(resultList, listNotification.Index.Value, notification.OldItems.Count);
                                                             this.InsertRange(resultList, listNotification.Index.Value, notification.NewItems.Select(localSelector));
@@ -175,8 +177,6 @@ namespace ExRam.ReactiveCollections
         public IObservable<TNotification> Changes { get; }
         public IReactiveCollection<ICollectionChangedNotification<TSource>> Source { get; }
 
-        protected abstract bool CanHandleIndexes { get; }
-        protected abstract void SetItem(TCollection collection, int index, TResult item);
         protected abstract void AddRange(TCollection collection, IEnumerable<TResult> items);
         protected abstract void InsertRange(TCollection collection, int index, IEnumerable<TResult> items);
         protected abstract void RemoveRange(TCollection collection, int index, int count);

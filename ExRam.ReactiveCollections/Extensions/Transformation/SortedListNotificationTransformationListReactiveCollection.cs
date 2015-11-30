@@ -37,11 +37,6 @@ namespace ExRam.ReactiveCollections
             throw new InvalidOperationException();
         }
 
-        protected override void SetItem(SortedListReactiveCollectionSource<TResult> collection, int index, TResult item)
-        {
-            throw new InvalidOperationException();
-        }
-
         protected override void RemoveRange(SortedListReactiveCollectionSource<TResult> collection, IEnumerable<TResult> items)
         {
             collection.RemoveRange(items, this._equalityComparer);
@@ -58,7 +53,5 @@ namespace ExRam.ReactiveCollections
                 ? new SortedListNotificationTransformationListReactiveCollection<TSource, TResult>(this.Source, x => this.Filter(x) && predicate(x), null, this.Comparer, this._equalityComparer)
                 : null;
         }
-
-        protected override bool CanHandleIndexes => false;
     }
 }

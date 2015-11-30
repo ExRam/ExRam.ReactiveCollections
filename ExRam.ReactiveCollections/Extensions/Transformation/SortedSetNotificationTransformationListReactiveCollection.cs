@@ -46,18 +46,11 @@ namespace ExRam.ReactiveCollections
             collection.Add(newItem);
         }
 
-        protected override void SetItem(SortedSetReactiveCollectionSource<TResult> collection, int index, TResult item)
-        {
-            throw new InvalidOperationException();
-        }
-
         public override IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate)
         {
             return this.Selector == null
                 ? new SortedSetNotificationTransformationListReactiveCollection<TSource, TResult>(this.Source, x => this.Filter(x) && predicate(x), null, this.Comparer)
                 : null;
         }
-
-        protected override bool CanHandleIndexes => false;
     }
 }

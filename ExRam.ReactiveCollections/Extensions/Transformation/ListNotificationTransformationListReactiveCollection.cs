@@ -34,11 +34,6 @@ namespace ExRam.ReactiveCollections
                 equalityComparer);
         }
 
-        protected override void SetItem(ListReactiveCollectionSource<TResult> collection, int index, TResult item)
-        {
-            collection.SetItem(index, item);
-        }
-
         protected override void AddRange(ListReactiveCollectionSource<TResult> collection, IEnumerable<TResult> items)
         {
             collection.AddRange(items);
@@ -68,7 +63,5 @@ namespace ExRam.ReactiveCollections
         {
             return new ListReactiveCollectionSource<TResult>();
         }
-
-        protected override bool CanHandleIndexes => true;
     }
 }
