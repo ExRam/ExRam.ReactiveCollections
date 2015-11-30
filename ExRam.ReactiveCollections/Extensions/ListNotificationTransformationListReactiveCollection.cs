@@ -24,7 +24,7 @@ namespace ExRam.ReactiveCollections
         public ListNotificationTransformationListReactiveCollection<TSource, TChainedResult> AddSelect<TChainedResult>(Func<TResult, TChainedResult> selector, IEqualityComparer<TChainedResult> equalityComparer)
         {
             return new ListNotificationTransformationListReactiveCollection<TSource, TChainedResult>(
-                this.Source, 
+                this.Source,
                 this.Filter,
                 this.Selector != null 
                     ? (Func<TSource, TChainedResult>)(x => selector(this.Selector(x)))
@@ -66,5 +66,7 @@ namespace ExRam.ReactiveCollections
         {
             collection.Replace(oldItem, newItem, this._equalityComparer);
         }
+
+        protected override bool CanHandleIndexes => true;
     }
 }

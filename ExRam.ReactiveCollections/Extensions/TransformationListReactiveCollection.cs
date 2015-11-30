@@ -39,6 +39,7 @@ namespace ExRam.ReactiveCollections
                                         {
                                             switch (notification.Action)
                                             {
+                                                #region Add
                                                 case NotifyCollectionChangedAction.Add:
                                                 {
                                                     var filteredItems = filter != null
@@ -47,17 +48,19 @@ namespace ExRam.ReactiveCollections
                                                 
                                                     var selectedItems = filteredItems.Select(localSelector);
 
-                                                    if ((filter == null) && listNotification?.Index != null)
+                                                    if ((filter == null) && listNotification?.Index != null && this.CanHandleIndexes)
                                                         this.InsertRange(resultList, listNotification.Index.Value, selectedItems);
                                                     else
                                                         this.AddRange(resultList, selectedItems);
 
                                                     break;
                                                 }
+                                                #endregion
 
+                                                #region Remove
                                                 case NotifyCollectionChangedAction.Remove:
                                                 {
-                                                    if ((filter == null) && (listNotification?.Index != null))
+                                                    if ((filter == null) && (listNotification?.Index != null) && this.CanHandleIndexes)
                                                         this.RemoveRange(resultList, listNotification.Index.Value, notification.OldItems.Count);
                                                     else
                                                     {
@@ -70,7 +73,9 @@ namespace ExRam.ReactiveCollections
 
                                                     break;
                                                 }
+                                                #endregion
 
+                                                #region Replace
                                                 case NotifyCollectionChangedAction.Replace:
                                                 {
                                                     if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
@@ -82,7 +87,7 @@ namespace ExRam.ReactiveCollections
                                                         {
                                                             var newItem = localSelector(notification.NewItems[0]);
                                                         
-                                                            if ((filter == null) && (listNotification?.Index != null))
+                                                            if ((filter == null) && (listNotification?.Index != null) && this.CanHandleIndexes)
                                                                 this.SetItem(resultList, listNotification.Index.Value, newItem);
                                                             else
                                                             {
@@ -98,7 +103,7 @@ namespace ExRam.ReactiveCollections
                                                     }
                                                     else
                                                     {
-                                                        if ((filter == null) && (listNotification?.Index != null))
+                                                        if ((filter == null) && (listNotification?.Index != null) && this.CanHandleIndexes)
                                                         {
                                                             this.RemoveRange(resultList, listNotification.Index.Value, notification.OldItems.Count);
                                                             this.InsertRange(resultList, listNotification.Index.Value, notification.NewItems.Select(localSelector));
@@ -120,7 +125,9 @@ namespace ExRam.ReactiveCollections
 
                                                     break;
                                                 }
+                                                #endregion
 
+                                                #region default
                                                 default:
                                                 {
                                                     this.Clear(resultList);
@@ -133,6 +140,7 @@ namespace ExRam.ReactiveCollections
 
                                                     break;
                                                 }
+                                                #endregion
                                             }
                                         }
                                     }),
@@ -159,6 +167,7 @@ namespace ExRam.ReactiveCollections
         public IObservable<TNotification> Changes { get; }
         public IReactiveCollection<ICollectionChangedNotification<TSource>> Source { get; }
 
+        protected abstract bool CanHandleIndexes { get; }
         protected abstract void SetItem(TCollection collection, int index, TResult item);
         protected abstract void AddRange(TCollection collection, IEnumerable<TResult> items);
         protected abstract void InsertRange(TCollection collection, int index, IEnumerable<TResult> items);
