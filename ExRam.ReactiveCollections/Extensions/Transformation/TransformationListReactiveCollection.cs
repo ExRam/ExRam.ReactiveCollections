@@ -18,7 +18,7 @@ namespace ExRam.ReactiveCollections
     }
 
     internal abstract class TransformationListReactiveCollection<TSource, TResult, TCollection, TNotification> : IReactiveCollection<TNotification>, ICanFilter<TSource>
-        where TCollection : IReactiveCollectionSource<TNotification>
+        where TCollection : IReactiveCollectionSource<TNotification>, ICollection<TResult>
         where TNotification : ICollectionChangedNotification<TResult>
     {
         protected TransformationListReactiveCollection(
@@ -145,7 +145,7 @@ namespace ExRam.ReactiveCollections
                                                 #region default
                                                 default:
                                                 {
-                                                    this.Clear(resultList);
+                                                    resultList.Clear();
 
                                                     var addedItems = filter != null
                                                         ? notification.Current.Where(x => filter(x))
@@ -182,7 +182,6 @@ namespace ExRam.ReactiveCollections
         protected abstract void RemoveRange(TCollection collection, int index, int count);
         protected abstract void RemoveRange(TCollection collection, IEnumerable<TResult> items);
         protected abstract void Replace(TCollection collection, TResult oldItem, TResult newItem);
-        protected abstract void Clear(TCollection collection);
 
         protected abstract TCollection CreateCollection();
     }

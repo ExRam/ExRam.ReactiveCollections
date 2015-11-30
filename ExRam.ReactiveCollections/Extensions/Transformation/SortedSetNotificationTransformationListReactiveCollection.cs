@@ -17,11 +17,6 @@ namespace ExRam.ReactiveCollections
             collection.AddRange(items);
         }
 
-        protected override void Clear(SortedSetReactiveCollectionSource<TResult> collection)
-        {
-            collection.Clear();
-        }
-
         protected override SortedSetReactiveCollectionSource<TResult> CreateCollection()
         {
             return new SortedSetReactiveCollectionSource<TResult>(this.Comparer);

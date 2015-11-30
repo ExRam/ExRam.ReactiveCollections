@@ -44,11 +44,6 @@ namespace ExRam.ReactiveCollections
             collection.AddRange(items);
         }
 
-        protected override void Clear(ListReactiveCollectionSource<TResult> collection)
-        {
-            collection.Clear();
-        }
-
         protected override void InsertRange(ListReactiveCollectionSource<TResult> collection, int index, IEnumerable<TResult> items)
         {
             collection.InsertRange(index, items);
