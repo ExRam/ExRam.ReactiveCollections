@@ -1796,5 +1796,127 @@ namespace ExRam.ReactiveCollections.Tests
             CollectionAssert.AreEqual(new[] { 0, 1, 2, 3, 4, 5, 6 }, notification.Current);
         }
         #endregion
+
+        #region Select_after_Where_squashes_both_operators
+        [TestMethod]
+        public void Select_after_Where_squashes_both_operators()
+        {
+            var list = new ListReactiveCollectionSource<int>();
+
+            var projectedList = list.ReactiveCollection
+                .Where(x => x % 2 == 0)
+                .Select(x => x.ToString(CultureInfo.InvariantCulture));
+
+            var transformed = projectedList as ListNotificationTransformationListReactiveCollection<int, string>;
+            Assert.IsNotNull(transformed);
+
+            Assert.AreSame(transformed.Source, list.ReactiveCollection);
+            Assert.IsNotNull(transformed.Selector);
+            Assert.IsNotNull(transformed.Filter);
+        }
+        #endregion
+
+        #region Where_after_Where_squashes_both_operators
+        [TestMethod]
+        public void Where_after_Where_squashes_both_operators()
+        {
+            var list = new ListReactiveCollectionSource<int>();
+
+            var projectedList = list.ReactiveCollection
+                .Where(x => x % 2 == 0)
+                .Where(x => x % 3 == 0);
+
+            var transformed = projectedList as ListNotificationTransformationListReactiveCollection<int, int>;
+            Assert.IsNotNull(transformed);
+
+            Assert.AreSame(transformed.Source, list.ReactiveCollection);
+            Assert.IsNull(transformed.Selector);
+            Assert.IsNotNull(transformed.Filter);
+
+            Assert.IsFalse(transformed.Filter(2));
+            Assert.IsFalse(transformed.Filter(3));
+            Assert.IsFalse(transformed.Filter(4));
+            Assert.IsTrue(transformed.Filter(6));
+        }
+        #endregion
+
+        #region Select_after_Where_behaves_correctly
+        [TestMethod]
+        public async Task Select_after_Where_behaves_correctly()
+        {
+            var list = new ListReactiveCollectionSource<int>();
+
+            var changesTask = list.ReactiveCollection
+                .Where(x => x % 2 == 0)
+                .Select(x => x.ToString(CultureInfo.InvariantCulture))
+                .Changes
+                .Take(6)
+                .ToArray()
+                .ToTask();
+
+            list.Add(1);
+            list.Add(2);
+            list.Remove(2);
+            list.Remove(1);
+            list.Add(4);
+            list.Insert(0, 2);
+            list[0] = 3;
+
+            var changes = await changesTask;
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Reset, changes[0].Action);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, changes[1].Action);
+            CollectionAssert.AreEqual(new[] { "2" }, changes[1].Current);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Remove, changes[2].Action);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, changes[3].Action);
+            CollectionAssert.AreEqual(new[] { "4" }, changes[3].Current);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, changes[4].Action);
+            CollectionAssert.AreEqual(new[] { "4", "2" }, changes[4].Current);
+            Assert.AreEqual(1, changes[4].Index);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Remove, changes[5].Action);
+            Assert.AreEqual(1, changes[5].Index);
+            CollectionAssert.AreEqual(new[] { "4" }, changes[5].Current);
+        }
+        #endregion
+
+        #region Where_after_Where_behaves_correctly
+        [TestMethod]
+        public async Task Where_after_Where_behaves_correctly()
+        {
+            var list = new ListReactiveCollectionSource<int>();
+
+            var changesTask = list.ReactiveCollection
+                .Where(x => x % 2 == 0)
+                .Where(x => x % 3 == 0)
+                .Changes
+                .Take(3)
+                .ToArray()
+                .ToTask();
+
+            list.Add(1);
+            list.Add(2);
+            list.Add(3);
+            list.Add(6);
+            list.Remove(1);
+            list.Remove(2);
+            list.Remove(3);
+            list.Remove(6);
+
+            var changes = await changesTask;
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Reset, changes[0].Action);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, changes[1].Action);
+            CollectionAssert.AreEqual(new[] { 6 }, changes[1].Current);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Remove, changes[2].Action);
+            Assert.IsTrue(changes[2].Current.IsEmpty);
+        }
+        #endregion
     }
 }
