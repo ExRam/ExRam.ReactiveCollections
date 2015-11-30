@@ -32,14 +32,24 @@ namespace ExRam.ReactiveCollections
                 this._equalityComparer = equalityComparer;
             }
 
+            protected override void SetItem(ListReactiveCollectionSource<TResult> collection, int index, TResult item)
+            {
+                collection.SetItem(index, item);
+            }
+
+            protected override void AddRange(ListReactiveCollectionSource<TResult> collection, IEnumerable<TResult> items)
+            {
+                collection.AddRange(items);
+            }
+
             protected override void Clear(ListReactiveCollectionSource<TResult> collection)
             {
                 collection.Clear();
             }
 
-            protected override void InsertRange(ListReactiveCollectionSource<TResult> collection, int? index, IEnumerable<TResult> items)
+            protected override void InsertRange(ListReactiveCollectionSource<TResult> collection, int index, IEnumerable<TResult> items)
             {
-                collection.InsertRange(index ?? collection.Count, items);
+                collection.InsertRange(index, items);
             }
 
             protected override void RemoveRange(ListReactiveCollectionSource<TResult> collection, int index, int count)

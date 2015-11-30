@@ -137,14 +137,24 @@ namespace ExRam.ReactiveCollections
                 this._equalityComparer = equalityComparer;
             }
 
+            protected override void SetItem(ListReactiveCollectionSource<T> collection, int index, T item)
+            {
+                collection.SetItem(index, item);
+            }
+
+            protected override void AddRange(ListReactiveCollectionSource<T> collection, IEnumerable<T> items)
+            {
+                collection.AddRange(items);
+            }
+
             protected override void Clear(ListReactiveCollectionSource<T> collection)
             {
                 collection.Clear();
             }
 
-            protected override void InsertRange(ListReactiveCollectionSource<T> collection, int? index, IEnumerable<T> items)
+            protected override void InsertRange(ListReactiveCollectionSource<T> collection, int index, IEnumerable<T> items)
             {
-                collection.InsertRange(index ?? collection.Count, items);
+                collection.InsertRange(index, items);
             }
 
             protected override void RemoveRange(ListReactiveCollectionSource<T> collection, int index, int count)

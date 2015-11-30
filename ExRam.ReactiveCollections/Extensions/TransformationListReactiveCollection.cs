@@ -35,15 +35,14 @@ namespace ExRam.ReactiveCollections
                                         {
                                             case NotifyCollectionChangedAction.Add:
                                             {
-                                                var insertionIndex = (filter == null) && listNotification != null
-                                                    ? listNotification.Index
-                                                    : null;
-
                                                 var filteredItems = filter != null
                                                     ? notification.NewItems.Where(x => filter(x))
                                                     : notification.NewItems;
-
-                                                this.InsertRange(resultList, insertionIndex, filteredItems.Select(localSelector));
+                                                
+                                                if ((filter == null) && listNotification?.Index != null)
+                                                    this.InsertRange(resultList, listNotification.Index.Value, filteredItems.Select(localSelector));
+                                                else
+                                                    this.AddRange(resultList, filteredItems.Select(localSelector));
 
                                                 break;
                                             }
@@ -76,11 +75,22 @@ namespace ExRam.ReactiveCollections
                                                     var getsIn = filter?.Invoke(notification.NewItems[0]) ?? true;
 
                                                     if (wasIn && getsIn)
-                                                        this.Replace(resultList, localSelector(notification.OldItems[0]), localSelector(notification.NewItems[0]));
+                                                    {
+                                                        var newItem = localSelector(notification.NewItems[0]);
+                                                        
+                                                        if (replaceIndex.HasValue)
+                                                            this.SetItem(resultList, replaceIndex.Value, newItem);
+                                                        else
+                                                        {
+                                                            var oldItem = localSelector(notification.OldItems[0]);
+
+                                                            this.Replace(resultList, oldItem, newItem);
+                                                        }
+                                                    }
                                                     else if (wasIn)
                                                         this.RemoveRange(resultList, notification.OldItems.Select(localSelector));
                                                     else if (getsIn)
-                                                        this.InsertRange(resultList, null, notification.NewItems.Select(localSelector));
+                                                        this.AddRange(resultList, notification.NewItems.Select(localSelector));
                                                 }
                                                 else
                                                 {
@@ -106,7 +116,7 @@ namespace ExRam.ReactiveCollections
                                                             .RemoveRange(resultList, removedItems.Select(localSelector));
 
                                                         this
-                                                            .InsertRange(resultList, null, addedItems.Select(localSelector));
+                                                            .AddRange(resultList, addedItems.Select(localSelector));
                                                     }
                                                 }
 
@@ -121,7 +131,7 @@ namespace ExRam.ReactiveCollections
                                                     ? notification.Current.Where(x => filter(x))
                                                     : notification.Current;
 
-                                                this.InsertRange(resultList, 0, addedItems.Select(localSelector));
+                                                this.AddRange(resultList, addedItems.Select(localSelector));
 
                                                 break;
                                             }
@@ -136,7 +146,9 @@ namespace ExRam.ReactiveCollections
                 .Normalize();
         }
 
-        protected abstract void InsertRange(TCollection collection, int? index, IEnumerable<TResult> items);
+        protected abstract void SetItem(TCollection collection, int index, TResult item);
+        protected abstract void AddRange(TCollection collection, IEnumerable<TResult> items);
+        protected abstract void InsertRange(TCollection collection, int index, IEnumerable<TResult> items);
         protected abstract void RemoveRange(TCollection collection, int index, int count);
         protected abstract void RemoveRange(TCollection collection, IEnumerable<TResult> items);
         protected abstract void Replace(TCollection collection, TResult oldItem, TResult newItem);
