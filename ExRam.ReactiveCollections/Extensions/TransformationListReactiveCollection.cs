@@ -15,6 +15,9 @@ namespace ExRam.ReactiveCollections
         {
             Contract.Requires(source != null);
 
+            this.Filter = filter;
+            this.Selector = selector;
+
             this.Changes = Observable
                 .Defer(() =>
                 {
@@ -146,6 +149,10 @@ namespace ExRam.ReactiveCollections
                 .Normalize();
         }
 
+        public Predicate<TSource> Filter { get; set; }
+        public Func<TSource, TResult> Selector { get; set; }
+        public IObservable<TNotification> Changes { get; }
+
         protected abstract void SetItem(TCollection collection, int index, TResult item);
         protected abstract void AddRange(TCollection collection, IEnumerable<TResult> items);
         protected abstract void InsertRange(TCollection collection, int index, IEnumerable<TResult> items);
@@ -153,7 +160,5 @@ namespace ExRam.ReactiveCollections
         protected abstract void RemoveRange(TCollection collection, IEnumerable<TResult> items);
         protected abstract void Replace(TCollection collection, TResult oldItem, TResult newItem);
         protected abstract void Clear(TCollection collection);
-
-        public IObservable<TNotification> Changes { get; }
     }
 }
