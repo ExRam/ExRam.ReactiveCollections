@@ -149,6 +149,11 @@ namespace ExRam.ReactiveCollections
             return this.Selector == null;   //TODO: Add Comparer == null later.
         }
 
+        public bool CanAddSelect()
+        {
+            return true;  //TODO: Add Comparer == null later.
+        }
+
         public Predicate<TSource> Filter { get; }
         public Func<TSource, TResult> Selector { get; }
         public IObservable<TNotification> Changes { get; }

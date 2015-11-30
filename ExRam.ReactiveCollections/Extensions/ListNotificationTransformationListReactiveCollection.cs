@@ -21,6 +21,17 @@ namespace ExRam.ReactiveCollections
             return new ListNotificationTransformationListReactiveCollection<TSource, TResult>(this.Source, x => this.Filter(x) && predicate(x), null, this._equalityComparer);
         }
 
+        public ListNotificationTransformationListReactiveCollection<TSource, TChainedResult> AddSelect<TChainedResult>(Func<TResult, TChainedResult> selector, IEqualityComparer<TChainedResult> equalityComparer)
+        {
+            return new ListNotificationTransformationListReactiveCollection<TSource, TChainedResult>(
+                this.Source, 
+                this.Filter,
+                this.Selector != null 
+                    ? (Func<TSource, TChainedResult>)(x => selector(this.Selector(x)))
+                    : x => selector((TResult)(object)x),
+                equalityComparer);
+        }
+
         protected override void SetItem(ListReactiveCollectionSource<TResult> collection, int index, TResult item)
         {
             collection.SetItem(index, item);
