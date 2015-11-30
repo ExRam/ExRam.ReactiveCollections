@@ -60,6 +60,13 @@ namespace ExRam.ReactiveCollections
             throw new InvalidOperationException();
         }
 
+        public override IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate)
+        {
+            return this.Selector == null
+                ? new SortedSetNotificationTransformationListReactiveCollection<TSource, TResult>(this.Source, x => this.Filter(x) && predicate(x), null, this._comparer)
+                : null;
+        }
+
         protected override bool CanHandleIndexes => false;
     }
 }

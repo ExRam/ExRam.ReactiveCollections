@@ -59,6 +59,13 @@ namespace ExRam.ReactiveCollections
             collection.Replace(oldItem, newItem, this._equalityComparer);
         }
 
+        public override IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate)
+        {
+            return this.Selector == null
+                ? new SortedListNotificationTransformationListReactiveCollection<TSource, TResult>(this.Source, x => this.Filter(x) && predicate(x), null, this._comparer, this._equalityComparer)
+                : null;
+        }
+
         protected override bool CanHandleIndexes => false;
     }
 }

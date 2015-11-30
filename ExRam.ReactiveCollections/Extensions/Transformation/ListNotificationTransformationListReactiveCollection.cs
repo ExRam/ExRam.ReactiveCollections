@@ -16,9 +16,11 @@ namespace ExRam.ReactiveCollections
             this._equalityComparer = equalityComparer;
         }
 
-        public ListNotificationTransformationListReactiveCollection<TSource, TResult> AddWhere(Predicate<TSource> predicate)
+        public override IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate)
         {
-            return new ListNotificationTransformationListReactiveCollection<TSource, TResult>(this.Source, x => this.Filter(x) && predicate(x), null, this._equalityComparer);
+            return this.Selector == null
+                ? new ListNotificationTransformationListReactiveCollection<TSource, TResult>(this.Source, x => this.Filter(x) && predicate(x), null, this._equalityComparer)
+                : null;
         }
 
         public ListNotificationTransformationListReactiveCollection<TSource, TChainedResult> AddSelect<TChainedResult>(Func<TResult, TChainedResult> selector, IEqualityComparer<TChainedResult> equalityComparer)

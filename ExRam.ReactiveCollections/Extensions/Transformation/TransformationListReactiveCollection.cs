@@ -7,11 +7,19 @@ using System.Reactive.Linq;
 
 namespace ExRam.ReactiveCollections
 {
-    internal abstract class TransformationListReactiveCollection<TSource, TResult, TCollection, TNotification> : IReactiveCollection<TNotification>
-        where TCollection : IReactiveCollectionSource<TNotification>
-        where TNotification : ICollectionChangedNotification
+    internal interface ICanFilter<out TSource>
     {
-        protected TransformationListReactiveCollection(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TResult> selector)
+        IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate);
+    }
+
+    internal abstract class TransformationListReactiveCollection<TSource, TResult, TCollection, TNotification> : IReactiveCollection<TNotification>, ICanFilter<TSource>
+        where TCollection : IReactiveCollectionSource<TNotification>
+        where TNotification : ICollectionChangedNotification<TResult>
+    {
+        protected TransformationListReactiveCollection(
+            IReactiveCollection<ICollectionChangedNotification<TSource>> source, 
+            Predicate<TSource> filter,
+            Func<TSource, TResult> selector)
         {
             Contract.Requires(source != null);
 
@@ -152,14 +160,11 @@ namespace ExRam.ReactiveCollections
                 .Normalize();
         }
 
-        public bool CanAddWhere()
-        {
-            return this.Selector == null;   //TODO: Add Comparer == null later.
-        }
+        public abstract IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate);
 
         public bool CanAddSelect()
         {
-            return true;  //TODO: Add Comparer == null later.
+            return true;
         }
 
         public Predicate<TSource> Filter { get; }
