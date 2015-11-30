@@ -25,9 +25,11 @@ namespace ExRam.ReactiveCollections
             IReactiveCollection<ICollectionChangedNotification<TSource>> source, 
             Predicate<TSource> filter,
             Func<TSource, TResult> selector,
-            IComparer<TResult> comparer)
+            IComparer<TResult> comparer,
+            IEqualityComparer<TResult> equalityComparer)
         {
             Contract.Requires(source != null);
+            Contract.Requires(equalityComparer != null);
 
             this.Source = source;
             this.Filter = filter;
@@ -110,7 +112,14 @@ namespace ExRam.ReactiveCollections
                                                             {
                                                                 var oldItem = localSelector(notification.OldItems[0]);
 
-                                                                this.Replace(resultList, oldItem, newItem);
+                                                                var canReplace = resultList as ICanReplaceValue<TResult>;
+                                                                if (canReplace != null)
+                                                                    canReplace.Replace(oldItem, newItem, equalityComparer);
+                                                                else
+                                                                {
+                                                                    resultList.Remove(oldItem);
+                                                                    resultList.Add(newItem);
+                                                                }
                                                             }
                                                         }
                                                         else if (wasIn)
@@ -181,7 +190,6 @@ namespace ExRam.ReactiveCollections
         protected abstract void InsertRange(TCollection collection, int index, IEnumerable<TResult> items);
         protected abstract void RemoveRange(TCollection collection, int index, int count);
         protected abstract void RemoveRange(TCollection collection, IEnumerable<TResult> items);
-        protected abstract void Replace(TCollection collection, TResult oldItem, TResult newItem);
 
         protected abstract TCollection CreateCollection();
     }

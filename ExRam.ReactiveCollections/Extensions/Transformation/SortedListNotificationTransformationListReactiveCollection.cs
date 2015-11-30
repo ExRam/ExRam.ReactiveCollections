@@ -8,7 +8,7 @@ namespace ExRam.ReactiveCollections
     {
         private readonly IEqualityComparer<TResult> _equalityComparer;
 
-        public SortedListNotificationTransformationListReactiveCollection(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TResult> selector, IComparer<TResult> comparer, IEqualityComparer<TResult> equalityComparer) : base(source, filter, selector, comparer)
+        public SortedListNotificationTransformationListReactiveCollection(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TResult> selector, IComparer<TResult> comparer, IEqualityComparer<TResult> equalityComparer) : base(source, filter, selector, comparer, equalityComparer)
         {
             Contract.Requires(source != null);
             Contract.Requires(comparer != null);
@@ -40,11 +40,6 @@ namespace ExRam.ReactiveCollections
         protected override void RemoveRange(SortedListReactiveCollectionSource<TResult> collection, IEnumerable<TResult> items)
         {
             collection.RemoveRange(items, this._equalityComparer);
-        }
-
-        protected override void Replace(SortedListReactiveCollectionSource<TResult> collection, TResult oldItem, TResult newItem)
-        {
-            collection.Replace(oldItem, newItem, this._equalityComparer);
         }
 
         public override IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate)

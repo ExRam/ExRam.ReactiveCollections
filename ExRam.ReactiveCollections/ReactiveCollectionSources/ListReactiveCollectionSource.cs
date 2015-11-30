@@ -13,10 +13,16 @@ using System.Diagnostics.Contracts;
 
 namespace ExRam.ReactiveCollections
 {
+    internal interface ICanReplaceValue<T>
+    {
+        void Replace(T oldValue, T newValue, IEqualityComparer<T> equalityComparer);
+    }
+
     public class ListReactiveCollectionSource<T> : 
         ReactiveCollectionSource<ListChangedNotification<T>>,
         IList<T>,
-        IList
+        IList,
+        ICanReplaceValue<T>
     {
         public ListReactiveCollectionSource() : this(ImmutableList<T>.Empty)
         {

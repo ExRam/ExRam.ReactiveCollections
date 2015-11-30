@@ -6,7 +6,7 @@ namespace ExRam.ReactiveCollections
 {
     internal sealed class SortedSetNotificationTransformationListReactiveCollection<TSource, TResult> : TransformationListReactiveCollection<TSource, TResult, SortedSetReactiveCollectionSource<TResult>, SortedSetChangedNotification<TResult>>
     {
-        public SortedSetNotificationTransformationListReactiveCollection(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TResult> selector, IComparer<TResult> comparer) : base(source, filter, selector, comparer)
+        public SortedSetNotificationTransformationListReactiveCollection(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TResult> selector, IComparer<TResult> comparer) : base(source, filter, selector, comparer, EqualityComparer<TResult>.Default)
         {
             Contract.Requires(source != null);
             Contract.Requires(comparer != null);
@@ -38,12 +38,6 @@ namespace ExRam.ReactiveCollections
         protected override void RemoveRange(SortedSetReactiveCollectionSource<TResult> collection, int index, int count)
         {
             throw new InvalidOperationException();
-        }
-
-        protected override void Replace(SortedSetReactiveCollectionSource<TResult> collection, TResult oldItem, TResult newItem)
-        {
-            collection.Remove(oldItem);
-            collection.Add(newItem);
         }
 
         public override IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate)

@@ -15,7 +15,8 @@ namespace ExRam.ReactiveCollections
     public class SortedListReactiveCollectionSource<T> : 
         IReactiveCollectionSource<ListChangedNotification<T>>,
         ICollection<T>,
-        ICollection
+        ICollection,
+        ICanReplaceValue<T>
     {
         private readonly IComparer<T> _comparer;
         private readonly ListReactiveCollectionSource<T> _innerList = new ListReactiveCollectionSource<T>();
