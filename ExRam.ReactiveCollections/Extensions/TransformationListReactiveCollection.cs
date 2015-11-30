@@ -11,10 +11,11 @@ namespace ExRam.ReactiveCollections
         where TCollection : IReactiveCollectionSource<TNotification>, new()
         where TNotification : ICollectionChangedNotification
     {
-        protected TransformationListReactiveCollection(IObservable<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TResult> selector)
+        protected TransformationListReactiveCollection(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TResult> selector)
         {
             Contract.Requires(source != null);
 
+            this.Source = source;
             this.Filter = filter;
             this.Selector = selector;
 
@@ -26,113 +27,115 @@ namespace ExRam.ReactiveCollections
 
                     return Observable
                         .Using(
-                            () => source.Subscribe(
-                                notification =>
-                                {
-                                    var localSelector = selector ?? (x => (TResult)(object)x);
-                                    var listNotification = notification as ListChangedNotification<TSource>;
-
-                                    lock (syncRoot)
+                            () => source
+                                .Changes
+                                .Subscribe(
+                                    notification =>
                                     {
-                                        switch (notification.Action)
+                                        var localSelector = selector ?? (x => (TResult)(object)x);
+                                        var listNotification = notification as ListChangedNotification<TSource>;
+
+                                        lock (syncRoot)
                                         {
-                                            case NotifyCollectionChangedAction.Add:
+                                            switch (notification.Action)
                                             {
-                                                var filteredItems = filter != null
-                                                    ? notification.NewItems.Where(x => filter(x))
-                                                    : notification.NewItems;
+                                                case NotifyCollectionChangedAction.Add:
+                                                {
+                                                    var filteredItems = filter != null
+                                                        ? notification.NewItems.Where(x => filter(x))
+                                                        : notification.NewItems;
                                                 
-                                                var selectedItems = filteredItems.Select(localSelector);
+                                                    var selectedItems = filteredItems.Select(localSelector);
 
-                                                if ((filter == null) && listNotification?.Index != null)
-                                                    this.InsertRange(resultList, listNotification.Index.Value, selectedItems);
-                                                else
-                                                    this.AddRange(resultList, selectedItems);
+                                                    if ((filter == null) && listNotification?.Index != null)
+                                                        this.InsertRange(resultList, listNotification.Index.Value, selectedItems);
+                                                    else
+                                                        this.AddRange(resultList, selectedItems);
 
-                                                break;
-                                            }
-
-                                            case NotifyCollectionChangedAction.Remove:
-                                            {
-                                                if ((filter == null) && (listNotification?.Index != null))
-                                                    this.RemoveRange(resultList, listNotification.Index.Value, notification.OldItems.Count);
-                                                else
-                                                {
-                                                    var filtered = filter != null
-                                                        ? notification.OldItems.Where(x => filter(x))
-                                                        : notification.OldItems;
-
-                                                    this.RemoveRange(resultList, filtered.Select(localSelector));
+                                                    break;
                                                 }
 
-                                                break;
-                                            }
-
-                                            case NotifyCollectionChangedAction.Replace:
-                                            {
-                                                if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
-                                                {
-                                                    var wasIn = filter?.Invoke(notification.OldItems[0]) ?? true;
-                                                    var getsIn = filter?.Invoke(notification.NewItems[0]) ?? true;
-
-                                                    if (wasIn && getsIn)
-                                                    {
-                                                        var newItem = localSelector(notification.NewItems[0]);
-                                                        
-                                                        if ((filter == null) && (listNotification?.Index != null))
-                                                            this.SetItem(resultList, listNotification.Index.Value, newItem);
-                                                        else
-                                                        {
-                                                            var oldItem = localSelector(notification.OldItems[0]);
-
-                                                            this.Replace(resultList, oldItem, newItem);
-                                                        }
-                                                    }
-                                                    else if (wasIn)
-                                                        this.RemoveRange(resultList, notification.OldItems.Select(localSelector));
-                                                    else if (getsIn)
-                                                        this.AddRange(resultList, notification.NewItems.Select(localSelector));
-                                                }
-                                                else
+                                                case NotifyCollectionChangedAction.Remove:
                                                 {
                                                     if ((filter == null) && (listNotification?.Index != null))
-                                                    {
                                                         this.RemoveRange(resultList, listNotification.Index.Value, notification.OldItems.Count);
-                                                        this.InsertRange(resultList, listNotification.Index.Value, notification.NewItems.Select(localSelector));
-                                                    }
                                                     else
                                                     {
-                                                        var removedItems = filter != null
+                                                        var filtered = filter != null
                                                             ? notification.OldItems.Where(x => filter(x))
                                                             : notification.OldItems;
 
-                                                        var addedItems = filter != null
-                                                            ? notification.NewItems.Where(x => filter(x))
-                                                            : notification.NewItems;
-
-                                                        this.RemoveRange(resultList, removedItems.Select(localSelector));
-                                                        this.AddRange(resultList, addedItems.Select(localSelector));
+                                                        this.RemoveRange(resultList, filtered.Select(localSelector));
                                                     }
+
+                                                    break;
                                                 }
 
-                                                break;
-                                            }
+                                                case NotifyCollectionChangedAction.Replace:
+                                                {
+                                                    if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
+                                                    {
+                                                        var wasIn = filter?.Invoke(notification.OldItems[0]) ?? true;
+                                                        var getsIn = filter?.Invoke(notification.NewItems[0]) ?? true;
 
-                                            default:
-                                            {
-                                                this.Clear(resultList);
+                                                        if (wasIn && getsIn)
+                                                        {
+                                                            var newItem = localSelector(notification.NewItems[0]);
+                                                        
+                                                            if ((filter == null) && (listNotification?.Index != null))
+                                                                this.SetItem(resultList, listNotification.Index.Value, newItem);
+                                                            else
+                                                            {
+                                                                var oldItem = localSelector(notification.OldItems[0]);
 
-                                                var addedItems = filter != null
-                                                    ? notification.Current.Where(x => filter(x))
-                                                    : notification.Current;
+                                                                this.Replace(resultList, oldItem, newItem);
+                                                            }
+                                                        }
+                                                        else if (wasIn)
+                                                            this.RemoveRange(resultList, notification.OldItems.Select(localSelector));
+                                                        else if (getsIn)
+                                                            this.AddRange(resultList, notification.NewItems.Select(localSelector));
+                                                    }
+                                                    else
+                                                    {
+                                                        if ((filter == null) && (listNotification?.Index != null))
+                                                        {
+                                                            this.RemoveRange(resultList, listNotification.Index.Value, notification.OldItems.Count);
+                                                            this.InsertRange(resultList, listNotification.Index.Value, notification.NewItems.Select(localSelector));
+                                                        }
+                                                        else
+                                                        {
+                                                            var removedItems = filter != null
+                                                                ? notification.OldItems.Where(x => filter(x))
+                                                                : notification.OldItems;
 
-                                                this.AddRange(resultList, addedItems.Select(localSelector));
+                                                            var addedItems = filter != null
+                                                                ? notification.NewItems.Where(x => filter(x))
+                                                                : notification.NewItems;
 
-                                                break;
+                                                            this.RemoveRange(resultList, removedItems.Select(localSelector));
+                                                            this.AddRange(resultList, addedItems.Select(localSelector));
+                                                        }
+                                                    }
+
+                                                    break;
+                                                }
+
+                                                default:
+                                                {
+                                                    this.Clear(resultList);
+
+                                                    var addedItems = filter != null
+                                                        ? notification.Current.Where(x => filter(x))
+                                                        : notification.Current;
+
+                                                    this.AddRange(resultList, addedItems.Select(localSelector));
+
+                                                    break;
+                                                }
                                             }
                                         }
-                                    }
-                                }),
+                                    }),
 
                             _ => resultList.ReactiveCollection.Changes);
                 })
@@ -144,6 +147,7 @@ namespace ExRam.ReactiveCollections
         public Predicate<TSource> Filter { get; set; }
         public Func<TSource, TResult> Selector { get; set; }
         public IObservable<TNotification> Changes { get; }
+        public IReactiveCollection<ICollectionChangedNotification<TSource>> Source { get; set; }
 
         protected abstract void SetItem(TCollection collection, int index, TResult item);
         protected abstract void AddRange(TCollection collection, IEnumerable<TResult> items);

@@ -21,7 +21,7 @@ namespace ExRam.ReactiveCollections
             private readonly IEqualityComparer<TResult> _equalityComparer;
 
             public SelectListReactiveCollection(
-                IObservable<ICollectionChangedNotification<TSource>> source, 
+                IReactiveCollection<ICollectionChangedNotification<TSource>> source, 
                 Func<TSource, TResult> selector,
                 IEqualityComparer<TResult> equalityComparer) : base(source, null, selector)
             {
@@ -152,7 +152,7 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(equalityComparer != null);
             Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TResult>>>() != null);
 
-            return new SelectListReactiveCollection<TSource, TResult>(source.Changes, selector, equalityComparer);
+            return new SelectListReactiveCollection<TSource, TResult>(source, selector, equalityComparer);
         }
 
         public static IReactiveCollection<DictionaryChangedNotification<TKey, TResult>> Select<TKey, TSource, TResult>(this IReactiveCollection<DictionaryChangedNotification<TKey, TSource>> source, Func<TSource, TResult> selector)

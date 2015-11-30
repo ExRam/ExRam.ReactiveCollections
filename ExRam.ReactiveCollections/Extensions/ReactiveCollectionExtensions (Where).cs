@@ -128,7 +128,7 @@ namespace ExRam.ReactiveCollections
         {
             private readonly IEqualityComparer<T> _equalityComparer;
 
-            public WhereReactiveList(IObservable<ICollectionChangedNotification<T>> source, Predicate<T> filter, IEqualityComparer<T> equalityComparer) : base(source, filter, null)
+            public WhereReactiveList(IReactiveCollection<ICollectionChangedNotification<T>> source, Predicate<T> filter, IEqualityComparer<T> equalityComparer) : base(source, filter, null)
             {
                 Contract.Requires(source != null);
                 Contract.Requires(filter != null);
@@ -232,7 +232,7 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(equalityComparer != null);
             Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
 
-            return new WhereReactiveList<TSource>(source.Changes, filter, equalityComparer);
+            return new WhereReactiveList<TSource>(source, filter, equalityComparer);
         }
 
         public static IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> Where<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> source, Predicate<KeyValuePair<TKey, TValue>> filter)
