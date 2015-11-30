@@ -16,116 +16,46 @@ namespace ExRam.ReactiveCollections
     public static partial class ReactiveCollectionExtensions
     {
         #region SelectListReactiveCollection
-        private sealed class SelectListReactiveCollection<TSource, TResult> : IReactiveCollection<ListChangedNotification<TResult>>
+        private sealed class SelectListReactiveCollection<TSource, TResult> : TransformationListReactiveCollection<TSource, TResult, ListReactiveCollectionSource<TResult>, ListChangedNotification<TResult>>
         {
+            private readonly IEqualityComparer<TResult> _equalityComparer;
+
             public SelectListReactiveCollection(
                 IObservable<ICollectionChangedNotification<TSource>> source, 
                 Func<TSource, TResult> selector,
-                IEqualityComparer<TResult> equalityComparer)
+                IEqualityComparer<TResult> equalityComparer) : base(source, null, selector)
             {
                 Contract.Requires(source != null);
                 Contract.Requires(selector != null);
                 Contract.Requires(equalityComparer != null);
 
-                this.Changes = Observable
-                    .Defer(() =>
-                    {
-                        var syncRoot = new object();
-                        var resultList = new ListReactiveCollectionSource<TResult>();
-
-                        return Observable.Using(
-                            () => source.Subscribe(
-                                notification =>
-                                {
-                                    lock (syncRoot)
-                                    {
-                                        switch (notification.Action)
-                                        {
-                                            case (NotifyCollectionChangedAction.Add):
-                                            {
-                                                var listNotification = notification as ListChangedNotification<TSource>;
-
-                                                if (listNotification != null)
-                                                    // ReSharper disable PossibleInvalidOperationException
-                                                    resultList.InsertRange(listNotification.Index.Value, notification.NewItems.Select(selector));
-                                                    // ReSharper restore PossibleInvalidOperationException
-                                                else
-                                                    resultList.AddRange(notification.NewItems.Select(selector));
-
-                                                break;
-                                            }
-
-                                            case (NotifyCollectionChangedAction.Remove):
-                                            {
-                                                var listNotification = notification as ListChangedNotification<TSource>;
-
-                                                if (listNotification != null)
-                                                    // ReSharper disable PossibleInvalidOperationException
-                                                    resultList.RemoveRange(listNotification.Index.Value, notification.OldItems.Count);
-                                                    // ReSharper restore PossibleInvalidOperationException
-                                                else
-                                                    resultList.RemoveRange(notification.OldItems.Select(selector), equalityComparer);
-
-                                                break;
-                                            }
-
-                                            case (NotifyCollectionChangedAction.Replace):
-                                            {
-                                                var listNotification = notification as ListChangedNotification<TSource>;
-
-                                                if (listNotification != null)
-                                                {
-                                                    // ReSharper disable PossibleInvalidOperationException
-                                                    var index = listNotification.Index.Value;
-                                                    // ReSharper restore PossibleInvalidOperationException
-
-                                                    if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
-                                                        resultList.Replace(selector(notification.OldItems[0]), selector(notification.NewItems[0]), equalityComparer);
-                                                    else
-                                                    {
-                                                        resultList
-                                                            .RemoveRange(index, notification.OldItems.Count);
-
-                                                        resultList
-                                                            .InsertRange(index, notification.NewItems.Select(selector));
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
-                                                        resultList.Replace(selector(notification.OldItems[0]), selector(notification.NewItems[0]), equalityComparer);
-                                                    else
-                                                    {
-                                                        resultList
-                                                            .RemoveRange(notification.OldItems.Select(selector), equalityComparer);
-
-                                                        resultList
-                                                            .AddRange(notification.NewItems.Select(selector));
-                                                    }
-                                                }
-
-                                                break;
-                                            }
-
-                                            default:
-                                            {
-                                                resultList.Clear();
-                                                resultList.AddRange(notification.Current.Select(selector));
-
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }),
-
-                            _ => resultList.ReactiveCollection.Changes);
-                    })
-                    .ReplayFresh(1)
-                    .RefCount()
-                    .Normalize();
+                this._equalityComparer = equalityComparer;
             }
 
-            public IObservable<ListChangedNotification<TResult>> Changes { get; }
+            protected override void Clear(ListReactiveCollectionSource<TResult> collection)
+            {
+                collection.Clear();
+            }
+
+            protected override void InsertRange(ListReactiveCollectionSource<TResult> collection, int? index, IEnumerable<TResult> items)
+            {
+                collection.InsertRange(index ?? collection.Count, items);
+            }
+
+            protected override void RemoveRange(ListReactiveCollectionSource<TResult> collection, int index, int count)
+            {
+                collection.RemoveRange(index, count);
+            }
+
+            protected override void RemoveRange(ListReactiveCollectionSource<TResult> collection, IEnumerable<TResult> items)
+            {
+                collection.RemoveRange(items, this._equalityComparer);
+            }
+
+            protected override void Replace(ListReactiveCollectionSource<TResult> collection, TResult oldItem, TResult newItem)
+            {
+                collection.Replace(oldItem, newItem, this._equalityComparer);
+            }
         }
         #endregion
 
