@@ -69,7 +69,7 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
-        #region SelectListReactiveDictionarySource
+        #region SelectReactiveDictionarySource
         private sealed class SelectReactiveDictionarySource<TKey, TSource, TResult> : IReactiveCollection<DictionaryChangedNotification<TKey, TResult>>
         {
             public SelectReactiveDictionarySource(

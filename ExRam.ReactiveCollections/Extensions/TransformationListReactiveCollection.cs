@@ -42,10 +42,12 @@ namespace ExRam.ReactiveCollections
                                                     ? notification.NewItems.Where(x => filter(x))
                                                     : notification.NewItems;
                                                 
+                                                var selectedItems = filteredItems.Select(localSelector);
+
                                                 if ((filter == null) && listNotification?.Index != null)
-                                                    this.InsertRange(resultList, listNotification.Index.Value, filteredItems.Select(localSelector));
+                                                    this.InsertRange(resultList, listNotification.Index.Value, selectedItems);
                                                 else
-                                                    this.AddRange(resultList, filteredItems.Select(localSelector));
+                                                    this.AddRange(resultList, selectedItems);
 
                                                 break;
                                             }
@@ -68,10 +70,6 @@ namespace ExRam.ReactiveCollections
 
                                             case NotifyCollectionChangedAction.Replace:
                                             {
-                                                var replaceIndex = (filter == null) && (listNotification != null)
-                                                    ? listNotification.Index
-                                                    : null;
-
                                                 if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
                                                 {
                                                     var wasIn = filter?.Invoke(notification.OldItems[0]) ?? true;
@@ -81,8 +79,8 @@ namespace ExRam.ReactiveCollections
                                                     {
                                                         var newItem = localSelector(notification.NewItems[0]);
                                                         
-                                                        if (replaceIndex.HasValue)
-                                                            this.SetItem(resultList, replaceIndex.Value, newItem);
+                                                        if ((filter == null) && (listNotification?.Index != null))
+                                                            this.SetItem(resultList, listNotification.Index.Value, newItem);
                                                         else
                                                         {
                                                             var oldItem = localSelector(notification.OldItems[0]);
@@ -97,13 +95,10 @@ namespace ExRam.ReactiveCollections
                                                 }
                                                 else
                                                 {
-                                                    if (replaceIndex.HasValue)
+                                                    if ((filter == null) && (listNotification?.Index != null))
                                                     {
-                                                        this
-                                                            .RemoveRange(resultList, replaceIndex.Value, notification.OldItems.Count);
-
-                                                        this
-                                                            .InsertRange(resultList, replaceIndex.Value, notification.NewItems.Select(localSelector));
+                                                        this.RemoveRange(resultList, listNotification.Index.Value, notification.OldItems.Count);
+                                                        this.InsertRange(resultList, listNotification.Index.Value, notification.NewItems.Select(localSelector));
                                                     }
                                                     else
                                                     {
@@ -115,11 +110,8 @@ namespace ExRam.ReactiveCollections
                                                             ? notification.NewItems.Where(x => filter(x))
                                                             : notification.NewItems;
 
-                                                        this
-                                                            .RemoveRange(resultList, removedItems.Select(localSelector));
-
-                                                        this
-                                                            .AddRange(resultList, addedItems.Select(localSelector));
+                                                        this.RemoveRange(resultList, removedItems.Select(localSelector));
+                                                        this.AddRange(resultList, addedItems.Select(localSelector));
                                                     }
                                                 }
 
