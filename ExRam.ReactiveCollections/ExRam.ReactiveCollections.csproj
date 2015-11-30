@@ -120,6 +120,7 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Extensions\ListNotificationTransformationListReactiveCollection.cs" />
     <Compile Include="Extensions\ObservableExtensions %28Multicast%29.cs" />
     <Compile Include="Extensions\ObservableExtensions %28ToConnectableReactiveCollection%29.cs" />
     <Compile Include="Extensions\ObservableExtensions %28ToNotifyCollectionChangedEventPattern%29.cs" />

@@ -123,57 +123,6 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
-        #region WhereReactiveList
-        private sealed class WhereReactiveList<T> : TransformationListReactiveCollection<T, T, ListReactiveCollectionSource<T>, ListChangedNotification<T>>
-        {
-            private readonly IEqualityComparer<T> _equalityComparer;
-
-            public WhereReactiveList(IReactiveCollection<ICollectionChangedNotification<T>> source, Predicate<T> filter, IEqualityComparer<T> equalityComparer) : base(source, filter, null)
-            {
-                Contract.Requires(source != null);
-                Contract.Requires(filter != null);
-                Contract.Requires(equalityComparer != null);
-
-                this._equalityComparer = equalityComparer;
-            }
-
-            protected override void SetItem(ListReactiveCollectionSource<T> collection, int index, T item)
-            {
-                collection.SetItem(index, item);
-            }
-
-            protected override void AddRange(ListReactiveCollectionSource<T> collection, IEnumerable<T> items)
-            {
-                collection.AddRange(items);
-            }
-
-            protected override void Clear(ListReactiveCollectionSource<T> collection)
-            {
-                collection.Clear();
-            }
-
-            protected override void InsertRange(ListReactiveCollectionSource<T> collection, int index, IEnumerable<T> items)
-            {
-                collection.InsertRange(index, items);
-            }
-
-            protected override void RemoveRange(ListReactiveCollectionSource<T> collection, int index, int count)
-            {
-                collection.RemoveRange(index, count);
-            }
-
-            protected override void RemoveRange(ListReactiveCollectionSource<T> collection, IEnumerable<T> items)
-            {
-                collection.RemoveRange(items, this._equalityComparer);
-            }
-
-            protected override void Replace(ListReactiveCollectionSource<T> collection, T oldItem, T newItem)
-            {
-                collection.Replace(oldItem, newItem, this._equalityComparer);
-            }
-        }
-        #endregion
-
         #region WhereReactiveDictionary
         private sealed class WhereReactiveDictionary<TKey, TValue> : WhereReactiveCollection<DictionaryReactiveCollectionSource<TKey, TValue>, DictionaryChangedNotification<TKey, TValue>, KeyValuePair<TKey, TValue>>
         {
@@ -232,7 +181,7 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(equalityComparer != null);
             Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
 
-            return new WhereReactiveList<TSource>(source, filter, equalityComparer);
+            return new ListNotificationTransformationListReactiveCollection<TSource, TSource>(source, filter, null, equalityComparer);
         }
 
         public static IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> Where<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> source, Predicate<KeyValuePair<TKey, TValue>> filter)
