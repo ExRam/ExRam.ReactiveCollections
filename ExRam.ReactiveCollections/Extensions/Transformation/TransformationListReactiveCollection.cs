@@ -7,10 +7,12 @@ using System.Reactive.Linq;
 
 namespace ExRam.ReactiveCollections
 {
-    internal abstract class TransformationListReactiveCollection<TSource, TResult, TCollection, TNotification> : IReactiveCollection<TNotification>, ICanFilter<TSource>
+    internal abstract class TransformationListReactiveCollection<TSource, TResult, TCollection, TNotification> : IReactiveCollection<TNotification>, ICanFilter<TSource>, ICanProject<TResult>
         where TCollection : IReactiveCollectionSource<TNotification>, ICollection<TResult>, ICanHandleRanges<TResult>
         where TNotification : ICollectionChangedNotification<TResult>
     {
+        private readonly IEqualityComparer<TResult> _equalityComparer;
+
         protected TransformationListReactiveCollection(
             IReactiveCollection<ICollectionChangedNotification<TSource>> source,
             TCollection collection,
@@ -19,6 +21,7 @@ namespace ExRam.ReactiveCollections
             IComparer<TResult> comparer,
             IEqualityComparer<TResult> equalityComparer)
         {
+            this._equalityComparer = equalityComparer;
             Contract.Requires(source != null);
             Contract.Requires(equalityComparer != null);
 
@@ -168,7 +171,34 @@ namespace ExRam.ReactiveCollections
                 .Normalize();
         }
 
-        public abstract IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate);
+        public IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate)
+        {
+            return (this.Selector == null && this.Comparer == null)
+                ? this.Chain(this.Source, x => this.Filter(x) && predicate(x), null, this._equalityComparer)
+                : null;
+        }
+
+        public IReactiveCollection<ICollectionChangedNotification> TrySelect<TChainedResult>(Func<TResult, TChainedResult> selector, IEqualityComparer<TChainedResult> equalityComparer)
+        {
+            if (this.Comparer == null)
+            {
+                return this.Chain(
+                    this.Source,
+                    this.Filter,
+                    this.Selector != null
+                        ? (Func<TSource, TChainedResult>)(x => selector(this.Selector(x)))
+                        : x => selector((TResult)(object)x),
+                    equalityComparer);
+            }
+
+            return null;
+        }
+
+        protected abstract IReactiveCollection<ICollectionChangedNotification> Chain<TNewResult>(
+            IReactiveCollection<ICollectionChangedNotification<TSource>> source,
+            Predicate<TSource> filter,
+            Func<TSource, TNewResult> selector,
+            IEqualityComparer<TNewResult> equalityComparer);
 
         public Predicate<TSource> Filter { get; }
         public IComparer<TResult> Comparer { get; }

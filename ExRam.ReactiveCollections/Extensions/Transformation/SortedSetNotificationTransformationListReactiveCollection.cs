@@ -12,11 +12,9 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(comparer != null);
         }
 
-        public override IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate)
+        protected override IReactiveCollection<ICollectionChangedNotification> Chain<TNewResult>(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TNewResult> selector, IEqualityComparer<TNewResult> equalityComparer)
         {
-            return this.Selector == null
-                ? new SortedSetNotificationTransformationListReactiveCollection<TSource, TResult>(this.Source, x => this.Filter(x) && predicate(x), null, this.Comparer)
-                : null;
+            throw new NotSupportedException();
         }
     }
 }
