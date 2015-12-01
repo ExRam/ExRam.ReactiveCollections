@@ -7,11 +7,11 @@ using System.Reactive.Linq;
 
 namespace ExRam.ReactiveCollections
 {
-    internal abstract class TransformationListReactiveCollection<TSource, TResult, TCollection, TNotification> : IReactiveCollection<TNotification>
+    internal abstract class TransformationReactiveCollection<TSource, TResult, TCollection, TNotification> : IReactiveCollection<TNotification>
         where TCollection : IReactiveCollectionSource<TNotification>, ICollection<TResult>, ICanHandleRanges<TResult>
         where TNotification : ICollectionChangedNotification<TResult>
     {
-        protected TransformationListReactiveCollection(
+        protected TransformationReactiveCollection(
             IReactiveCollection<ICollectionChangedNotification<TSource>> source,
             TCollection collection,
             Predicate<TSource> filter,

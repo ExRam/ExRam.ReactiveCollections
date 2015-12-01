@@ -181,11 +181,11 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(equalityComparer != null);
             Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
 
-            var nonProjected = source as ListNotificationTransformationListReactiveCollection<TSource, TSource>;
+            var nonProjected = source as ListNotificationTransformationReactiveCollection<TSource, TSource>;
 
             return (nonProjected != null) && (nonProjected.Selector == null)
-                ? new ListNotificationTransformationListReactiveCollection<TSource, TSource>(nonProjected.Source, x => nonProjected.Filter(x) && filter(x), null, nonProjected.EqualityComparer)
-                : new ListNotificationTransformationListReactiveCollection<TSource, TSource>(source, filter, null, equalityComparer);
+                ? new ListNotificationTransformationReactiveCollection<TSource, TSource>(nonProjected.Source, x => nonProjected.Filter(x) && filter(x), null, nonProjected.EqualityComparer)
+                : new ListNotificationTransformationReactiveCollection<TSource, TSource>(source, filter, null, equalityComparer);
         }
 
         public static IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> Where<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> source, Predicate<KeyValuePair<TKey, TValue>> filter)

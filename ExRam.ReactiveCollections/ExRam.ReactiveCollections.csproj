@@ -121,7 +121,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Extensions\Transformation\Interfaces\ICanProjectList.cs" />
-    <Compile Include="Extensions\Transformation\ListNotificationTransformationListReactiveCollection.cs" />
+    <Compile Include="Extensions\Transformation\ListNotificationTransformationReactiveCollection.cs" />
     <Compile Include="Extensions\ObservableExtensions %28Multicast%29.cs" />
     <Compile Include="Extensions\ObservableExtensions %28ToConnectableReactiveCollection%29.cs" />
     <Compile Include="Extensions\ObservableExtensions %28ToNotifyCollectionChangedEventPattern%29.cs" />
@@ -132,9 +132,9 @@
     <Compile Include="Extensions\ReactiveCollectionExtensions %28WithChanges%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28ToObservableCollection%29.cs" />
     <Compile Include="Extensions\ReactiveCollectionExtensions %28GetValueObservable%29.cs" />
-    <Compile Include="Extensions\Transformation\SortedListNotificationTransformationListReactiveCollection.cs" />
-    <Compile Include="Extensions\Transformation\SortedSetNotificationTransformationListReactiveCollection.cs" />
-    <Compile Include="Extensions\Transformation\TransformationListReactiveCollection.cs" />
+    <Compile Include="Extensions\Transformation\DictionaryNotificationTransformationReactiveCollection.cs" />
+    <Compile Include="Extensions\Transformation\SortedListNotificationTransformationReactiveCollection.cs" />
+    <Compile Include="Extensions\Transformation\SortedSetNotificationTransformationReactiveCollection.cs" />
     <Compile Include="Interfaces\IConnectableReactiveCollection.cs" />
     <Compile Include="Interfaces\IIndexedCollectionChangedNotification.cs" />
     <Compile Include="Interfaces\ICanHandleIndexedRanges.cs" />

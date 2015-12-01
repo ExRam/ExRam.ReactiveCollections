@@ -1807,7 +1807,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .Where(x => x % 2 == 0)
                 .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
-            var transformed = projectedList as ListNotificationTransformationListReactiveCollection<int, string>;
+            var transformed = projectedList as ListNotificationTransformationReactiveCollection<int, string>;
             Assert.IsNotNull(transformed);
 
             Assert.AreSame(transformed.Source, list.ReactiveCollection);
@@ -1826,7 +1826,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .Where(x => x % 2 == 0)
                 .Where(x => x % 3 == 0);
 
-            var transformed = projectedList as ListNotificationTransformationListReactiveCollection<int, int>;
+            var transformed = projectedList as ListNotificationTransformationReactiveCollection<int, int>;
             Assert.IsNotNull(transformed);
 
             Assert.AreSame(transformed.Source, list.ReactiveCollection);
@@ -1850,7 +1850,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .Select(x => x.ToString())
                 .Select(int.Parse);
 
-            var transformed = projectedList as ListNotificationTransformationListReactiveCollection<int, int>;
+            var transformed = projectedList as ListNotificationTransformationReactiveCollection<int, int>;
             Assert.IsNotNull(transformed);
 
             Assert.AreSame(transformed.Source, list.ReactiveCollection);
