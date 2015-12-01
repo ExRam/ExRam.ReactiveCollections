@@ -44,6 +44,9 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(equalityComparer != null);
             Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
 
+            if (source is ICanSortList<TSource>)
+                return ((ICanSortList<TSource>)source).Sort(comparer);
+
             return new SortedListNotificationTransformationReactiveCollection<TSource, TSource>(source, null, null, comparer, equalityComparer);
         }
     }

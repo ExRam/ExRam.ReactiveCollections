@@ -2117,5 +2117,24 @@ namespace ExRam.ReactiveCollections.Tests
             Assert.IsTrue(changes[2].Current.IsEmpty);
         }
         #endregion
+
+        #region Sort_after_Where_squashes_both_operators
+        [TestMethod]
+        public void Sort_after_Where_squashes_both_operators()
+        {
+            var list = new ListReactiveCollectionSource<int>();
+
+            var projectedList = list.ReactiveCollection
+                .Where(x => x % 2 == 0)
+                .Sort();
+
+            var transformed = projectedList as SortedListNotificationTransformationReactiveCollection<int, int>;
+            Assert.IsNotNull(transformed);
+
+            Assert.AreSame(transformed.Source, list.ReactiveCollection);
+            Assert.IsNull(transformed.Selector);
+            Assert.IsNotNull(transformed.Filter);
+        }
+        #endregion
     }
 }
