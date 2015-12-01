@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 
 namespace ExRam.ReactiveCollections
 {
-    internal sealed class ListNotificationTransformationListReactiveCollection<TSource, TResult> : TransformationListReactiveCollection<TSource, TResult, ListReactiveCollectionSource<TResult>, ListChangedNotification<TResult>>, ICanFilter<TSource>, ICanProject<TResult>
+    internal sealed class ListNotificationTransformationListReactiveCollection<TSource, TResult> : TransformationListReactiveCollection<TSource, TResult, ListReactiveCollectionSource<TResult>, ListChangedNotification<TResult>>, ICanFilter<TSource>, ICanProjectList<TResult>
     {
         public ListNotificationTransformationListReactiveCollection(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TResult> selector, IEqualityComparer<TResult> equalityComparer) : base(source, new ListReactiveCollectionSource<TResult>(), filter, selector, equalityComparer)
         {
@@ -14,40 +14,20 @@ namespace ExRam.ReactiveCollections
 
         public IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate)
         {
-            return this.CanAddWhere()
-                ? this.Chain(this.Source, x => this.Filter(x) && predicate(x), null, this.EqualityComparer)
+            return this.Selector == null
+                ? new ListNotificationTransformationListReactiveCollection<TSource, TResult>(this.Source, x => this.Filter(x) && predicate(x), null, this.EqualityComparer)
                 : null;
         }
 
-        public IReactiveCollection<ICollectionChangedNotification> TrySelect<TChainedResult>(Func<TResult, TChainedResult> selector, IEqualityComparer<TChainedResult> equalityComparer)
+        public IReactiveCollection<ListChangedNotification<TChainedResult>> TrySelect<TChainedResult>(Func<TResult, TChainedResult> selector, IEqualityComparer<TChainedResult> equalityComparer)
         {
-            if (this.CanAddSelect())
-            {
-                return this.Chain(
-                    this.Source,
-                    this.Filter,
-                    this.Selector != null
-                        ? (Func<TSource, TChainedResult>)(x => selector(this.Selector(x)))
-                        : x => selector((TResult)(object)x),
-                    equalityComparer);
-            }
-
-            return null;
-        }
-
-        private bool CanAddWhere()
-        {
-            return this.Selector == null;
-        }
-
-        private bool CanAddSelect()
-        {
-            return true;
-        }
-
-        private IReactiveCollection<ICollectionChangedNotification> Chain<TNewResult>(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TNewResult> selector, IEqualityComparer<TNewResult> equalityComparer)
-        {
-            return new ListNotificationTransformationListReactiveCollection<TSource, TNewResult>(source, filter, selector, equalityComparer);
+            return new ListNotificationTransformationListReactiveCollection<TSource, TChainedResult>(
+                this.Source,
+                this.Filter,
+                this.Selector != null
+                    ? (Func<TSource, TChainedResult>)(x => selector(this.Selector(x)))
+                    : x => selector((TResult)(object)x),
+                equalityComparer);
         }
     }
 }
