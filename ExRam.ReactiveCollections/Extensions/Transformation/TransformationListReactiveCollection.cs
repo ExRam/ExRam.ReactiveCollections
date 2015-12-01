@@ -18,17 +18,16 @@ namespace ExRam.ReactiveCollections
             TCollection collection,
             Predicate<TSource> filter,
             Func<TSource, TResult> selector,
-            IComparer<TResult> comparer,
             IEqualityComparer<TResult> equalityComparer)
         {
-            this._equalityComparer = equalityComparer;
             Contract.Requires(source != null);
             Contract.Requires(equalityComparer != null);
 
             this.Source = source;
             this.Filter = filter;
             this.Selector = selector;
-            this.Comparer = comparer;
+
+            this._equalityComparer = equalityComparer;
 
             this.Changes = Observable
                 .Defer(() =>
@@ -173,14 +172,14 @@ namespace ExRam.ReactiveCollections
 
         public IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate)
         {
-            return (this.Selector == null && this.Comparer == null)
+            return this.CanAddWhere()
                 ? this.Chain(this.Source, x => this.Filter(x) && predicate(x), null, this._equalityComparer)
                 : null;
         }
 
         public IReactiveCollection<ICollectionChangedNotification> TrySelect<TChainedResult>(Func<TResult, TChainedResult> selector, IEqualityComparer<TChainedResult> equalityComparer)
         {
-            if (this.Comparer == null)
+            if (this.CanAddSelect())
             {
                 return this.Chain(
                     this.Source,
@@ -200,8 +199,17 @@ namespace ExRam.ReactiveCollections
             Func<TSource, TNewResult> selector,
             IEqualityComparer<TNewResult> equalityComparer);
 
+        protected virtual bool CanAddWhere()
+        {
+            return this.Selector == null;
+        }
+
+        protected virtual bool CanAddSelect()
+        {
+            return true;
+        }
+
         public Predicate<TSource> Filter { get; }
-        public IComparer<TResult> Comparer { get; }
         public Func<TSource, TResult> Selector { get; }
         public IObservable<TNotification> Changes { get; }
         public IReactiveCollection<ICollectionChangedNotification<TSource>> Source { get; }
