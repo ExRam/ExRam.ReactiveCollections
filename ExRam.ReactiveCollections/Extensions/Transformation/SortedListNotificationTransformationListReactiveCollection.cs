@@ -8,18 +8,13 @@ namespace ExRam.ReactiveCollections
     {
         private readonly IEqualityComparer<TResult> _equalityComparer;
 
-        public SortedListNotificationTransformationListReactiveCollection(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TResult> selector, IComparer<TResult> comparer, IEqualityComparer<TResult> equalityComparer) : base(source, filter, selector, comparer, equalityComparer)
+        public SortedListNotificationTransformationListReactiveCollection(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TResult> selector, IComparer<TResult> comparer, IEqualityComparer<TResult> equalityComparer) : base(source, new SortedListReactiveCollectionSource<TResult>(comparer), filter, selector, comparer, equalityComparer)
         {
             Contract.Requires(source != null);
             Contract.Requires(comparer != null);
             Contract.Requires(equalityComparer != null);
 
             this._equalityComparer = equalityComparer;
-        }
-
-        protected override SortedListReactiveCollectionSource<TResult> CreateCollection()
-        {
-            return new SortedListReactiveCollectionSource<TResult>(this.Comparer);
         }
 
         public override IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate)

@@ -8,7 +8,7 @@ namespace ExRam.ReactiveCollections
     {
         private readonly IEqualityComparer<TResult> _equalityComparer;
 
-        public ListNotificationTransformationListReactiveCollection(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TResult> selector, IEqualityComparer<TResult> equalityComparer) : base(source, filter, selector, null, equalityComparer)
+        public ListNotificationTransformationListReactiveCollection(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TResult> selector, IEqualityComparer<TResult> equalityComparer) : base(source, new ListReactiveCollectionSource<TResult>(), filter, selector, null, equalityComparer)
         {
             Contract.Requires(source != null);
             Contract.Requires(equalityComparer != null);
@@ -32,11 +32,6 @@ namespace ExRam.ReactiveCollections
                     ? (Func<TSource, TChainedResult>)(x => selector(this.Selector(x)))
                     : x => selector((TResult)(object)x),
                 equalityComparer);
-        }
-
-        protected override ListReactiveCollectionSource<TResult> CreateCollection()
-        {
-            return new ListReactiveCollectionSource<TResult>();
         }
     }
 }
