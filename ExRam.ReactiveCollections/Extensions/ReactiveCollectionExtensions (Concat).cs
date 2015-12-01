@@ -16,106 +16,106 @@ namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        #region Node
-        [ContractClass(typeof(NodeContracts<>))]
-        private abstract class Node<T>
-        {
-            protected Node(ImmutableList<T> list, int maxIndex)
-            {
-                this.List = list;
-                this.MaxIndex = maxIndex;
-            }
-
-            public abstract Node<T> ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList);
-
-            public int MaxIndex { get; }
-            public ImmutableList<T> List { get; }
-        }
-
-        [ContractClassFor(typeof(Node<>))]
-        private abstract class NodeContracts<T> : Node<T>
-        {
-            protected NodeContracts(ImmutableList<T> list, int maxIndex) : base(list, maxIndex)
-            {
-            }
-
-            public override Node<T> ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
-            {
-                Contract.Ensures(Contract.Result<Node<T>>() != null);
-
-                replacementOffset = default(int);
-                oldList = default(ImmutableList<T>);
-
-                return default(Node<T>);
-            }
-        }
-
-        private sealed class InnerNode<T> : Node<T>
-        {
-            private readonly Node<T> _left;
-            private readonly Node<T> _right;
-
-            public InnerNode(Node<T> left, Node<T> right) : base(
-                left.List != null && right.List != null
-                    ? left.List.AddRange(right.List)
-                    : null,
-                Math.Max(left.MaxIndex, right.MaxIndex))
-            {
-                Contract.Requires(left != null);
-                Contract.Requires(right != null);
-
-                this._left = left;
-                this._right = right;
-            }
-
-            public override Node<T> ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
-            {
-                if (this.MaxIndex < index)
-                    throw new InvalidOperationException();
-
-                if (this._left.MaxIndex >= index)
-                    return new InnerNode<T>(this._left.ReplaceNode(newList, index, out replacementOffset, out oldList), this._right);
-
-                var newNode = new InnerNode<T>(this._left, this._right.ReplaceNode(newList, index, out replacementOffset, out oldList));
-                replacementOffset += this._left.List?.Count;
-
-                return newNode;
-            }
-        }
-
-        private sealed class TerminalNode<T> : Node<T>
-        {
-            public TerminalNode(ImmutableList<T> list, int maxIndex) : base(list, maxIndex)
-            {
-            }
-
-            public override Node<T> ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
-            {
-                oldList = this.List;
-                replacementOffset = 0;
-
-                return new TerminalNode<T>(newList, index);
-            }
-        }
-        #endregion
-
-        #region IndexedNotification
-        private struct IndexedNotification<T>
-        {
-            public int Index { get; }
-            public ListChangedNotification<T> Notification { get; }
-
-            public IndexedNotification(int index, ListChangedNotification<T> notification)
-            {
-                this.Index = index;
-                this.Notification = notification;
-            }
-        }
-        #endregion
-
         #region ConcatListReactiveCollection
         private sealed class ConcatListReactiveCollection<T> : IReactiveCollection<ListChangedNotification<T>>
         {
+            #region Node
+            [ContractClass(typeof(NodeContracts<>))]
+            private abstract class Node<T>
+            {
+                protected Node(ImmutableList<T> list, int maxIndex)
+                {
+                    this.List = list;
+                    this.MaxIndex = maxIndex;
+                }
+
+                public abstract Node<T> ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList);
+
+                public int MaxIndex { get; }
+                public ImmutableList<T> List { get; }
+            }
+
+            [ContractClassFor(typeof(Node<>))]
+            private abstract class NodeContracts<T> : Node<T>
+            {
+                protected NodeContracts(ImmutableList<T> list, int maxIndex) : base(list, maxIndex)
+                {
+                }
+
+                public override Node<T> ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
+                {
+                    Contract.Ensures(Contract.Result<Node<T>>() != null);
+
+                    replacementOffset = default(int);
+                    oldList = default(ImmutableList<T>);
+
+                    return default(Node<T>);
+                }
+            }
+
+            private sealed class InnerNode<T> : Node<T>
+            {
+                private readonly Node<T> _left;
+                private readonly Node<T> _right;
+
+                public InnerNode(Node<T> left, Node<T> right) : base(
+                    left.List != null && right.List != null
+                        ? left.List.AddRange(right.List)
+                        : null,
+                    Math.Max(left.MaxIndex, right.MaxIndex))
+                {
+                    Contract.Requires(left != null);
+                    Contract.Requires(right != null);
+
+                    this._left = left;
+                    this._right = right;
+                }
+
+                public override Node<T> ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
+                {
+                    if (this.MaxIndex < index)
+                        throw new InvalidOperationException();
+
+                    if (this._left.MaxIndex >= index)
+                        return new InnerNode<T>(this._left.ReplaceNode(newList, index, out replacementOffset, out oldList), this._right);
+
+                    var newNode = new InnerNode<T>(this._left, this._right.ReplaceNode(newList, index, out replacementOffset, out oldList));
+                    replacementOffset += this._left.List?.Count;
+
+                    return newNode;
+                }
+            }
+
+            private sealed class TerminalNode<T> : Node<T>
+            {
+                public TerminalNode(ImmutableList<T> list, int maxIndex) : base(list, maxIndex)
+                {
+                }
+
+                public override Node<T> ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
+                {
+                    oldList = this.List;
+                    replacementOffset = 0;
+
+                    return new TerminalNode<T>(newList, index);
+                }
+            }
+            #endregion
+
+            #region IndexedNotification
+            private struct IndexedNotification<T>
+            {
+                public int Index { get; }
+                public ListChangedNotification<T> Notification { get; }
+
+                public IndexedNotification(int index, ListChangedNotification<T> notification)
+                {
+                    this.Index = index;
+                    this.Notification = notification;
+                }
+            }
+            #endregion
+
             public ConcatListReactiveCollection(
                 IObservable<ListChangedNotification<T>>[] sources,
                 IEqualityComparer<T> equalityComparer)
