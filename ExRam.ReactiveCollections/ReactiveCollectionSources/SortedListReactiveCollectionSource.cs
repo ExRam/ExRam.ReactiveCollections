@@ -38,8 +38,6 @@ namespace ExRam.ReactiveCollections
 
         public void AddRange(IEnumerable<T> items)
         {
-            Contract.Requires(items != null);
-
             if (this._innerList.Count == 0)
                 this._innerList.AddRange(items.OrderBy(x => x, this._comparer));
             else
@@ -97,6 +95,8 @@ namespace ExRam.ReactiveCollections
 
         public void RemoveAt(int index)
         {
+            Contract.Requires(index > 0);
+
             this._innerList.RemoveAt(index);
         }
 
@@ -116,8 +116,6 @@ namespace ExRam.ReactiveCollections
 
         public void RemoveRange(IEnumerable<T> items, IEqualityComparer<T> itemsequalityComparer)
         {
-            Contract.Requires(items != null);
-
             this._innerList.RemoveRange(items);
         }
 
@@ -128,8 +126,6 @@ namespace ExRam.ReactiveCollections
 
         public void Replace(T oldValue, T newValue, IEqualityComparer<T> equalityComparer)
         {
-            Contract.Requires(equalityComparer != null);
-
             this.Remove(oldValue, equalityComparer);
             this.Add(newValue);
         }

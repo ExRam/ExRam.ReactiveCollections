@@ -40,8 +40,6 @@ namespace ExRam.ReactiveCollections
 
         public void AddRange(IEnumerable<T> items)
         {
-            Contract.Requires(items != null);
-
             this.InsertRange(this.Current.Count, items);
         }
 
@@ -68,9 +66,6 @@ namespace ExRam.ReactiveCollections
 
         public void InsertRange(int index, IEnumerable<T> items)
         {
-            Contract.Requires(items != null);
-            Contract.Requires(index >= 0);
-
             var immutableItems = ImmutableList.CreateRange(items);
 
             if (!immutableItems.IsEmpty)
@@ -138,8 +133,6 @@ namespace ExRam.ReactiveCollections
 
         public void RemoveRange(int index, int count)
         {
-            Contract.Requires(index >= 0);
-
             var oldList = this.Current;
             var range = oldList.GetRange(index, count);
             var newList = oldList.RemoveRange(index, count);
@@ -157,9 +150,6 @@ namespace ExRam.ReactiveCollections
 
         public void RemoveRange(IEnumerable<T> items, IEqualityComparer<T> equalityComparer)
         {
-            Contract.Requires(items != null);
-            Contract.Requires(equalityComparer != null);
-
             var removedItems = ImmutableList.CreateRange(items);
 
             if (removedItems.Count > 0)
@@ -183,8 +173,6 @@ namespace ExRam.ReactiveCollections
 
         public void Replace(T oldValue, T newValue, IEqualityComparer<T> equalityComparer)
         {
-            Contract.Requires(equalityComparer != null);
-
             var index = this.Current.IndexOf(oldValue, 0, this.Count, equalityComparer);
 
             if (index > -1)

@@ -39,8 +39,6 @@ namespace ExRam.ReactiveCollections
 
         public void AddRange(IEnumerable<T> items)
         {
-            Contract.Requires(items != null);
-
             foreach (var item in items)
             {
                 this.Add(item);

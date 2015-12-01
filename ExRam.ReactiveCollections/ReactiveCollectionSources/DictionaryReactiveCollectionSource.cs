@@ -40,8 +40,6 @@ namespace ExRam.ReactiveCollections
 
         public void AddRange(IEnumerable<KeyValuePair<TKey, TValue>> pairs)
         {
-            Contract.Requires(pairs != null);
-
             var immutablePairs = ImmutableList.CreateRange(pairs);
 
             if (!immutablePairs.IsEmpty)
@@ -174,6 +172,8 @@ namespace ExRam.ReactiveCollections
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Remove(KeyValuePair<TKey, TValue> item)
         {
+            Contract.Assume(!object.ReferenceEquals(item.Key, null));
+
             return ((IDictionary<TKey, TValue>)this).Remove(item.Key);
         }
 
