@@ -13,23 +13,6 @@ using System.Diagnostics.Contracts;
 
 namespace ExRam.ReactiveCollections
 {
-    internal interface ICanReplaceValue<T>
-    {
-        void Replace(T oldValue, T newValue, IEqualityComparer<T> equalityComparer);
-    }
-
-    internal interface ICanHandleIndexedRanges<in T>
-    {
-        void InsertRange(int index, IEnumerable<T> items);
-        void RemoveRange(int index, int count);
-    }
-
-    internal interface ICanHandleRanges<T>
-    {
-        void AddRange(IEnumerable<T> items);
-        void RemoveRange(IEnumerable<T> items, IEqualityComparer<T> equalityComparer);
-    }
-
     public class ListReactiveCollectionSource<T> : 
         ReactiveCollectionSource<ListChangedNotification<T>>,
         IList<T>,

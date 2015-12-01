@@ -7,22 +7,12 @@ using System.Reactive.Linq;
 
 namespace ExRam.ReactiveCollections
 {
-    internal interface ICanFilter<out TSource>
-    {
-        IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate);
-    }
-
-    internal interface ICanProject<out TSource>
-    {
-        IReactiveCollection<ICollectionChangedNotification> TrySelect<TResult>(Func<TSource, TResult> selector, IEqualityComparer<TResult> equalityComparer);
-    }
-
     internal abstract class TransformationListReactiveCollection<TSource, TResult, TCollection, TNotification> : IReactiveCollection<TNotification>, ICanFilter<TSource>
         where TCollection : IReactiveCollectionSource<TNotification>, ICollection<TResult>, ICanHandleRanges<TResult>
         where TNotification : ICollectionChangedNotification<TResult>
     {
         protected TransformationListReactiveCollection(
-            IReactiveCollection<ICollectionChangedNotification<TSource>> source, 
+            IReactiveCollection<ICollectionChangedNotification<TSource>> source,
             Predicate<TSource> filter,
             Func<TSource, TResult> selector,
             IComparer<TResult> comparer,
@@ -182,8 +172,8 @@ namespace ExRam.ReactiveCollections
         public abstract IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate);
 
         public Predicate<TSource> Filter { get; }
-        public Func<TSource, TResult> Selector { get; }
         public IComparer<TResult> Comparer { get; }
+        public Func<TSource, TResult> Selector { get; }
         public IObservable<TNotification> Changes { get; }
         public IReactiveCollection<ICollectionChangedNotification<TSource>> Source { get; }
 
