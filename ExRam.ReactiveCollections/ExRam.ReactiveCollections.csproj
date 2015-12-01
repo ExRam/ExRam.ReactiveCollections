@@ -135,6 +135,7 @@
     <Compile Include="Extensions\Transformation\DictionaryNotificationTransformationReactiveCollection.cs" />
     <Compile Include="Extensions\Transformation\SortedListNotificationTransformationReactiveCollection.cs" />
     <Compile Include="Extensions\Transformation\SortedSetNotificationTransformationReactiveCollection.cs" />
+    <Compile Include="Extensions\Transformation\TransformationReactiveCollection.cs" />
     <Compile Include="Interfaces\IConnectableReactiveCollection.cs" />
     <Compile Include="Interfaces\IIndexedCollectionChangedNotification.cs" />
     <Compile Include="Interfaces\ICanHandleIndexedRanges.cs" />
