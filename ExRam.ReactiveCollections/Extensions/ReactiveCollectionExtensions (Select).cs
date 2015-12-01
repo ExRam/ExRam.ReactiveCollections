@@ -98,7 +98,7 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(equalityComparer != null);
             Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TResult>>>() != null);
 
-            var ret = (source as ICanProjectList<TSource>)?.TrySelect(selector, equalityComparer);
+            var ret = (source as ICanProjectList<TSource>)?.Select(selector, equalityComparer);
 
             return ret ?? new ListNotificationTransformationListReactiveCollection<TSource, TResult>(source, null, selector, equalityComparer);
         }

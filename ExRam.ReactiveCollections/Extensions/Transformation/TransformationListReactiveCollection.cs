@@ -170,7 +170,7 @@ namespace ExRam.ReactiveCollections
         public Predicate<TSource> Filter { get; }
         public Func<TSource, TResult> Selector { get; }
         public IObservable<TNotification> Changes { get; }
-        protected IEqualityComparer<TResult> EqualityComparer { get; }
+        public IEqualityComparer<TResult> EqualityComparer { get; }
         public IReactiveCollection<ICollectionChangedNotification<TSource>> Source { get; }
     }
 }

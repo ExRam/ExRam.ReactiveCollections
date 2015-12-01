@@ -21,7 +21,7 @@ namespace ExRam.ReactiveCollections
                 : null;
         }
 
-        public IReactiveCollection<ListChangedNotification<TChainedResult>> TrySelect<TChainedResult>(Func<TResult, TChainedResult> selector, IEqualityComparer<TChainedResult> equalityComparer)
+        public IReactiveCollection<ListChangedNotification<TChainedResult>> Select<TChainedResult>(Func<TResult, TChainedResult> selector, IEqualityComparer<TChainedResult> equalityComparer)
         {
             return new ListNotificationTransformationListReactiveCollection<TSource, TChainedResult>(
                 this.Source,
