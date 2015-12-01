@@ -34,16 +34,6 @@ namespace ExRam.ReactiveCollections
                 equalityComparer);
         }
 
-        protected override void AddRange(ListReactiveCollectionSource<TResult> collection, IEnumerable<TResult> items)
-        {
-            collection.AddRange(items);
-        }
-
-        protected override void RemoveRange(ListReactiveCollectionSource<TResult> collection, IEnumerable<TResult> items)
-        {
-            collection.RemoveRange(items, this._equalityComparer);
-        }
-
         protected override ListReactiveCollectionSource<TResult> CreateCollection()
         {
             return new ListReactiveCollectionSource<TResult>();

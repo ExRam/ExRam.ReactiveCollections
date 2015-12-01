@@ -12,22 +12,9 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(comparer != null);
         }
 
-        protected override void AddRange(SortedSetReactiveCollectionSource<TResult> collection, IEnumerable<TResult> items)
-        {
-            collection.AddRange(items);
-        }
-
         protected override SortedSetReactiveCollectionSource<TResult> CreateCollection()
         {
             return new SortedSetReactiveCollectionSource<TResult>(this.Comparer);
-        }
-
-        protected override void RemoveRange(SortedSetReactiveCollectionSource<TResult> collection, IEnumerable<TResult> items)
-        {
-            foreach (var item in items)
-            {
-                collection.Remove(item);
-            }
         }
 
         public override IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate)

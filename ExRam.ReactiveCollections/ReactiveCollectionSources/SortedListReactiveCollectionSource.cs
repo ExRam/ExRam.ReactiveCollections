@@ -16,7 +16,8 @@ namespace ExRam.ReactiveCollections
         IReactiveCollectionSource<ListChangedNotification<T>>,
         ICollection<T>,
         ICollection,
-        ICanReplaceValue<T>
+        ICanReplaceValue<T>,
+        ICanHandleRanges<T>
     {
         private readonly IComparer<T> _comparer;
         private readonly ListReactiveCollectionSource<T> _innerList = new ListReactiveCollectionSource<T>();

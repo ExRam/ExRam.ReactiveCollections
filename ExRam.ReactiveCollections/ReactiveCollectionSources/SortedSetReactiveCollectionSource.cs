@@ -17,7 +17,8 @@ namespace ExRam.ReactiveCollections
         ReactiveCollectionSource<SortedSetChangedNotification<T>>,
         IList<T>,
         IList,
-        ISet<T>
+        ISet<T>,
+        ICanHandleRanges<T>
     {
         public SortedSetReactiveCollectionSource() : this(Comparer<T>.Default)
         {
@@ -43,6 +44,14 @@ namespace ExRam.ReactiveCollections
             foreach (var item in items)
             {
                 this.Add(item);
+            }
+        }
+
+        void ICanHandleRanges<T>.RemoveRange(IEnumerable<T> items, IEqualityComparer<T> equalityComparer)
+        {
+            foreach (var item in items)
+            {
+                this.Remove(item);
             }
         }
 

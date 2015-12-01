@@ -17,19 +17,9 @@ namespace ExRam.ReactiveCollections
             this._equalityComparer = equalityComparer;
         }
 
-        protected override void AddRange(SortedListReactiveCollectionSource<TResult> collection, IEnumerable<TResult> items)
-        {
-            collection.AddRange(items);
-        }
-
         protected override SortedListReactiveCollectionSource<TResult> CreateCollection()
         {
             return new SortedListReactiveCollectionSource<TResult>(this.Comparer);
-        }
-
-        protected override void RemoveRange(SortedListReactiveCollectionSource<TResult> collection, IEnumerable<TResult> items)
-        {
-            collection.RemoveRange(items, this._equalityComparer);
         }
 
         public override IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate)
