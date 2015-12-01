@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 
 namespace ExRam.ReactiveCollections
 {
-    internal sealed class ListNotificationTransformationListReactiveCollection<TSource, TResult> : TransformationListReactiveCollection<TSource, TResult, ListReactiveCollectionSource<TResult>, ListChangedNotification<TResult>>, ICanFilter<TSource>, ICanProjectList<TResult>
+    internal sealed class ListNotificationTransformationListReactiveCollection<TSource, TResult> : TransformationListReactiveCollection<TSource, TResult, ListReactiveCollectionSource<TResult>, ListChangedNotification<TResult>>, ICanFilterList<TSource>, ICanProjectList<TResult>
     {
         public ListNotificationTransformationListReactiveCollection(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TResult> selector, IEqualityComparer<TResult> equalityComparer) : base(source, new ListReactiveCollectionSource<TResult>(), filter, selector, equalityComparer)
         {
@@ -12,10 +12,12 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(equalityComparer != null);
         }
 
-        public IReactiveCollection<ICollectionChangedNotification> TryWhere(Predicate<TSource> predicate)
+        public IReactiveCollection<ListChangedNotification<TSource>> TryWhere(Predicate<TSource> predicate)
         {
-            return this.Selector == null
-                ? new ListNotificationTransformationListReactiveCollection<TSource, TResult>(this.Source, x => this.Filter(x) && predicate(x), null, this.EqualityComparer)
+            var nonProjected = this as ListNotificationTransformationListReactiveCollection<TSource, TSource>;
+
+            return ((nonProjected != null) && (nonProjected.Selector == null))
+                ? new ListNotificationTransformationListReactiveCollection<TSource, TSource>(nonProjected.Source, x => nonProjected.Filter(x) && predicate(x), null, nonProjected.EqualityComparer)
                 : null;
         }
 

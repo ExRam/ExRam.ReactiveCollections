@@ -100,9 +100,7 @@ namespace ExRam.ReactiveCollections
 
             var ret = (source as ICanProjectList<TSource>)?.TrySelect(selector, equalityComparer);
 
-            return ret != null
-                ? (IReactiveCollection<ListChangedNotification<TResult>>)ret
-                : new ListNotificationTransformationListReactiveCollection<TSource, TResult>(source, null, selector, equalityComparer);
+            return ret ?? new ListNotificationTransformationListReactiveCollection<TSource, TResult>(source, null, selector, equalityComparer);
         }
 
         public static IReactiveCollection<DictionaryChangedNotification<TKey, TResult>> Select<TKey, TSource, TResult>(this IReactiveCollection<DictionaryChangedNotification<TKey, TSource>> source, Func<TSource, TResult> selector)
