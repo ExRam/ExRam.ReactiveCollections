@@ -20,8 +20,8 @@ namespace ExRam.ReactiveCollections
         private sealed class ConcatListReactiveCollection<T> : IReactiveCollection<ListChangedNotification<T>>
         {
             #region Node
-            [ContractClass(typeof(NodeContracts<>))]
-            private abstract class Node<T>
+            [ContractClass(typeof(ConcatListReactiveCollection<>.NodeContracts))]
+            private abstract class Node
             {
                 protected Node(ImmutableList<T> list, int maxIndex)
                 {
@@ -29,36 +29,36 @@ namespace ExRam.ReactiveCollections
                     this.MaxIndex = maxIndex;
                 }
 
-                public abstract Node<T> ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList);
+                public abstract Node ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList);
 
                 public int MaxIndex { get; }
                 public ImmutableList<T> List { get; }
             }
 
-            [ContractClassFor(typeof(Node<>))]
-            private abstract class NodeContracts<T> : Node<T>
+            [ContractClassFor(typeof(ConcatListReactiveCollection<>.Node))]
+            private abstract class NodeContracts : Node
             {
                 protected NodeContracts(ImmutableList<T> list, int maxIndex) : base(list, maxIndex)
                 {
                 }
 
-                public override Node<T> ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
+                public override Node ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
                 {
-                    Contract.Ensures(Contract.Result<Node<T>>() != null);
+                    Contract.Ensures(Contract.Result<Node>() != null);
 
                     replacementOffset = default(int);
                     oldList = default(ImmutableList<T>);
 
-                    return default(Node<T>);
+                    return default(Node);
                 }
             }
 
-            private sealed class InnerNode<T> : Node<T>
+            private sealed class InnerNode : Node
             {
-                private readonly Node<T> _left;
-                private readonly Node<T> _right;
+                private readonly Node _left;
+                private readonly Node _right;
 
-                public InnerNode(Node<T> left, Node<T> right) : base(
+                public InnerNode(Node left, Node right) : base(
                     left.List != null && right.List != null
                         ? left.List.AddRange(right.List)
                         : null,
@@ -71,39 +71,39 @@ namespace ExRam.ReactiveCollections
                     this._right = right;
                 }
 
-                public override Node<T> ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
+                public override Node ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
                 {
                     if (this.MaxIndex < index)
                         throw new InvalidOperationException();
 
                     if (this._left.MaxIndex >= index)
-                        return new InnerNode<T>(this._left.ReplaceNode(newList, index, out replacementOffset, out oldList), this._right);
+                        return new InnerNode(this._left.ReplaceNode(newList, index, out replacementOffset, out oldList), this._right);
 
-                    var newNode = new InnerNode<T>(this._left, this._right.ReplaceNode(newList, index, out replacementOffset, out oldList));
+                    var newNode = new InnerNode(this._left, this._right.ReplaceNode(newList, index, out replacementOffset, out oldList));
                     replacementOffset += this._left.List?.Count;
 
                     return newNode;
                 }
             }
 
-            private sealed class TerminalNode<T> : Node<T>
+            private sealed class TerminalNode : Node
             {
                 public TerminalNode(ImmutableList<T> list, int maxIndex) : base(list, maxIndex)
                 {
                 }
 
-                public override Node<T> ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
+                public override Node ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
                 {
                     oldList = this.List;
                     replacementOffset = 0;
 
-                    return new TerminalNode<T>(newList, index);
+                    return new TerminalNode(newList, index);
                 }
             }
             #endregion
 
             #region IndexedNotification
-            private struct IndexedNotification<T>
+            private struct IndexedNotification
             {
                 public int Index { get; }
                 public ListChangedNotification<T> Notification { get; }
@@ -131,7 +131,7 @@ namespace ExRam.ReactiveCollections
 
                         return sources
                             .Select((observable, i) => observable
-                                .Select(notification => new IndexedNotification<T>(i, notification)))
+                                .Select(notification => new IndexedNotification(i, notification)))
                             .Merge()
                             .Select(tuple =>
                             {
@@ -186,14 +186,14 @@ namespace ExRam.ReactiveCollections
 
             public IObservable<ListChangedNotification<T>> Changes { get; }
 
-            private Node<T> GetTree(int min, int max)
+            private Node GetTree(int min, int max)
             {
                 if (min == max)
-                    return new TerminalNode<T>(null, min);
+                    return new TerminalNode(null, min);
 
                 var half = (max - min + 1) / 2;
                
-                return new InnerNode<T>(this.GetTree(min, (min + half - 1)), this.GetTree(min + half, max));
+                return new InnerNode(this.GetTree(min, (min + half - 1)), this.GetTree(min + half, max));
             } 
         }
         #endregion
