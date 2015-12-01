@@ -120,7 +120,6 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Extensions\Transformation\Interfaces\ICanFilterList.cs" />
     <Compile Include="Extensions\Transformation\Interfaces\ICanProjectList.cs" />
     <Compile Include="Extensions\Transformation\ListNotificationTransformationListReactiveCollection.cs" />
     <Compile Include="Extensions\ObservableExtensions %28Multicast%29.cs" />
