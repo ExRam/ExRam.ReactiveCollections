@@ -39,7 +39,7 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(selector != null);
             Contract.Ensures(Contract.Result<IReactiveCollection<DictionaryChangedNotification<TKey, TResult>>>() != null);
 
-            return new DictionaryNotificationTransformationReactiveCollection<TKey, TSource, TResult>(source, new DictionaryReactiveCollectionSource<TKey, TResult>(), null, kvp => new KeyValuePair<TKey, TResult>(kvp.Key, selector(kvp.Value)), EqualityComparer<KeyValuePair<TKey, TResult>>.Default);
+            return new DictionaryNotificationTransformationReactiveCollection<TKey, TSource, TResult>(source, null, kvp => new KeyValuePair<TKey, TResult>(kvp.Key, selector(kvp.Value)), EqualityComparer<KeyValuePair<TKey, TResult>>.Default);
         }
     }
 }
