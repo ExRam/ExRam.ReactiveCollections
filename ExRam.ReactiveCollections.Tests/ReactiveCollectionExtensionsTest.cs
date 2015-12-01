@@ -1937,5 +1937,62 @@ namespace ExRam.ReactiveCollections.Tests
             Assert.IsTrue(changes[2].Current.IsEmpty);
         }
         #endregion
+        
+        #region Select_after_Where_on_dictionaries_squashes_both_operators
+        [TestMethod]
+        public void Select_after_Where_on_dictionaries_squashes_both_operators()
+        {
+            var list = new DictionaryReactiveCollectionSource<int, int>();
+
+            var projectedList = list.ReactiveCollection
+                .Where(x => x % 2 == 0)
+                .Select(x => x.ToString(CultureInfo.InvariantCulture));
+
+            var transformed = projectedList as DictionaryNotificationTransformationReactiveCollection<int, int, string>;
+            Assert.IsNotNull(transformed);
+
+            Assert.AreSame(transformed.Source, list.ReactiveCollection);
+            Assert.IsNotNull(transformed.Selector);
+            Assert.IsNotNull(transformed.Filter);
+        }
+        #endregion
+
+        #region Where_after_Where_on_dictionaries_squashes_both_operators
+        [TestMethod]
+        public void Where_after_Where_on_dictionaries_squashes_both_operators()
+        {
+            var list = new DictionaryReactiveCollectionSource<int, int>();
+
+            var projectedList = list.ReactiveCollection
+                .Where(x => x % 2 == 0)
+                .Where(x => x % 3 == 0);
+
+            var transformed = projectedList as DictionaryNotificationTransformationReactiveCollection<int, int, int>;
+            Assert.IsNotNull(transformed);
+
+            Assert.AreSame(transformed.Source, list.ReactiveCollection);
+            Assert.IsNull(transformed.Selector);
+            Assert.IsNotNull(transformed.Filter);
+        }
+        #endregion
+
+        #region Select_after_Select_on_dictionaries_squashes_both_operators
+        [TestMethod]
+        public void Select_after_Select_on_dictionaries_squashes_both_operators()
+        {
+            var list = new DictionaryReactiveCollectionSource<int, int>();
+
+            var projectedList = list.ReactiveCollection
+                .Select(x => x.ToString())
+                .Select(int.Parse);
+
+            var transformed = projectedList as DictionaryNotificationTransformationReactiveCollection<int, int, int>;
+            Assert.IsNotNull(transformed);
+
+            Assert.AreSame(transformed.Source, list.ReactiveCollection);
+            Assert.IsNotNull(transformed.Selector);
+            Assert.IsNull(transformed.Filter);
+        }
+        #endregion
     }
 }
