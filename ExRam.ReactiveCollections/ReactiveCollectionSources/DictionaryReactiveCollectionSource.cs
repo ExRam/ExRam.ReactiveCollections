@@ -17,7 +17,8 @@ namespace ExRam.ReactiveCollections
     public class DictionaryReactiveCollectionSource<TKey, TValue> :
         ReactiveCollectionSource<DictionaryChangedNotification<TKey, TValue>>,
         IDictionary<TKey, TValue>, 
-        IDictionary
+        IDictionary,
+        ICanHandleRanges<KeyValuePair<TKey, TValue>>
     {
         public DictionaryReactiveCollectionSource() : base(new DictionaryChangedNotification<TKey, TValue>(ImmutableDictionary<TKey, TValue>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList<KeyValuePair<TKey, TValue>>.Empty))
         {
@@ -173,7 +174,7 @@ namespace ExRam.ReactiveCollections
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Remove(KeyValuePair<TKey, TValue> item)
         {
-            return ((ICollection<KeyValuePair<TKey, TValue>>)this.Current).Remove(item);
+            return ((IDictionary<TKey, TValue>)this).Remove(item.Key);
         }
 
         void ICollection<KeyValuePair<TKey, TValue>>.Clear()
@@ -244,6 +245,11 @@ namespace ExRam.ReactiveCollections
         object ICollection.SyncRoot => this;
 
         #endregion
+
+        void ICanHandleRanges<KeyValuePair<TKey, TValue>>.RemoveRange(IEnumerable<KeyValuePair<TKey, TValue>> items, IEqualityComparer<KeyValuePair<TKey, TValue>> equalityComparer)
+        {
+            this.RemoveRange(items.Select(x => x.Key));
+        }
 
         public IEnumerable<TValue> Values
         {
