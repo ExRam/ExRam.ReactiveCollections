@@ -2036,6 +2036,52 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
+        #region Select_after_Select_on_dictionaries_behaves_correctly
+        [TestMethod]
+        public async Task Select_after_Select_on_dictionaries_behaves_correctly()
+        {
+            var list = new DictionaryReactiveCollectionSource<int, int>();
+
+            var changesTask = list.ReactiveCollection
+                .Select(x => x.ToString(CultureInfo.InvariantCulture))
+                .Select(x => x + "!")
+                .Changes
+                .Take(6)
+                .ToArray()
+                .ToTask();
+
+            list.Add(1, 36);
+            list.Add(2, 37);
+            list.Remove(2);
+            list.Remove(1);
+            list.Add(4, 38);
+
+            var changes = await changesTask;
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Reset, changes[0].Action);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, changes[1].Action);
+            Assert.AreEqual(1, changes[1].Current.Count);
+            Assert.AreEqual("36!", changes[1].Current[1]);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, changes[2].Action);
+            Assert.AreEqual(2, changes[2].Current.Count);
+            Assert.AreEqual("36!", changes[2].Current[1]);
+            Assert.AreEqual("37!", changes[2].Current[2]);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Remove, changes[3].Action);
+            Assert.AreEqual(1, changes[3].Current.Count);
+            Assert.AreEqual("36!", changes[3].Current[1]);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Remove, changes[4].Action);
+            Assert.AreEqual(0, changes[4].Current.Count);
+
+            Assert.AreEqual(NotifyCollectionChangedAction.Add, changes[5].Action);
+            Assert.AreEqual(1, changes[5].Current.Count);
+            Assert.AreEqual("38!", changes[5].Current[4]);
+        }
+        #endregion
+
         #region Where_after_Where_on_dictionaries_behaves_correctly
         [TestMethod]
         public async Task Where_after_Where_on_dictionaries_behaves_correctly()
