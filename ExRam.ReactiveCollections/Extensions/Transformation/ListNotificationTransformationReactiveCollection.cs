@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 
 namespace ExRam.ReactiveCollections
 {
-    internal sealed class ListNotificationTransformationReactiveCollection<TSource, TResult> : TransformationReactiveCollection<TSource, TResult, ListReactiveCollectionSource<TResult>, ListChangedNotification<TResult>>, ICanProjectList<TResult>, ICanSortList<TResult>
+    internal sealed class ListNotificationTransformationReactiveCollection<TSource, TResult> : TransformationReactiveCollection<TSource, TResult, ListReactiveCollectionSource<TResult>, ListChangedNotification<TResult>>, ICanProjectList<TResult>, ICanSortList<TResult>, ICanSortSet<TResult>
     {
         public ListNotificationTransformationReactiveCollection(IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, Func<TSource, TResult> selector, IEqualityComparer<TResult> equalityComparer) : base(source, new ListReactiveCollectionSource<TResult>(), filter, selector, equalityComparer)
         {
@@ -23,7 +23,7 @@ namespace ExRam.ReactiveCollections
                 equalityComparer);
         }
 
-        public IReactiveCollection<ListChangedNotification<TResult>> Sort(IComparer<TResult> comparer)
+        IReactiveCollection<ListChangedNotification<TResult>> ICanSortList<TResult>.Sort(IComparer<TResult> comparer)
         {
             return new SortedListNotificationTransformationReactiveCollection<TSource,TResult>(
                 this.Source,
@@ -31,6 +31,15 @@ namespace ExRam.ReactiveCollections
                 this.Selector,
                 comparer,
                 this.EqualityComparer);
+        }
+
+        IReactiveCollection<SortedSetChangedNotification<TResult>> ICanSortSet<TResult>.Sort(IComparer<TResult> comparer)
+        {
+            return new SortedSetNotificationTransformationReactiveCollection<TSource, TResult>(
+                 this.Source,
+                 this.Filter,
+                 this.Selector,
+                 comparer);
         }
     }
 }

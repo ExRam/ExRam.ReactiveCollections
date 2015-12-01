@@ -25,6 +25,9 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(comparer != null);
             Contract.Ensures(Contract.Result<IReactiveCollection<SortedSetChangedNotification<TSource>>>() != null);
 
+            if (source is ICanSortSet<TSource>)
+                return ((ICanSortSet<TSource>)source).Sort(comparer);
+
             return new SortedSetNotificationTransformationReactiveCollection<TSource, TSource>(source, null, null, comparer);
         }
     }
