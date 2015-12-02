@@ -28,11 +28,11 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(equalityComparer != null);
             Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
 
-            var nonProjected = source as ListNotificationTransformationReactiveCollection<TSource, TSource>;
+            var nonProjected = source as ListTransformationReactiveCollection<TSource, TSource>;
 
             return (nonProjected != null) && (nonProjected.Selector == null)
-                ? new ListNotificationTransformationReactiveCollection<TSource, TSource>(nonProjected.Source, x => nonProjected.Filter(x) && filter(x), null, nonProjected.EqualityComparer)
-                : new ListNotificationTransformationReactiveCollection<TSource, TSource>(source, filter, null, equalityComparer);
+                ? new ListTransformationReactiveCollection<TSource, TSource>(nonProjected.Source, x => nonProjected.Filter(x) && filter(x), null, nonProjected.EqualityComparer)
+                : new ListTransformationReactiveCollection<TSource, TSource>(source, filter, null, equalityComparer);
         }
 
         public static IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> Where<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> source, Predicate<TValue> filter)
@@ -41,11 +41,11 @@ namespace ExRam.ReactiveCollections
             Contract.Requires(filter != null);
             Contract.Ensures(Contract.Result<IReactiveCollection<DictionaryChangedNotification<TKey, TValue>>>() != null);
 
-            var nonProjected = source as DictionaryNotificationTransformationReactiveCollection<TKey, TValue, TValue>;
+            var nonProjected = source as DictionaryTransformationReactiveCollection<TKey, TValue, TValue>;
 
             return (nonProjected != null) && (nonProjected.Selector == null)
-                ? new DictionaryNotificationTransformationReactiveCollection<TKey, TValue, TValue>(nonProjected.Source, kvp => nonProjected.Filter(kvp) && filter(kvp.Value), null, nonProjected.EqualityComparer)
-                : new DictionaryNotificationTransformationReactiveCollection<TKey, TValue, TValue>(source, kvp => filter(kvp.Value), null, EqualityComparer<KeyValuePair<TKey, TValue>>.Default);
+                ? new DictionaryTransformationReactiveCollection<TKey, TValue, TValue>(nonProjected.Source, kvp => nonProjected.Filter(kvp) && filter(kvp.Value), null, nonProjected.EqualityComparer)
+                : new DictionaryTransformationReactiveCollection<TKey, TValue, TValue>(source, kvp => filter(kvp.Value), null, EqualityComparer<KeyValuePair<TKey, TValue>>.Default);
         }
     }
 }

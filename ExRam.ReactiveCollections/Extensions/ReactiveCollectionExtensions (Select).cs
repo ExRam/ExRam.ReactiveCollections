@@ -30,7 +30,7 @@ namespace ExRam.ReactiveCollections
 
             var ret = (source as ICanProjectList<TSource>)?.Select(selector, equalityComparer);
 
-            return ret ?? new ListNotificationTransformationReactiveCollection<TSource, TResult>(source, null, selector, equalityComparer);
+            return ret ?? new ListTransformationReactiveCollection<TSource, TResult>(source, null, selector, equalityComparer);
         }
 
         public static IReactiveCollection<DictionaryChangedNotification<TKey, TResult>> Select<TKey, TSource, TResult>(this IReactiveCollection<DictionaryChangedNotification<TKey, TSource>> source, Func<TSource, TResult> selector)
@@ -41,7 +41,7 @@ namespace ExRam.ReactiveCollections
 
             var ret = (source as ICanProjectDictionary<TKey, TSource>)?.Select(selector);
 
-            return ret ?? new DictionaryNotificationTransformationReactiveCollection<TKey, TSource, TResult>(source, null, kvp => new KeyValuePair<TKey, TResult>(kvp.Key, selector(kvp.Value)), EqualityComparer<KeyValuePair<TKey, TResult>>.Default);
+            return ret ?? new DictionaryTransformationReactiveCollection<TKey, TSource, TResult>(source, null, kvp => new KeyValuePair<TKey, TResult>(kvp.Key, selector(kvp.Value)), EqualityComparer<KeyValuePair<TKey, TResult>>.Default);
         }
     }
 }

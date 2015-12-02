@@ -47,7 +47,7 @@ namespace ExRam.ReactiveCollections
             if (source is ICanSortList<TSource>)
                 return ((ICanSortList<TSource>)source).Sort(comparer);
 
-            return new SortedListNotificationTransformationReactiveCollection<TSource, TSource>(source, null, null, comparer, equalityComparer);
+            return new SortedListTransformationReactiveCollection<TSource, TSource>(source, null, null, comparer, equalityComparer);
         }
     }
 }

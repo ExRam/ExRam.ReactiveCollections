@@ -1807,7 +1807,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .Where(x => x % 2 == 0)
                 .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
-            var transformed = projectedList as ListNotificationTransformationReactiveCollection<int, string>;
+            var transformed = projectedList as ListTransformationReactiveCollection<int, string>;
             Assert.IsNotNull(transformed);
 
             Assert.AreSame(transformed.Source, list.ReactiveCollection);
@@ -1826,7 +1826,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .Where(x => x % 2 == 0)
                 .Where(x => x % 3 == 0);
 
-            var transformed = projectedList as ListNotificationTransformationReactiveCollection<int, int>;
+            var transformed = projectedList as ListTransformationReactiveCollection<int, int>;
             Assert.IsNotNull(transformed);
 
             Assert.AreSame(transformed.Source, list.ReactiveCollection);
@@ -1850,7 +1850,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .Select(x => x.ToString())
                 .Select(int.Parse);
 
-            var transformed = projectedList as ListNotificationTransformationReactiveCollection<int, int>;
+            var transformed = projectedList as ListTransformationReactiveCollection<int, int>;
             Assert.IsNotNull(transformed);
 
             Assert.AreSame(transformed.Source, list.ReactiveCollection);
@@ -1948,7 +1948,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .Where(x => x % 2 == 0)
                 .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
-            var transformed = projectedList as DictionaryNotificationTransformationReactiveCollection<int, int, string>;
+            var transformed = projectedList as DictionaryTransformationReactiveCollection<int, int, string>;
             Assert.IsNotNull(transformed);
 
             Assert.AreSame(transformed.Source, list.ReactiveCollection);
@@ -1967,7 +1967,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .Where(x => x % 2 == 0)
                 .Where(x => x % 3 == 0);
 
-            var transformed = projectedList as DictionaryNotificationTransformationReactiveCollection<int, int, int>;
+            var transformed = projectedList as DictionaryTransformationReactiveCollection<int, int, int>;
             Assert.IsNotNull(transformed);
 
             Assert.AreSame(transformed.Source, list.ReactiveCollection);
@@ -1986,7 +1986,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .Select(x => x.ToString())
                 .Select(int.Parse);
 
-            var transformed = projectedList as DictionaryNotificationTransformationReactiveCollection<int, int, int>;
+            var transformed = projectedList as DictionaryTransformationReactiveCollection<int, int, int>;
             Assert.IsNotNull(transformed);
 
             Assert.AreSame(transformed.Source, list.ReactiveCollection);
@@ -2128,7 +2128,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .Where(x => x % 2 == 0)
                 .Sort();
 
-            var transformed = projectedList as SortedListNotificationTransformationReactiveCollection<int, int>;
+            var transformed = projectedList as SortedListTransformationReactiveCollection<int, int>;
             Assert.IsNotNull(transformed);
 
             Assert.AreSame(transformed.Source, list.ReactiveCollection);
@@ -2147,7 +2147,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .Where(x => x % 2 == 0)
                 .SortSet();
 
-            var transformed = projectedList as SortedSetNotificationTransformationReactiveCollection<int, int>;
+            var transformed = projectedList as SortedSetTransformationReactiveCollection<int, int>;
             Assert.IsNotNull(transformed);
 
             Assert.AreSame(transformed.Source, list.ReactiveCollection);

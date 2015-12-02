@@ -28,7 +28,7 @@ namespace ExRam.ReactiveCollections
             if (source is ICanSortSet<TSource>)
                 return ((ICanSortSet<TSource>)source).Sort(comparer);
 
-            return new SortedSetNotificationTransformationReactiveCollection<TSource, TSource>(source, null, null, comparer);
+            return new SortedSetTransformationReactiveCollection<TSource, TSource>(source, null, null, comparer);
         }
     }
 }
