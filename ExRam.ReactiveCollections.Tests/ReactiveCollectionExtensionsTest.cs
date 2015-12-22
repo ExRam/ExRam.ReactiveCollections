@@ -2156,5 +2156,30 @@ namespace ExRam.ReactiveCollections.Tests
             Assert.IsNotNull(transformed.Filter);
         }
         #endregion
+
+        #region Select_after_SortSet_preserves_order
+        [TestMethod]
+        public async Task Select_after_SortSet_preserves_order()
+        {
+            var list = new DictionaryReactiveCollectionSource<int, int>();
+
+            var lastTask = list.ReactiveCollection
+                .SortSet(new Comparison<KeyValuePair<int, int>>((x, y) => x.Value.CompareTo(y.Value)).ToComparer())
+                .Select(x => x.Value.ToString())
+                .Changes
+                .Skip(4)
+                .FirstAsync()
+                .ToTask();
+
+            list.Add(1, 36);
+            list.Add(2, 35);
+            list.Add(4, 34);
+            list.Add(0, 37);
+
+            var lastList = (await lastTask).Current;
+
+            CollectionAssert.AreEqual(new[] { "34", "35", "36", "37" }, lastList);
+        }
+        #endregion
     }
 }
