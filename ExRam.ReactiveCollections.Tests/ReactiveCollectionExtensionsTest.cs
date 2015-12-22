@@ -324,10 +324,11 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.IsNull(notifications[0].Index);
-            Assert.AreEqual(0, notifications[0].OldItems.Count);
+            Assert.AreEqual(0, notifications[0].Index);
+            Assert.AreEqual(2, notifications[0].OldItems.Count);
             Assert.AreEqual(0, notifications[0].NewItems.Count);
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notifications[0].Action);
+            CollectionAssert.AreEqual(ImmutableList.Create("1", "2"), notifications[0].OldItems.ToArray());
+            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[0].Action);
 
             Assert.AreEqual(0, notifications[1].Index);
             Assert.AreEqual(0, notifications[1].OldItems.Count);

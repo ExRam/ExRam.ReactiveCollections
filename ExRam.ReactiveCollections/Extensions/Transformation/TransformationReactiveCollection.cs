@@ -41,7 +41,7 @@ namespace ExRam.ReactiveCollections
                                     notification =>
                                     {
                                         var localSelector = selector ?? (x => (TResult)(object)x);
-                                        var listNotification = notification as ListChangedNotification<TSource>;
+                                        var listNotification = notification as IIndexedCollectionChangedNotification<TSource>;
 
                                         lock (syncRoot)
                                         {
