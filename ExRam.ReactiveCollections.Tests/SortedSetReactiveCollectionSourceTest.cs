@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
@@ -11,6 +12,16 @@ namespace ExRam.ReactiveCollections.Tests
     [TestClass]
     public class SortedSetReactiveCollectionSourceTest
     {
+        private struct StructNotImplementingIComparable
+        {
+            public StructNotImplementingIComparable(int value)
+            {
+                this.Value = value;
+            }
+
+            public int Value { get; }
+        }
+
         #region First_notification_is_reset
         [TestMethod]
         public async Task First_notification_is_reset()
@@ -98,6 +109,23 @@ namespace ExRam.ReactiveCollections.Tests
             Assert.AreEqual(0, notification.NewItems.Count);
             Assert.AreEqual(0, notification.OldItems.Count);
             CollectionAssert.AreEqual(new int[0], notification.Current);
+        }
+        #endregion
+
+        #region Clear_preserves_comparer
+        [TestMethod]
+        public async Task Clear_preserves_comparer()
+        {
+            var list = new SortedSetReactiveCollectionSource<StructNotImplementingIComparable>(new Comparison<StructNotImplementingIComparable>((x, y) => x.Value.CompareTo(y.Value)).ToComparer());
+
+            list.Add(new StructNotImplementingIComparable(1));
+            list.Clear();
+            list.Add(new StructNotImplementingIComparable(2));
+            list.Add(new StructNotImplementingIComparable(1));
+
+            var current = (await list.ReactiveCollection.Changes.FirstAsync()).Current.Select(x => x.Value).ToArray();
+
+            CollectionAssert.AreEqual(new[] { 1, 2 }, current);
         }
         #endregion
 
