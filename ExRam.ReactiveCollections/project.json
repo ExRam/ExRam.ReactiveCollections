@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0-*",
+  "description": "ExRam.ReactiveCollections",
+  "authors": [ "ExRam EDV GmbH & Co. KG" ],
+  "frameworks": {
+    "netstandard13": {
+    }
+  },
+  "dependencies": {
+    "System.Collections.Specialized": "4.0.1",
+    "System.ObjectModel": "4.0.12",
+    "System.Diagnostics.Contracts": "4.0.1",
+    "System.Reactive.Linq": "3.0.0",
+    "System.Collections.Immutable": "1.2.0-rc2-24027"
+  },
+  "buildOptions": {
+    "nowarn": [ "CS1998" ]
+  }
+}
