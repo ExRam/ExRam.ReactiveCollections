@@ -66,7 +66,7 @@ namespace ExRam.ReactiveCollections
                         {
                             switch (notification.Action)
                             {
-                                case (NotifyCollectionChangedAction.Add):
+                                case NotifyCollectionChangedAction.Add:
                                 {
                                     obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)notification.NewItems, notification.Index.Value));
                                     obs.OnNext(new PropertyChangedEventArgs("Count"));
@@ -75,7 +75,7 @@ namespace ExRam.ReactiveCollections
                                     break;
                                 }
 
-                                case (NotifyCollectionChangedAction.Remove):
+                                case NotifyCollectionChangedAction.Remove:
                                 {
 
                                     obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, (IList)notification.OldItems, notification.Index.Value));
@@ -85,7 +85,7 @@ namespace ExRam.ReactiveCollections
                                     break;
                                 }
 
-                                case (NotifyCollectionChangedAction.Replace):
+                                case NotifyCollectionChangedAction.Replace:
                                 {
                                     obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, (IList)notification.NewItems, (IList)notification.OldItems, notification.Index.Value));
                                     obs.OnNext(new PropertyChangedEventArgs("Item[]"));

@@ -18,7 +18,7 @@ namespace ExRam.ReactiveCollections
         protected CollectionChangedNotification(IReadOnlyCollection<T> current, NotifyCollectionChangedAction action, IReadOnlyList<T> oldItems, IReadOnlyList<T> newItems)
         {
             // ReSharper disable RedundantCast
-            Contract.Requires(((object)current) != null);
+            Contract.Requires((object)current != null);
             // ReSharper restore RedundantCast
             Contract.Requires(oldItems != null);
             Contract.Requires(newItems != null);
@@ -42,7 +42,7 @@ namespace ExRam.ReactiveCollections
             get 
             {
                 // ReSharper disable RedundantCast
-                Contract.Ensures(((object)Contract.Result<IReadOnlyCollection<T>>()) != null);
+                Contract.Ensures((object)Contract.Result<IReadOnlyCollection<T>>() != null);
                 // ReSharper restore RedundantCast
 
                 return this._current;

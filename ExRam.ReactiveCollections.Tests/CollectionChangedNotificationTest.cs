@@ -1,10 +1,10 @@
 ﻿using System.Collections.Immutable;
 using System.Collections.Specialized;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
+using Xunit;
 
 namespace ExRam.ReactiveCollections.Tests
 {
-    [TestClass]
     public class CollectionChangedNotificationTest
     {
         #region NotificationImpl
@@ -22,13 +22,13 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
-        [TestMethod]
+        [Fact]
         public void Current_is_set()
         {
             var list = ImmutableList.Create(1, 2, 3);
             var notification = new NotificationImpl(list, NotifyCollectionChangedAction.Reset, ImmutableList<int>.Empty, ImmutableList<int>.Empty);
 
-            Assert.AreEqual(list, notification.Current);
+            notification.Current.Should().Equal(list);
         }
     }
 }

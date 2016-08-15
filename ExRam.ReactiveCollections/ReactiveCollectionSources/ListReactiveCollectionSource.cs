@@ -100,7 +100,7 @@ namespace ExRam.ReactiveCollections
             var oldList = this.Current;
             var index = oldList.IndexOf(item, equalityComparer);
 
-            return ((index > -1) && (this.RemoveAtInternal(index)));
+            return (index > -1) && this.RemoveAtInternal(index);
         }
 
         public void RemoveAll(Predicate<T> match)

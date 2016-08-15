@@ -152,7 +152,7 @@ namespace ExRam.ReactiveCollections
             var oldList = this.Current;
             this.Remove(key);
 
-            return (this.Current != oldList);
+            return this.Current != oldList;
         }
 
         ICollection<TValue> IDictionary<TKey, TValue>.Values => this.Current.Values.ToList();

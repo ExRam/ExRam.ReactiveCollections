@@ -1,35 +1,29 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Immutable;
+﻿using System.Collections;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
+using Xunit;
 
 namespace ExRam.ReactiveCollections.Tests
 {
-    [TestClass]
     public class ListReactiveCollectionSourceTest
     {
-        #region First_notification_is_reset
-        [TestMethod]
+        [Fact]
         public async Task First_notification_is_reset()
         {
             var list = new ListReactiveCollectionSource<int>();
 
             var notification = await list.ReactiveCollection.Changes.FirstAsync().ToTask();
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notification.Action);
-            Assert.AreEqual(ImmutableList<int>.Empty, notification.OldItems);
-            Assert.AreEqual(ImmutableList<int>.Empty, notification.NewItems);
-            Assert.AreEqual(ImmutableList<int>.Empty, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notification.OldItems.Should().BeEmpty();
+            notification.NewItems.Should().BeEmpty();
+            notification.Current.Should().BeEmpty();
         }
-        #endregion
 
-        #region Add
-        [TestMethod]
+        [Fact]
         public async Task Add()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -43,19 +37,14 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(0, notification.Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-
-            Assert.AreEqual(1, notification.NewItems.Count);
-            Assert.AreEqual(0, notification.OldItems.Count);
-
-            CollectionAssert.AreEqual(new[] { 1 }, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 1 }, notification.Current.ToArray());
+            notification.Index.Should().Be(0);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.NewItems.Should().Equal(1);
+            notification.OldItems.Should().BeEmpty();
+            notification.Current.Should().Equal(1);
         }
-        #endregion
 
-        #region AddRange
-        [TestMethod]
+        [Fact]
         public async Task AddRange()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -70,19 +59,14 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(0, notification.Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-
-            Assert.AreEqual(3, notification.NewItems.Count);
-            Assert.AreEqual(0, notification.OldItems.Count);
-
-            CollectionAssert.AreEqual(range, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(range, notification.Current);
+            notification.Index.Should().Be(0);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.OldItems.Should().BeEmpty();
+            notification.NewItems.Should().Equal(range);
+            notification.Current.Should().Equal(range);
         }
-        #endregion
 
-        #region Clear
-        [TestMethod]
+        [Fact]
         public async Task Clear()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -97,18 +81,14 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.IsNull(notification.Index);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notification.Action);
-
-            Assert.AreEqual(0, notification.NewItems.Count);
-            Assert.AreEqual(0, notification.OldItems.Count);
-            CollectionAssert.AreEqual(new int[0], notification.Current);
+            notification.Index.Should().NotHaveValue();
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notification.NewItems.Should().BeEmpty();
+            notification.OldItems.Should().BeEmpty();
+            notification.Current.Should().BeEmpty();
         }
-        #endregion
 
-        #region Contains
-        [TestMethod]
+        [Fact]
         public void Contains()
         {
             var list = new ListReactiveCollectionSource<int>
@@ -116,13 +96,11 @@ namespace ExRam.ReactiveCollections.Tests
                 1
             };
 
-            Assert.IsTrue(list.Contains(1));
-            Assert.IsFalse(list.Contains(2));
+            list.Contains(1).Should().BeTrue();
+            list.Contains(2).Should().BeFalse();
         }
-        #endregion
 
-        #region Contains
-        [TestMethod]
+        [Fact]
         public void CopyTo()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -133,50 +111,48 @@ namespace ExRam.ReactiveCollections.Tests
             var target = new int[5];
             list.CopyTo(target, 2);
 
-            CollectionAssert.AreEqual(new[] { 0, 0, 1, 2, 3 }, target);
+            target.Should().Equal(0, 0, 1, 2, 3);
         }
-        #endregion
 
-        #region GetEnumerator
-        [TestMethod]
+        [Fact]
         public void GetEnumerator()
         {
-            var list = new ListReactiveCollectionSource<int>();
+            var list = new ListReactiveCollectionSource<int>
+            {
+                1,
+                2,
+                3
+            };
 
-            var range = new[] { 1, 2, 3 };
-            list.AddRange(range);
+            using (var enumerator = list.GetEnumerator())
+            {
+                enumerator.MoveNext().Should().BeTrue();
+                enumerator.Current.Should().Be(1);
 
-            var enumerator = list.GetEnumerator();
+                enumerator.MoveNext().Should().BeTrue();
+                enumerator.Current.Should().Be(2);
 
-            Assert.IsTrue(enumerator.MoveNext());
-            Assert.AreEqual(1, enumerator.Current);
+                enumerator.MoveNext().Should().BeTrue();
+                enumerator.Current.Should().Be(3);
 
-            Assert.IsTrue(enumerator.MoveNext());
-            Assert.AreEqual(2, enumerator.Current);
-
-            Assert.IsTrue(enumerator.MoveNext());
-            Assert.AreEqual(3, enumerator.Current);
-
-            Assert.IsFalse(enumerator.MoveNext());
+                enumerator.MoveNext().Should().BeFalse();
+            }
         }
-        #endregion
 
-        #region IndexOf
-        [TestMethod]
+        [Fact]
         public void IndexOf()
         {
-            var list = new ListReactiveCollectionSource<int>();
+            var list = new ListReactiveCollectionSource<int>
+            {
+                1, 2, 3
+            };
 
-            list.AddRange(new[] { 1, 2, 3 });
-
-            Assert.AreEqual(2, list.IndexOf(3));
-            Assert.AreEqual(1, list.IndexOf(2));
-            Assert.AreEqual(0, list.IndexOf(1));
+            list.IndexOf(3).Should().Be(2);
+            list.IndexOf(2).Should().Be(1);
+            list.IndexOf(1).Should().Be(0);
         }
-        #endregion
 
-        #region Insert
-        [TestMethod]
+        [Fact]
         public async Task Insert()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -189,20 +165,15 @@ namespace ExRam.ReactiveCollections.Tests
             list.Insert(0, 2);
 
             var notification = await notificationTask;
-            
-            Assert.AreEqual(0, notification.Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
 
-            Assert.AreEqual(1, notification.NewItems.Count);
-            Assert.AreEqual(0, notification.OldItems.Count);
-
-            CollectionAssert.AreEqual(new[] { 2 }, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 2 }, notification.Current);
+            notification.Index.Should().Be(0);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.NewItems.Should().Equal(2);
+            notification.OldItems.Should().BeEmpty();
+            notification.Current.Should().Equal(2);
         }
-        #endregion
 
-        #region InsertRange
-        [TestMethod]
+        [Fact]
         public async Task InsertRange()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -219,39 +190,31 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(1, notification.Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-            Assert.AreEqual(3, notification.NewItems.Count);
-            Assert.AreEqual(0, notification.OldItems.Count);
-
-            CollectionAssert.AreEqual(range, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 1, 1, 2, 3 }, notification.Current);
+            notification.Index.Should().Be(1);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.NewItems.Should().Equal(1, 2, 3);
+            notification.OldItems.Should().BeEmpty();
+            notification.Current.Should().Equal(1, 1, 2, 3);
         }
-        #endregion
 
-        #region IsReadOnly
-        [TestMethod]
+        [Fact]
         public void IsReadOnly()
         {
             var list = (IList)new ListReactiveCollectionSource<int>();
 
-            Assert.IsFalse(list.IsReadOnly);
+            list.IsReadOnly.Should().BeFalse();
         }
-        #endregion
 
-        #region Item
-        [TestMethod]
+        [Fact]
         public void Item()
         {
             var list = (IList)new ListReactiveCollectionSource<int>();
             list.Add(1);
 
-            Assert.AreEqual(1, list[0]);
+            list[0].Should().Be(1);
         }
-        #endregion
 
-        #region Remove
-        [TestMethod]
+        [Fact]
         public async Task Remove()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -266,18 +229,14 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(0, notification.Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-            Assert.AreEqual(0, notification.NewItems.Count);
-            Assert.AreEqual(1, notification.OldItems.Count);
-
-            CollectionAssert.AreEqual(new[] { 1 }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new int[0], notification.Current);
+            notification.Index.Should().Be(0);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notification.NewItems.Should().BeEmpty();
+            notification.OldItems.Should().Equal(1);
+            notification.Current.Should().BeEmpty();
         }
-        #endregion
 
-        #region RemoveAll
-        [TestMethod]
+        [Fact]
         public async Task RemoveAll()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -292,13 +251,11 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notification.Action);
-            CollectionAssert.AreEqual(new[] { 1, 3 }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notification.Current.Should().Equal(1, 3);
         }
-        #endregion
 
-        #region RemoveAt
-        [TestMethod]
+        [Fact]
         public async Task RemoveAt()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -314,18 +271,14 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(1, notification.Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-            Assert.AreEqual(0, notification.NewItems.Count);
-            Assert.AreEqual(1, notification.OldItems.Count);
-
-            CollectionAssert.AreEqual(new[] { 2 }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 1 }, notification.Current);
+            notification.Index.Should().Be(1);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notification.NewItems.Should().BeEmpty();
+            notification.OldItems.Should().Equal(2);
+            notification.Current.Should().Equal(1);
         }
-        #endregion
 
-        #region RemoveRange
-        [TestMethod]
+        [Fact]
         public async Task RemoveRange()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -340,16 +293,13 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notification.Action);
-            Assert.AreEqual(0, notification.NewItems.Count);
-            Assert.AreEqual(0, notification.OldItems.Count);
-
-            CollectionAssert.AreEqual(new[] { 1, 3 }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notification.NewItems.Should().BeEmpty();
+            notification.OldItems.Should().BeEmpty();
+            notification.Current.Should().Equal(1, 3);
         }
-        #endregion
 
-        #region RemoveRange2
-        [TestMethod]
+        [Fact]
         public async Task RemoveRange2()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -364,16 +314,13 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-            CollectionAssert.AreEqual(new[] { 3, 4 }, notification.OldItems.ToArray());
-            Assert.AreEqual(0, notification.NewItems.Count);
-
-            CollectionAssert.AreEqual(new[] { 1, 2 }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notification.OldItems.Should().ContainInOrder(3, 4);
+            notification.NewItems.Should().BeEmpty();
+            notification.Current.Should().Equal(1, 2);
         }
-        #endregion
 
-        #region Replace
-        [TestMethod]
+        [Fact]
         public async Task Replace()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -388,16 +335,13 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Replace, notification.Action);
-            CollectionAssert.AreEqual(new[] { 1 }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 5 }, notification.NewItems.ToArray());
-
-            CollectionAssert.AreEqual(new[] { 5, 2, 3, 4, 1 }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Replace);
+            notification.OldItems.Should().Equal(1);
+            notification.NewItems.Should().Equal(5);
+            notification.Current.Should().Equal(5, 2, 3, 4, 1);
         }
-        #endregion
 
-        #region Reverse
-        [TestMethod]
+        [Fact]
         public async Task Reverse()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -412,13 +356,11 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notification.Action);
-            CollectionAssert.AreEqual(new[] { 5, 4, 3, 2, 1 }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notification.Current.Should().Equal(5, 4, 3, 2, 1);
         }
-        #endregion
 
-        #region SetItem
-        [TestMethod]
+        [Fact]
         public async Task SetItem()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -433,17 +375,14 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Replace, notification.Action);
-            Assert.AreEqual(2, notification.Index);
-
-            CollectionAssert.AreEqual(new[] { 3 }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 6 }, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 1, 2, 6, 4, 5 }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Replace);
+            notification.Index.Should().Be(2);
+            notification.OldItems.Should().Equal(3);
+            notification.NewItems.Should().Equal(6);
+            notification.Current.Should().Equal(1, 2, 6, 4, 5);
         }
-        #endregion
 
-        #region Sort
-        [TestMethod]
+        [Fact]
         public async Task Sort()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -458,13 +397,11 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notification.Action);
-            CollectionAssert.AreEqual(new[] { 0, 1, 2, 3, 5 }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notification.Current.Should().Equal(0, 1, 2, 3, 5);
         }
-        #endregion
 
-        #region Sort_with_comparison
-        [TestMethod]
+        [Fact]
         public async Task Sort_with_comparison()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -479,9 +416,8 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notification.Action);
-            CollectionAssert.AreEqual(new[] { 5, 3, 2, 1, 0 }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notification.Current.Should().Equal(5, 3, 2, 1, 0);
         }
-        #endregion
     }
 }

@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
+using Xunit;
 
 namespace ExRam.ReactiveCollections.Tests
 {
-    [TestClass]
     public class SortedSetReactiveCollectionSourceTest
     {
         private struct StructNotImplementingIComparable
@@ -22,23 +21,20 @@ namespace ExRam.ReactiveCollections.Tests
             public int Value { get; }
         }
 
-        #region First_notification_is_reset
-        [TestMethod]
+        [Fact]
         public async Task First_notification_is_reset()
         {
             var list = new SortedSetReactiveCollectionSource<int>();
 
             var notification = await list.ReactiveCollection.Changes.FirstAsync().ToTask();
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notification.Action);
-            Assert.AreEqual(ImmutableList<int>.Empty, notification.OldItems);
-            Assert.AreEqual(ImmutableList<int>.Empty, notification.NewItems);
-            Assert.AreEqual(ImmutableSortedSet<int>.Empty, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notification.OldItems.Should().BeEmpty();
+            notification.NewItems.Should().BeEmpty();
+            notification.Current.Should().BeEmpty();
         }
-        #endregion
 
-        #region Add
-        [TestMethod]
+        [Fact]
         public async Task Add()
         {
             var list = new SortedSetReactiveCollectionSource<int>();
@@ -52,18 +48,13 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-            Assert.AreEqual(0, notification.Index);
-            Assert.AreEqual(1, notification.NewItems.Count);
-            Assert.AreEqual(0, notification.OldItems.Count);
-
-            CollectionAssert.AreEqual(new[] { 1 }, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 1 }, notification.Current.ToArray());
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.Index.Should().Be(0);
+            notification.NewItems.Should().Equal(1);
+            notification.Current.Should().Equal(1);
         }
-        #endregion
 
-        #region Add_multiple
-        [TestMethod]
+        [Fact]
         public async Task Add_multiple()
         {
             var list = new SortedSetReactiveCollectionSource<int>();
@@ -84,12 +75,10 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationTask;
 
-            CollectionAssert.AreEqual(new[] { 0, 1, 1, 0, 4, 4 }, notifications);
+            notifications.Should().BeEquivalentTo(new[] { 0, 1, 1, 0, 4, 4 });
         }
-        #endregion
 
-        #region Clear
-        [TestMethod]
+        [Fact]
         public async Task Clear()
         {
             var list = new SortedSetReactiveCollectionSource<int>();
@@ -104,16 +93,13 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notification.Action);
-
-            Assert.AreEqual(0, notification.NewItems.Count);
-            Assert.AreEqual(0, notification.OldItems.Count);
-            CollectionAssert.AreEqual(new int[0], notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notification.NewItems.Should().BeEmpty();
+            notification.OldItems.Should().BeEmpty();
+            notification.Current.Should().BeEmpty();
         }
-        #endregion
 
-        #region Clear_preserves_comparer
-        [TestMethod]
+        [Fact]
         public async Task Clear_preserves_comparer()
         {
             var list = new SortedSetReactiveCollectionSource<StructNotImplementingIComparable>(new Comparison<StructNotImplementingIComparable>((x, y) => x.Value.CompareTo(y.Value)).ToComparer());
@@ -125,12 +111,10 @@ namespace ExRam.ReactiveCollections.Tests
 
             var current = (await list.ReactiveCollection.Changes.FirstAsync()).Current.Select(x => x.Value).ToArray();
 
-            CollectionAssert.AreEqual(new[] { 1, 2 }, current);
+            current.Should().Equal(1, 2);
         }
-        #endregion
 
-        #region Remove
-        [TestMethod]
+        [Fact]
         public async Task Remove()
         {
             var list = new SortedSetReactiveCollectionSource<int>();
@@ -145,14 +129,11 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-            Assert.AreEqual(0, notification.NewItems.Count);
-            Assert.AreEqual(1, notification.OldItems.Count);
-            Assert.AreEqual(0, notification.Index);
-
-            CollectionAssert.AreEqual(new[] { 1 }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new int[0], notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notification.NewItems.Should().BeEmpty();
+            notification.OldItems.Should().Equal(1);
+            notification.Current.Should().BeEmpty();
+            notification.Index.Should().Be(0);
         }
-        #endregion
     }
 }

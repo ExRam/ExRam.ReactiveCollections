@@ -209,7 +209,7 @@ namespace ExRam.ReactiveCollections
             var oldList = this.Current;
             this.Remove(item);
 
-            return (this.Current != oldList);
+            return this.Current != oldList;
         }
         #endregion
 

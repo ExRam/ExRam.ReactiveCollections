@@ -37,7 +37,7 @@ namespace ExRam.ReactiveCollections
         protected ReactiveCollectionSource(TNotification initialNotification)
         {
             // ReSharper disable RedundantCast
-            Contract.Requires(((object)initialNotification) != null);
+            Contract.Requires((object)initialNotification != null);
             // ReSharper restore RedundantCast
 
             this._subject = new BehaviorSubject<TNotification>(initialNotification);

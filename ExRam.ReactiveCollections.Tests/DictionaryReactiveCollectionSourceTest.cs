@@ -1,35 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
+using Xunit;
 
 namespace ExRam.ReactiveCollections.Tests
 {
-    [TestClass]
     public class DictionaryReactiveCollectionSourceTest
     {
-        #region First_notification_is_reset
-        [TestMethod]
+        [Fact]
         public async Task First_notification_is_reset()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
 
-            var notification = await list.ReactiveCollection.Changes.FirstAsync().ToTask();
+            var notification = await list.ReactiveCollection.Changes
+                .FirstAsync()
+                .ToTask();
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notification.Action);
-            Assert.AreEqual(ImmutableList<KeyValuePair<string, int>>.Empty, notification.OldItems);
-            Assert.AreEqual(ImmutableList<KeyValuePair<string, int>>.Empty, notification.NewItems);
-            Assert.AreEqual(ImmutableDictionary<string, int>.Empty, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notification.OldItems.Should().BeEmpty();
+            notification.NewItems.Should().BeEmpty();
+            notification.Current.Should().BeEmpty();
         }
-        #endregion
 
-        #region Add
-        [TestMethod]
+        [Fact]
         public async Task Add()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -43,34 +40,29 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-
-            Assert.AreEqual(1, notification.NewItems.Count);
-            Assert.AreEqual(0, notification.OldItems.Count);
-
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key", 1) }, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key", 1) }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.OldItems.Should().BeEmpty();
+            notification.NewItems.Should().Equal(new KeyValuePair<string, int>("Key", 1));
+            notification.Current.Should().Contain("Key", 1);
         }
-        #endregion
 
-        #region Adding_existing_key_throws
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void Adding_existing_key_throws()
         {
-            // ReSharper disable ObjectCreationAsStatement
-            new DictionaryReactiveCollectionSource<string, int>
-            {
-                { "Key", 1 },
-                { "Key", 2 }
-            };
-            // ReSharper restore ObjectCreationAsStatement
+            Assert.Throws<ArgumentException>(
+                () =>
+                {
+                    // ReSharper disable ObjectCreationAsStatement
+                    new DictionaryReactiveCollectionSource<string, int>
+                    {
+                        { "Key", 1 },
+                        { "Key", 2 }
+                    };
+                    // ReSharper restore ObjectCreationAsStatement
+                });
         }
 
-        #endregion
-
-        #region AddRange1
-        [TestMethod]
+        [Fact]
         public async Task AddRange1()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -80,29 +72,24 @@ namespace ExRam.ReactiveCollections.Tests
                 .FirstAsync()
                 .ToTask();
 
-            var range = new[]
+            var range = new Dictionary<string, int>
             {
-                new KeyValuePair<string, int>("Key1", 1),
-                new KeyValuePair<string, int>("Key2", 2),
-                new KeyValuePair<string, int>("Key3", 3)
+                { "Key1", 1 },
+                { "Key2", 2 },
+                { "Key3", 3 }
             };
 
             list.AddRange(range);
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-
-            Assert.AreEqual(3, notification.NewItems.Count);
-            Assert.AreEqual(0, notification.OldItems.Count);
-
-            CollectionAssert.AreEqual(range, notification.NewItems.ToArray());
-            CollectionAssert.AreEquivalent(range, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.NewItems.Should().BeEquivalentTo(range);
+            notification.OldItems.Should().BeEmpty();
+            notification.Current.Should().Equal(range);
         }
-        #endregion
 
-        #region AddRange2
-        [TestMethod]
+        [Fact]
         public async Task AddRange2()
         {
             var list = new DictionaryReactiveCollectionSource<int, string>();
@@ -123,38 +110,29 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-
-            Assert.AreEqual(3, notification.NewItems.Count);
-            Assert.AreEqual(0, notification.OldItems.Count);
-
-            Assert.AreEqual("A", notification.Current[1]);
-            Assert.AreEqual("BB", notification.Current[2]);
-            Assert.AreEqual("CCC", notification.Current[3]);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.NewItems.Should().HaveCount(3);
+            notification.OldItems.Should().BeEmpty();
+            notification.Current.Should()
+                .Contain(1, "A").And
+                .Contain(2, "BB").And
+                .Contain(3, "CCC");
         }
-        #endregion
 
-        #region Count_reflects_actual_count
-        [TestMethod]
-        public async Task Count_reflects_actual_count()
+        [Fact]
+        public void Count_reflects_actual_count()
         {
-            var list = new DictionaryReactiveCollectionSource<string, int>();
-
-            var range = new[]
+            var list = new DictionaryReactiveCollectionSource<string, int>
             {
-                new KeyValuePair<string, int>("Key1", 1),
-                new KeyValuePair<string, int>("Key2", 2),
-                new KeyValuePair<string, int>("Key3", 3)
+                { "Key1", 1 },
+                { "Key2", 2 },
+                { "Key3", 3 }
             };
 
-            list.AddRange(range);
-
-            Assert.AreEqual(3, list.Count);
+            list.Should().HaveCount(3);
         }
-        #endregion
 
-        #region Clear
-        [TestMethod]
+        [Fact]
         public async Task Clear()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -169,16 +147,13 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notification.Action);
-
-            Assert.AreEqual(0, notification.NewItems.Count);
-            Assert.AreEqual(0, notification.OldItems.Count);
-            CollectionAssert.AreEqual(new int[0], notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notification.NewItems.Should().BeEmpty();
+            notification.OldItems.Should().BeEmpty();
+            notification.Current.Should().BeEmpty();
         }
-        #endregion
 
-        #region Contains
-        [TestMethod]
+        [Fact]
         public void Contains()
         {
             var dict = new DictionaryReactiveCollectionSource<string, int>
@@ -186,15 +161,11 @@ namespace ExRam.ReactiveCollections.Tests
                 { "Key", 1 }
             };
 
-            Assert.IsTrue(dict.Contains(new KeyValuePair<string, int>("Key", 1)));
-            Assert.IsFalse(dict.Contains(new KeyValuePair<string, int>("Key", 2)));
-            Assert.IsTrue(dict.ContainsKey("Key"));
-            Assert.IsFalse(dict.ContainsKey("Key1"));
+            dict.Contains(new KeyValuePair<string, int>("Key", 1)).Should().BeTrue();
+            dict.Contains(new KeyValuePair<string, int>("Key1", 2)).Should().BeFalse();
         }
-        #endregion
 
-        #region Remove
-        [TestMethod]
+        [Fact]
         public async Task Remove()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -209,17 +180,13 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-            Assert.AreEqual(0, notification.NewItems.Count);
-            Assert.AreEqual(1, notification.OldItems.Count);
-
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1) }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new KeyValuePair<string, int>[0], notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notification.NewItems.Should().BeEmpty();
+            notification.OldItems.Should().Equal(new KeyValuePair<string, int>("Key1", 1));
+            notification.Current.Should().BeEmpty();
         }
-        #endregion
 
-        #region RemoveRange
-        [TestMethod]
+        [Fact]
         public async Task RemoveRange()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -245,18 +212,17 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[0].Action);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1) }, notifications[0].OldItems.ToArray());
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[1].Action);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notifications[1].OldItems.ToArray());
-
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key3", 3) }, notifications[1].Current);
+            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notifications[0].OldItems.Should().Equal(new KeyValuePair<string, int>("Key1", 1));
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notifications[1].OldItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
+            notifications[1].Current.Should().Equal(new Dictionary<string, int>
+            {
+                { "Key3", 3 }
+            });
         }
-        #endregion
 
-        #region SetItem
-        [TestMethod]
+        [Fact]
         public async Task SetItem()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -266,11 +232,11 @@ namespace ExRam.ReactiveCollections.Tests
                 .FirstAsync()
                 .ToTask();
 
-            var range = new[]
+            var range = new Dictionary<string, int>
             {
-                new KeyValuePair<string, int>("Key1", 1),
-                new KeyValuePair<string, int>("Key2", 2),
-                new KeyValuePair<string, int>("Key3", 3)
+                { "Key1", 1 },
+                { "Key2", 2 },
+                { "Key3", 3 }
             };
 
             list.AddRange(range);
@@ -279,21 +245,19 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Replace, notification.Action);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 3) }, notification.NewItems.ToArray());
-
-            CollectionAssert.AreEquivalent(new[]
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Replace);
+            notification.OldItems.Should().HaveCount(1);
+            notification.OldItems.Should().Contain(new KeyValuePair<string, int>("Key2", 2));
+            notification.NewItems.Should().Contain(new KeyValuePair<string, int>("Key2", 3));
+            notification.Current.Should().Equal(new Dictionary<string, int>
             {
-                new KeyValuePair<string, int>("Key1", 1),
-                new KeyValuePair<string, int>("Key2", 3),
-                new KeyValuePair<string, int>("Key3", 3)
-            }, notification.Current);
+                { "Key1", 1 },
+                { "Key2", 3 },
+                { "Key3", 3 }
+            });
         }
-        #endregion
 
-        #region SetItems
-        [TestMethod]
+        [Fact]
         public async Task SetItems()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -319,53 +283,44 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notification.Action);
-
-            CollectionAssert.AreEquivalent(new[]
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notification.Current.Should().Equal(new Dictionary<string, int>
             {
-                new KeyValuePair<string, int>("Key1", 4),
-                new KeyValuePair<string, int>("Key2", 5),
-                new KeyValuePair<string, int>("Key3", 6)
-            }, notification.Current);
+                { "Key1", 4 },
+                { "Key2", 5 },
+                { "Key3", 6 }
+            });
         }
-        #endregion
 
-        #region TryGetValue
-        [TestMethod]
+        [Fact]
         public void TryGetValue()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>
-                {
+            {
                 { "Key1", 1 }
             };
 
             int value;
-            Assert.IsTrue(list.TryGetValue("Key1", out value));
-            Assert.AreEqual(1, value);
 
-            Assert.IsFalse(list.TryGetValue("Key2", out value));
+            list.TryGetValue("Key1", out value).Should().BeTrue();
+            value.Should().Be(1);
+            list.TryGetValue("Key2", out value).Should().BeFalse();
         }
-        #endregion
 
-        #region Item
-        [TestMethod]
+        [Fact]
         public void Item()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>
-                {
+            {
                 { "Key1", 1 }
             };
 
-            Assert.AreEqual(1, list["Key1"]);
-
+            list["Key1"].Should().Be(1);
             list["Key1"] = 2;
-            Assert.AreEqual(2, list["Key1"]);
+            list["Key1"].Should().Be(2);
         }
-        #endregion
 
-        #region Item2
-        [TestMethod]
-        [ExpectedException(typeof(KeyNotFoundException))]
+        [Fact]
         public void Item2()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>
@@ -373,12 +328,13 @@ namespace ExRam.ReactiveCollections.Tests
                 { "Key1", 1 }
             };
 
-            Assert.AreEqual(1, list["Key"]);
+            Assert.Throws<KeyNotFoundException>(() =>
+            {
+                var v = list["Key"];
+            });
         }
-        #endregion
 
-        #region GetEnumerator
-        [TestMethod]
+        [Fact]
         public void GetEnumerator()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>
@@ -386,12 +342,12 @@ namespace ExRam.ReactiveCollections.Tests
                 { "Key1", 1 }
             };
 
-            var enumerator = list.GetEnumerator();
-
-            Assert.IsTrue(enumerator.MoveNext());
-            Assert.AreEqual(new KeyValuePair<string, int>("Key1", 1), enumerator.Current);
-            Assert.IsFalse(enumerator.MoveNext());
+            using (var enumerator = list.GetEnumerator())
+            {
+                enumerator.MoveNext().Should().BeTrue();
+                enumerator.Current.Should().Be(new KeyValuePair<string, int>("Key1", 1));
+                enumerator.MoveNext().Should().BeFalse();
+            }
         }
-        #endregion
     }
 }

@@ -4,15 +4,13 @@ using System.Globalization;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace ExRam.ReactiveCollections.Tests
 {
-    [TestClass]
     public class PerformanceTest
     {
-        [Ignore]
-        [TestMethod]
+        [Fact(Skip="")]
         public async Task DictionaryPerformanceTest()
         {
             const int count = 10000;

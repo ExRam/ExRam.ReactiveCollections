@@ -3,14 +3,14 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
+using Xunit;
 
 namespace ExRam.ReactiveCollections.Tests
 {
-    [TestClass]
     public class ObservableExtensionsTest
     {
-        [TestMethod]
+        [Fact]
         public async Task ReplayFresh_provides_a_fresh_observable()
         {
             var sourceSubject = new Subject<int>();
@@ -27,10 +27,8 @@ namespace ExRam.ReactiveCollections.Tests
 
                 sourceSubject.OnNext(36);
 
-                Assert.AreEqual(36, await task1);
-                Assert.AreEqual(36, await replayed
-                    .FirstAsync()
-                    .ToTask());
+                (await task1).Should().Be(36);
+                (await replayed.FirstAsync().ToTask()).Should().Be(36);
             }
 
             var task2 = replayed
@@ -39,7 +37,7 @@ namespace ExRam.ReactiveCollections.Tests
 
             sourceSubject.OnNext(37);
 
-            Assert.AreEqual(37, await task2);
+            (await task2).Should().Be(37);
         }
     }
 }

@@ -193,7 +193,7 @@ namespace ExRam.ReactiveCollections
 
                 var half = (max - min + 1) / 2;
                
-                return new InnerNode(this.GetTree(min, (min + half - 1)), this.GetTree(min + half, max));
+                return new InnerNode(this.GetTree(min, min + half - 1), this.GetTree(min + half, max));
             } 
         }
         #endregion

@@ -9,15 +9,14 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
+using Xunit;
 
 namespace ExRam.ReactiveCollections.Tests
 {
-    [TestClass]
     public class ReactiveCollectionExtensionsTest
     {
-        #region Add_to_projected_list
-        [TestMethod]
+        [Fact]
         public async Task Add_to_projected_list()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -36,31 +35,21 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(null, notifications[0].Index);
-            Assert.AreEqual(0, notifications[1].Index);
-            Assert.AreEqual(1, notifications[2].Index);
-            Assert.AreEqual(2, notifications[3].Index);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notifications[0].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[2].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[3].Action);
-
-            Assert.AreEqual(0, notifications[0].NewItems.Count);
-
-            Assert.AreEqual(1, notifications[1].NewItems.Count);
-            CollectionAssert.AreEqual(new[] { "1" }, notifications[1].NewItems.ToArray());
-
-            Assert.AreEqual(1, notifications[2].NewItems.Count);
-            CollectionAssert.AreEqual(new[] { "2" }, notifications[2].NewItems.ToArray());
-
-            Assert.AreEqual(1, notifications[3].NewItems.Count);
-            CollectionAssert.AreEqual(new[] { "3" }, notifications[3].NewItems.ToArray());
+            notifications[0].Index.Should().NotHaveValue();
+            notifications[1].Index.Should().Be(0);
+            notifications[2].Index.Should().Be(1);
+            notifications[3].Index.Should().Be(2);
+            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[2].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[3].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[0].NewItems.Should().BeEmpty();
+            notifications[1].NewItems.Should().Equal("1");
+            notifications[2].NewItems.Should().Equal("2");
+            notifications[3].NewItems.Should().Equal("3");
         }
-        #endregion
 
-        #region Add_to_projected_set
-        [TestMethod]
+        [Fact]
         public async Task Add_to_projected_set()
         {
             var list = new SortedSetReactiveCollectionSource<int>();
@@ -79,31 +68,21 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(null, notifications[0].Index);
-            Assert.AreEqual(0, notifications[1].Index);
-            Assert.AreEqual(1, notifications[2].Index);
-            Assert.AreEqual(2, notifications[3].Index);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notifications[0].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[2].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[3].Action);
-
-            Assert.AreEqual(0, notifications[0].NewItems.Count);
-
-            Assert.AreEqual(1, notifications[1].NewItems.Count);
-            CollectionAssert.AreEqual(new[] { "1" }, notifications[1].NewItems.ToArray());
-
-            Assert.AreEqual(1, notifications[2].NewItems.Count);
-            CollectionAssert.AreEqual(new[] { "2" }, notifications[2].NewItems.ToArray());
-
-            Assert.AreEqual(1, notifications[3].NewItems.Count);
-            CollectionAssert.AreEqual(new[] { "3" }, notifications[3].NewItems.ToArray());
+            notifications[0].Index.Should().NotHaveValue();
+            notifications[1].Index.Should().Be(0);
+            notifications[2].Index.Should().Be(1);
+            notifications[3].Index.Should().Be(2);
+            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[2].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[3].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[0].NewItems.Should().BeEmpty();
+            notifications[1].NewItems.Should().Equal("1");
+            notifications[2].NewItems.Should().Equal("2");
+            notifications[3].NewItems.Should().Equal("3");
         }
-        #endregion
 
-        #region Add_to_projected_dictionary
-        [TestMethod]
+        [Fact]
         public async Task Add_to_projected_dictionary()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -122,28 +101,23 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notifications[0].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[2].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[3].Action);
-
-            Assert.AreEqual(0, notifications[0].NewItems.Count);
-
-            Assert.AreEqual(1, notifications[1].NewItems.Count);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, string>("Key1", "1") }, notifications[1].NewItems.ToArray());
-
-            Assert.AreEqual(1, notifications[2].NewItems.Count);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, string>("Key2", "2") }, notifications[2].NewItems.ToArray());
-
-            Assert.AreEqual(1, notifications[3].NewItems.Count);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, string>("Key3", "3") }, notifications[3].NewItems.ToArray());
-
-            CollectionAssert.AreEquivalent(new[] { new KeyValuePair<string, string>("Key1", "1"), new KeyValuePair<string, string>("Key2", "2"), new KeyValuePair<string, string>("Key3", "3") }, notifications[3].Current.ToArray());
+            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[2].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[3].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[0].NewItems.Should().BeEmpty();
+            notifications[1].NewItems.Should().Equal(new KeyValuePair<string, string>("Key1", "1"));
+            notifications[2].NewItems.Should().Equal(new KeyValuePair<string, string>("Key2", "2"));
+            notifications[3].NewItems.Should().Equal(new KeyValuePair<string, string>("Key3", "3"));
+            notifications[3].Current.Should().Equal(new Dictionary<string, string>
+            {
+                { "Key1", "1" },
+                { "Key2", "2" },
+                { "Key3", "3" }
+            });
         }
-        #endregion
 
-        #region Remove_from_projected_list
-        [TestMethod]
+        [Fact]
         public async Task Remove_from_projected_list()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -161,18 +135,14 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(1, notification.Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-
-            Assert.AreEqual(1, notification.OldItems.Count);
-            Assert.AreEqual(0, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { "2" }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { "1", "3" }, notification.Current);
+            notification.Index.Should().Be(1);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notification.OldItems.Should().Equal("2");
+            notification.NewItems.Should().BeEmpty();
+            notification.Current.Should().Equal("1", "3");
         }
-        #endregion
 
-        #region Remove_from_projected_set
-        [TestMethod]
+        [Fact]
         public async Task Remove_from_projected_set()
         {
             var list = new SortedSetReactiveCollectionSource<int>();
@@ -192,18 +162,14 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(1, notification.Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-
-            Assert.AreEqual(1, notification.OldItems.Count);
-            Assert.AreEqual(0, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { "2" }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { "1", "3" }, notification.Current);
+            notification.Index.Should().Be(1);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notification.NewItems.Should().BeEmpty();
+            notification.OldItems.Should().Equal("2");
+            notification.Current.Should().Equal("1", "3");
         }
-        #endregion
 
-        #region Remove_from_projected_dictionary
-        [TestMethod]
+        [Fact]
         public async Task Remove_from_projected_dictionary()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -223,17 +189,13 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-
-            Assert.AreEqual(1, notification.OldItems.Count);
-            Assert.AreEqual(0, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, string>("Key2", "2") }, notification.OldItems.ToArray());
-            CollectionAssert.AreEquivalent(new[] { new KeyValuePair<string, string>("Key1", "1"), new KeyValuePair<string, string>("Key3", "3") }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notification.OldItems.Should().Equal(new Dictionary<string, string> { { "Key2", "2" } });
+            notification.NewItems.Should().BeEmpty();
+            notification.Current.Should().Equal(new Dictionary<string, string> { { "Key1", "1" }, { "Key3", "3" }});
         }
-        #endregion
 
-        #region Replace_in_projected_list
-        [TestMethod]
+        [Fact]
         public async Task Replace_in_projected_list()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -251,19 +213,14 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(1, notification.Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Replace, notification.Action);
-
-            Assert.AreEqual(1, notification.OldItems.Count);
-            Assert.AreEqual(1, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { "2" }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { "4" }, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { "1", "4", "3" }, notification.Current);
+            notification.Index.Should().Be(1);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Replace);
+            notification.OldItems.Should().Equal("2");
+            notification.NewItems.Should().Equal("4");
+            notification.Current.Should().Equal("1", "4", "3");
         }
-        #endregion
 
-        #region Replace_in_projected_from_ListChangedNotification_observable
-        [TestMethod]
+        [Fact]
         public async Task Replace_in_projected_from_ListChangedNotification_observable()
         {
             var observable = new[]
@@ -285,24 +242,18 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(0, notifications[0].Index);
-            Assert.AreEqual(2, notifications[0].OldItems.Count);
-            Assert.AreEqual(0, notifications[0].NewItems.Count);
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[0].Action);
-            CollectionAssert.AreEqual(ImmutableList.Create("1", "2"), notifications[0].OldItems.ToArray());
-
-            Assert.AreEqual(0, notifications[1].Index);
-            Assert.AreEqual(0, notifications[1].OldItems.Count);
-            Assert.AreEqual(2, notifications[1].NewItems.Count);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
-            CollectionAssert.AreEqual(ImmutableList.Create("3", "4"), notifications[1].NewItems.ToArray());
-
-            CollectionAssert.AreEqual(ImmutableList.Create("3", "4"), notifications[1].Current);
+            notifications[0].Index.Should().Be(0);
+            notifications[0].NewItems.Should().BeEmpty();
+            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notifications[0].OldItems.Should().Equal("1", "2");
+            notifications[1].Index.Should().Be(0);
+            notifications[1].OldItems.Should().BeEmpty();
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[1].NewItems.Should().Equal("3", "4");
+            notifications[1].Current.Should().Equal("3", "4");
         }
-        #endregion
 
-        #region Replace_in_projected_from_SortedSetChangedNotification_observable
-        [TestMethod]
+        [Fact]
         public async Task Replace_in_projected_from_SortedSetChangedNotification_observable()
         {
             var observable = new[]
@@ -324,23 +275,18 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(0, notifications[0].Index);
-            Assert.AreEqual(2, notifications[0].OldItems.Count);
-            Assert.AreEqual(0, notifications[0].NewItems.Count);
-            CollectionAssert.AreEqual(ImmutableList.Create("1", "2"), notifications[0].OldItems.ToArray());
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[0].Action);
-
-            Assert.AreEqual(0, notifications[1].Index);
-            Assert.AreEqual(0, notifications[1].OldItems.Count);
-            CollectionAssert.AreEqual(ImmutableList.Create("3", "4"), notifications[1].NewItems.ToArray());
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
-
-            CollectionAssert.AreEqual(ImmutableList.Create("3", "4"), notifications[1].Current);
+            notifications[0].Index.Should().Be(0);
+            notifications[0].OldItems.Should().Equal("1", "2");
+            notifications[0].NewItems.Should().BeEmpty();
+            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notifications[1].Index.Should().Be(0);
+            notifications[1].OldItems.Should().BeEmpty();
+            notifications[1].NewItems.Should().Equal("3", "4");
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[1].Current.Should().Equal("3", "4");
         }
-        #endregion
 
-        #region Replace_in_projected_dictionary
-        [TestMethod]
+        [Fact]
         public async Task Replace_in_projected_dictionary()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -362,18 +308,18 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[0].Action);
-
-            Assert.AreEqual(1, notifications[0].OldItems.Count);
-            Assert.AreEqual(1, notifications[1].NewItems.Count);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, string>("Key2", "2") }, notifications[0].OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, string>("Key2", "4") }, notifications[1].NewItems.ToArray());
-            CollectionAssert.AreEquivalent(new[] { new KeyValuePair<string, string>("Key1", "1"), new KeyValuePair<string, string>("Key2", "4"), new KeyValuePair<string, string>("Key3", "3") }, notifications[1].Current);
+            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notifications[0].OldItems.Should().Equal(new KeyValuePair<string, string>("Key2", "2"));
+            notifications[1].NewItems.Should().Equal(new KeyValuePair<string, string>("Key2", "4"));
+            notifications[1].Current.Should().Equal(new Dictionary<string, string>
+            {
+                { "Key1", "1" },
+                { "Key2", "4" },
+                { "Key3", "3" }
+            });
         }
-        #endregion
 
-        #region Add_to_filtered_list
-        [TestMethod]
+        [Fact]
         public async Task Add_to_filtered_list()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -393,17 +339,12 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(0, notification.Index);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-
-            Assert.AreEqual(1, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { 2 }, notification.NewItems.ToArray());
+            notification.Index.Should().Be(0);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.NewItems.Should().Equal(2);
         }
-        #endregion
 
-        #region Add_to_filtered_set
-        [TestMethod]
+        [Fact]
         public async Task Add_to_filtered_set()
         {
             var list = new SortedSetReactiveCollectionSource<int>();
@@ -423,17 +364,12 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(0, notification.Index);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-
-            Assert.AreEqual(1, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { 2 }, notification.NewItems.ToArray());
+            notification.Index.Should().Be(0);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.NewItems.Should().Equal(2);
         }
-        #endregion
 
-        #region Add_to_filtered_dictionary
-        [TestMethod]
+        [Fact]
         public async Task Add_to_filtered_dictionary()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -453,15 +389,11 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-
-            Assert.AreEqual(1, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notification.NewItems.ToArray());
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.NewItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
         }
-        #endregion
 
-        #region Remove_from_filtered_list
-        [TestMethod]
+        [Fact]
         public async Task Remove_from_filtered_list()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -480,18 +412,14 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(0, notification.Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-
-            Assert.AreEqual(1, notification.OldItems.Count);
-            Assert.AreEqual(0, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { 2 }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new int[0], notification.Current);
+            notification.Index.Should().Be(0);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notification.NewItems.Should().BeEmpty();
+            notification.OldItems.Should().Equal(2);
+            notification.Current.Should().BeEmpty();
         }
-        #endregion
 
-        #region Remove_from_filtered_set
-        [TestMethod]
+        [Fact]
         public async Task Remove_from_filtered_set()
         {
             var list = new SortedSetReactiveCollectionSource<int>();
@@ -512,18 +440,14 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(0, notification.Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-
-            Assert.AreEqual(1, notification.OldItems.Count);
-            Assert.AreEqual(0, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { 2 }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new int[0], notification.Current);
+            notification.Index.Should().Be(0);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notification.OldItems.Should().Equal(2);
+            notification.NewItems.Should().BeEmpty();
+            notification.Current.Should().BeEmpty();
         }
-        #endregion
 
-        #region Remove_from_filtered_dictionary
-        [TestMethod]
+        [Fact]
         public async Task Remove_from_filtered_dictionary()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -543,17 +467,13 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-
-            Assert.AreEqual(1, notification.OldItems.Count);
-            Assert.AreEqual(0, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new int[0], notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notification.NewItems.Should().BeEmpty();
+            notification.OldItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
+            notification.Current.Should().BeEmpty();
         }
-        #endregion
 
-        #region Replace_in_filtered_list_addition
-        [TestMethod]
+        [Fact]
         public async Task Replace_in_filtered_list_addition()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -571,19 +491,14 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(1, notification.Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-
-            Assert.AreEqual(0, notification.OldItems.Count);
-            Assert.AreEqual(1, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { 4 }, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new int[0], notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 2, 4 }, notification.Current);
+            notification.Index.Should().Be(1);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.OldItems.Should().BeEmpty();
+            notification.NewItems.Should().Equal(4);
+            notification.Current.Should().Equal(2, 4);
         }
-        #endregion
 
-        #region Replace_in_filtered_list_removal
-        [TestMethod]
+        [Fact]
         public async Task Replace_in_filtered_list_removal()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -601,17 +516,14 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(0, notification.Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-
-            CollectionAssert.AreEqual(new[] { 2 }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new int[0], notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new int[0], notification.Current);
+            notification.Index.Should().Be(0);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notification.OldItems.Should().Equal(2);
+            notification.NewItems.Should().BeEmpty();
+            notification.Current.Should().BeEmpty();
         }
-        #endregion
 
-        #region Replace_in_filtered_list_replacement
-        [TestMethod]
+        [Fact]
         public async Task Replace_in_filtered_list_replacement()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -629,17 +541,14 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(0, notification.Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Replace, notification.Action);
-
-            CollectionAssert.AreEqual(new[] { 2 }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 4 }, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 4 }, notification.Current);
+            notification.Index.Should().Be(0);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Replace);
+            notification.OldItems.Should().Equal(2);
+            notification.NewItems.Should().Equal(4);
+            notification.Current.Should().Equal(4);
         }
-        #endregion
 
-        #region Replace_in_filtered_list_replacement2
-        [TestMethod]
+        [Fact]
         public async Task Replace_in_filtered_list_replacement2()
         {
             var list = new ListReactiveCollectionSource<int>(new[] { 1 });
@@ -657,17 +566,14 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(0, notification.Index);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-
-            CollectionAssert.AreEqual(new int[0], notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 4 }, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 4 }, notification.Current);
+            notification.Index.Should().Be(0);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.OldItems.Should().BeEmpty();
+            notification.NewItems.Should().Equal(4);
+            notification.Current.Should().Equal(4);
         }
-        #endregion
 
-        #region Replace_in_filtered_dictionary_addition
-        [TestMethod]
+        [Fact]
         public async Task Replace_in_filtered_dictionary_addition()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -688,17 +594,17 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-
-            Assert.AreEqual(0, notification.OldItems.Count);
-            Assert.AreEqual(1, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 4) }, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2), new KeyValuePair<string, int>("Key1", 4) }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.OldItems.Should().BeEmpty();
+            notification.NewItems.Should().Equal(new KeyValuePair<string, int>("Key1", 4));
+            notification.Current.Should().Equal(new Dictionary<string, int>
+            {
+                { "Key2", 2 },
+                { "Key1", 4 }
+            });
         }
-        #endregion
 
-        #region Replace_in_filtered_dictionary_removal
-        [TestMethod]
+        [Fact]
         public async Task Replace_in_filtered_dictionary_removal()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -719,15 +625,12 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notification.OldItems.ToArray());
-            Assert.AreEqual(0, notification.NewItems.Count);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notification.OldItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
+            notification.NewItems.Should().BeEmpty();
         }
-        #endregion
 
-        #region Replace_in_filtered_dictionary_replacement
-        [TestMethod]
+        [Fact]
         public async Task Replace_in_filtered_dictionary_replacement()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -749,17 +652,17 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[0].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
-
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notifications[0].OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 4) }, notifications[1].NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 4) }, notifications[1].Current);
+            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[0].OldItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
+            notifications[1].NewItems.Should().Equal(new KeyValuePair<string, int>("Key2", 4));
+            notifications[1].Current.Should().Equal(new Dictionary<string, int>
+            {
+                { "Key2", 4 }
+            });
         }
-        #endregion
 
-        #region Replace_in_filtered_from_ListChangedNotification_observable
-        [TestMethod]
+        [Fact]
         public async Task Replace_in_filtered_from_ListChangedNotification_observable()
         {
             var observable = new[]
@@ -781,22 +684,18 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(0, notifications[0].Index);
-            Assert.AreEqual(0, notifications[0].NewItems.Count);
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[0].Action);
-            CollectionAssert.AreEqual(ImmutableList.Create(2), notifications[0].OldItems.ToArray());
-
-            Assert.AreEqual(0, notifications[1].Index);
-            Assert.AreEqual(0, notifications[1].OldItems.Count);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
-            CollectionAssert.AreEqual(ImmutableList.Create(4), notifications[1].NewItems.ToArray());
-
-            CollectionAssert.AreEqual(ImmutableList.Create(4), notifications[1].Current);
+            notifications[0].Index.Should().Be(0);
+            notifications[0].NewItems.Should().BeEmpty();
+            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notifications[0].OldItems.Should().Equal(2);
+            notifications[1].Index.Should().Be(0);
+            notifications[1].OldItems.Should().BeEmpty();
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[1].NewItems.Should().Equal(4);
+            notifications[1].Current.Should().Equal(4);
         }
-        #endregion
 
-        #region Add_to_sorted_list
-        [TestMethod]
+        [Fact]
         public async Task Add_to_sorted_list()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -816,16 +715,12 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-
-            Assert.AreEqual(1, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { 2 }, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.NewItems.Should().Equal(2);
+            notification.Current.Should().Equal(1, 2, 3);
         }
-        #endregion
 
-        #region Add_to_sorted_dictionary
-        [TestMethod]
+        [Fact]
         public async Task Add_to_sorted_dictionary()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -845,16 +740,12 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-
-            Assert.AreEqual(1, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2)  }, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key2", 2), new KeyValuePair<string, int>("Key3", 3) }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.NewItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
+            notification.Current.Should().Equal(new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key2", 2), new KeyValuePair<string, int>("Key3", 3));
         }
-        #endregion
 
-        #region Add_to_setSorted_dictionary
-        [TestMethod]
+        [Fact]
         public async Task Add_to_setSorted_dictionary()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -874,16 +765,12 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-
-            Assert.AreEqual(1, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key2", 2), new KeyValuePair<string, int>("Key3", 3) }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.NewItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
+            notification.Current.Should().Equal(new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key2", 2), new KeyValuePair<string, int>("Key3", 3));
         }
-        #endregion
 
-        #region Add_to_setSorted_dictionary_with_duplicate_value
-        [TestMethod]
+        [Fact]
         public async Task Add_to_setSorted_dictionary_with_duplicate_value()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -904,16 +791,12 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-
-            Assert.AreEqual(1, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key2", 2), new KeyValuePair<string, int>("Key3", 3) }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.NewItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
+            notification.Current.Should().Equal(new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key2", 2), new KeyValuePair<string, int>("Key3", 3));
         }
-        #endregion
 
-        #region Add_to_sorted_list_with_Changes
-        [TestMethod]
+        [Fact]
         public async Task Add_to_sorted_list_with_Changes()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -933,16 +816,12 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notification.Action);
-
-            Assert.AreEqual(1, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { 2 }, notification.NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.NewItems.Should().Equal(2);
+            notification.Current.Should().Equal(1, 2, 3);
         }
-        #endregion
 
-        #region Remove_from_sorted_list
-        [TestMethod]
+        [Fact]
         public async Task Remove_from_sorted_list()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -961,17 +840,13 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-
-            Assert.AreEqual(1, notification.OldItems.Count);
-            Assert.AreEqual(0, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { 2 }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 1, 3 }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notification.NewItems.Should().BeEmpty();
+            notification.OldItems.Should().Equal(2);
+            notification.Current.Should().Equal(1, 3);
         }
-        #endregion
 
-        #region Remove_in_sorted_dictionary
-        [TestMethod]
+        [Fact]
         public async Task Remove_in_sorted_dictionary()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -990,16 +865,13 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1) }, notification.OldItems.ToArray());
-            Assert.AreEqual(0, notification.Index);
-
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notification.OldItems.Should().Equal(new KeyValuePair<string, int>("Key1", 1));
+            notification.Index.Should().Be(0);
+            notification.Current.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
         }
-        #endregion
 
-        #region Remove_in_setSorted_dictionary
-        [TestMethod]
+        [Fact]
         public async Task Remove_in_setSorted_dictionary()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -1018,14 +890,12 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1) }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notification.OldItems.Should().Equal(new KeyValuePair<string, int>("Key1", 1));
+            notification.Current.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
         }
-        #endregion
 
-        #region Remove_from_sorted_list_with_Changes
-        [TestMethod]
+        [Fact]
         public async Task Remove_from_sorted_list_with_Changes()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -1044,17 +914,13 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notification = await notificationTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notification.Action);
-
-            Assert.AreEqual(1, notification.OldItems.Count);
-            Assert.AreEqual(0, notification.NewItems.Count);
-            CollectionAssert.AreEqual(new[] { 2 }, notification.OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 1, 3 }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notification.NewItems.Should().BeEmpty();
+            notification.OldItems.Should().Equal(2);
+            notification.Current.Should().Equal(1, 3);
         }
-        #endregion
 
-        #region Replace_in_sorted_list
-        [TestMethod]
+        [Fact]
         public async Task Replace_in_sorted_list()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -1074,19 +940,15 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[0].Action);
-            CollectionAssert.AreEqual(new[] { 2 }, notifications[0].OldItems.ToArray());
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
-            CollectionAssert.AreEqual(new[] { 4 }, notifications[1].NewItems.ToArray());
-
-            CollectionAssert.AreEqual(new[] { 1, 3 }, notifications[0].Current);
-            CollectionAssert.AreEqual(new[] { 1, 3, 4 }, notifications[1].Current);
+            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notifications[0].OldItems.Should().Equal(2);
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[1].NewItems.Should().Equal(4);
+            notifications[0].Current.Should().Equal(1, 3);
+            notifications[1].Current.Should().Equal(1, 3, 4);
         }
-        #endregion
 
-        #region Replace_in_sorted_list_with_Changes
-        [TestMethod]
+        [Fact]
         public async Task Replace_in_sorted_list_with_Changes()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -1106,19 +968,15 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[0].Action);
-            CollectionAssert.AreEqual(new[] { 2 }, notifications[0].OldItems.ToArray());
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
-            CollectionAssert.AreEqual(new[] { 4 }, notifications[1].NewItems.ToArray());
-
-            CollectionAssert.AreEqual(new[] { 1, 3 }, notifications[0].Current);
-            CollectionAssert.AreEqual(new[] { 1, 3, 4 }, notifications[1].Current);
+            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notifications[0].OldItems.Should().Equal(2);
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[1].NewItems.Should().Equal(4);
+            notifications[0].Current.Should().Equal(1, 3);
+            notifications[1].Current.Should().Equal(1, 3, 4);
         }
-        #endregion
 
-        #region Replace_in_sorted_from_ListChangedNotification_observable
-        [TestMethod]
+        [Fact]
         public async Task Replace_in_sorted_from_ListChangedNotification_observable()
         {
             var observable = new[]
@@ -1140,18 +998,15 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notifications[0].Action);
-
-            Assert.AreEqual(0, notifications[1].Index);
-            Assert.AreEqual(0, notifications[1].OldItems.Count);
-            CollectionAssert.AreEqual(new[] { 3, 4 }, notifications[1].NewItems.ToArray());
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
-            CollectionAssert.AreEqual(ImmutableList.Create(3, 4), notifications[1].Current);
+            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notifications[1].Index.Should().Be(0);
+            notifications[1].OldItems.Should().BeEmpty();
+            notifications[1].NewItems.Should().Equal(3, 4);
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[1].Current.Should().Equal(3, 4);
         }
-        #endregion
 
-        #region Replace_in_sorted_dictionary
-        [TestMethod]
+        [Fact]
         public async Task Replace_in_sorted_dictionary()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -1173,20 +1028,16 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[0].Action);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notifications[0].OldItems.ToArray());
-            Assert.AreEqual(1, notifications[0].Index);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 4) }, notifications[1].NewItems.ToArray());
-            Assert.AreEqual(2, notifications[1].Index);
-
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key3", 3), new KeyValuePair<string, int>("Key2", 4) }, notifications[1].Current);
+            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notifications[0].OldItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
+            notifications[0].Index.Should().Be(1);
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[1].NewItems.Should().Equal(new KeyValuePair<string, int>("Key2", 4));
+            notifications[1].Index.Should().Be(2);
+            notifications[1].Current.Should().Equal(new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key3", 3), new KeyValuePair<string, int>("Key2", 4));
         }
-        #endregion
 
-        #region Replace_in_setSorted_dictionary
-        [TestMethod]
+        [Fact]
         public async Task Replace_in_setSorted_dictionary()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
@@ -1208,22 +1059,18 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[0].Action);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 2) }, notifications[0].OldItems.ToArray());
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key2", 4) }, notifications[1].NewItems.ToArray());
-
-            CollectionAssert.AreEqual(new[] { new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key3", 3), new KeyValuePair<string, int>("Key2", 4) }, notifications[1].Current);
+            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notifications[0].OldItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[1].NewItems.Should().Equal(new KeyValuePair<string, int>("Key2", 4));
+            notifications[1].Current.Should().Equal(new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key3", 3), new KeyValuePair<string, int>("Key2", 4));
         }
-        #endregion
 
-        #region List_ToObservableCollection_Add
-        [TestMethod]
+        [Fact]
         public async Task List_ToObservableCollection_Add()
         {
             var list = new ListReactiveCollectionSource<int>();
-            var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
+            var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
             var eventsTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
@@ -1238,16 +1085,14 @@ namespace ExRam.ReactiveCollections.Tests
 
             var events = await eventsTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, events[0].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, events[1].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, events[2].Action);
-
-            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, (ICollection)observableCollection);
+            events.Should().HaveCount(3);
+            events[0].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            events[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            events[2].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            ((ICollection)observableCollection).Should().Equal(new[] { 1, 2, 3 });
         }
-        #endregion
 
-        #region List_ToObservableCollection_Add_multiple
-        [TestMethod]
+        [Fact]
         public void List_ToObservableCollection_Add_multiple()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -1258,20 +1103,18 @@ namespace ExRam.ReactiveCollections.Tests
                 .Subscribe())
             {
                 list.AddRange(new[] { 1, 2, 3 });
-                CollectionAssert.AreEqual(new[] { 1, 2, 3 }, (ICollection)observableCollection);
+                ((ICollection)observableCollection).Should().Equal(new[] { 1, 2, 3 });
 
                 list.InsertRange(2, new[] { 4, 5, 6 });
-                CollectionAssert.AreEqual(new[] { 1, 2, 4, 5, 6, 3 }, (ICollection)observableCollection);
+                ((ICollection)observableCollection).Should().Equal(new[] { 1, 2, 4, 5, 6, 3 });
             }
         }
-        #endregion
 
-        #region List_ToObservableCollection_Remove
-        [TestMethod]
+        [Fact]
         public async Task List_ToObservableCollection_Remove()
         {
             var list = new ListReactiveCollectionSource<int>();
-            var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
+            var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
             var eventsTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
@@ -1286,14 +1129,12 @@ namespace ExRam.ReactiveCollections.Tests
 
             var events = await eventsTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, events[0].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, events[1].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, events[2].Action);
+            events[0].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            events[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            events[2].Action.Should().Be(NotifyCollectionChangedAction.Remove);
         }
-        #endregion
 
-        #region List_ToObservableCollection_Remove_multiple
-        [TestMethod]
+        [Fact]
         public void List_ToObservableCollection_Remove_multiple()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -1306,17 +1147,15 @@ namespace ExRam.ReactiveCollections.Tests
                 list.AddRange(new[] { 1, 2, 3, 4, 5, 6, 7 });
                 list.RemoveRange(2, 3);
 
-                CollectionAssert.AreEqual(new[] { 1, 2, 6, 7 }, (ICollection)observableCollection);
+                ((ICollection)observableCollection).Should().Equal(new[] { 1, 2, 6, 7 });
             }
         }
-        #endregion
 
-        #region List_ToObservableCollection_Replace
-        [TestMethod]
+        [Fact]
         public async Task List_ToObservableCollection_Replace()
         {
             var list = new ListReactiveCollectionSource<int>();
-            var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
+            var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
             var eventsTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
@@ -1331,23 +1170,19 @@ namespace ExRam.ReactiveCollections.Tests
 
             var events = await eventsTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, events[0].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, events[1].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Replace, events[2].Action);
-
-            CollectionAssert.AreEqual(new[] { 1 }, events[2].OldItems);
-            CollectionAssert.AreEqual(new[] { 3 }, events[2].NewItems);
-
-            CollectionAssert.AreEqual(new[] { 3, 2 }, (ICollection)observableCollection);
+            events[0].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            events[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            events[2].Action.Should().Be(NotifyCollectionChangedAction.Replace);
+            events[2].OldItems.Should().Equal(1);
+            events[2].NewItems.Should().Equal(3);
+            ((ICollection)observableCollection).Should().Equal(3, 2);
         }
-        #endregion
 
-        #region List_ToObservableCollection_Clear
-        [TestMethod]
+        [Fact]
         public async Task List_ToObservableCollection_Clear()
         {
             var list = new ListReactiveCollectionSource<int>();
-            var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
+            var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
             var eventTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
@@ -1361,18 +1196,16 @@ namespace ExRam.ReactiveCollections.Tests
 
             var ev = await eventTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, ev.Action);
-            CollectionAssert.AreEqual(new[] { 1, 2 }, (ICollection)observableCollection);
+            ev.Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            ((ICollection)observableCollection).Should().Equal(1, 2);
         }
-        #endregion
 
-        #region List_ToObservableCollection_does_not_raise_events_on_event_subscription
-        [TestMethod]
+        [Fact]
         public async Task List_ToObservableCollection_does_not_raise_events_on_event_subscription()
         {
             var list = new ListReactiveCollectionSource<int> {1, 2, 3};
 
-            var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
+            var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
             var eventsTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
@@ -1380,23 +1213,21 @@ namespace ExRam.ReactiveCollections.Tests
                 .FirstAsync()
                 .ToTask();
 
-            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, (ICollection)observableCollection);
+            ((ICollection)observableCollection).ShouldBeEquivalentTo(new[] { 1, 2, 3 });
             list.Add(4);
 
             var ev = await eventsTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, ev.Action);
-            CollectionAssert.AreEqual(new[] { 4 }, ev.NewItems);
-            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4 }, (ICollection)observableCollection);
+            ev.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            ev.NewItems.Should().Equal(4);
+            ((ICollection)observableCollection).Should().Equal(1, 2, 3, 4);
         }
-        #endregion
 
-        #region SortedSet_ToObservableCollection_Add
-        [TestMethod]
+        [Fact]
         public async Task SortedSet_ToObservableCollection_Add()
         {
             var list = new SortedSetReactiveCollectionSource<int>();
-            var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
+            var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
             var eventsTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
@@ -1411,16 +1242,13 @@ namespace ExRam.ReactiveCollections.Tests
 
             var events = await eventsTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, events[0].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, events[1].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, events[2].Action);
-
-            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, (ICollection)observableCollection);
+            events[0].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            events[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            events[2].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            ((ICollection)observableCollection).Should().Equal(1, 2, 3);
         }
-        #endregion
 
-        #region SortedSet_ToObservableCollection_Add_multiple
-        [TestMethod]
+        [Fact]
         public void SortedSet_ToObservableCollection_Add_multiple()
         {
             var list = new SortedSetReactiveCollectionSource<int>();
@@ -1431,20 +1259,18 @@ namespace ExRam.ReactiveCollections.Tests
                 .Subscribe())
             {
                 list.AddRange(new[] { 2, 4, 6 });
-                CollectionAssert.AreEqual(new[] { 2, 4, 6 }, (ICollection)observableCollection);
+                ((ICollection)observableCollection).Should().Equal(2, 4, 6);
 
                 list.AddRange(new[] { 1, 3, 5 });
-                CollectionAssert.AreEqual(new[] { 1, 2, 3, 4, 5, 6 }, (ICollection)observableCollection);
+                ((ICollection)observableCollection).Should().Equal(1, 2, 3, 4, 5, 6);
             }
         }
-        #endregion
 
-        #region SortedSet_ToObservableCollection_Remove
-        [TestMethod]
+        [Fact]
         public async Task SortedSet_ToObservableCollection_Remove()
         {
             var list = new SortedSetReactiveCollectionSource<int>();
-            var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
+            var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
             var eventsTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
@@ -1459,14 +1285,12 @@ namespace ExRam.ReactiveCollections.Tests
 
             var events = await eventsTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, events[0].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, events[1].Action);
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, events[2].Action);
+            events[0].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            events[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            events[2].Action.Should().Be(NotifyCollectionChangedAction.Remove);
         }
-        #endregion
 
-        #region SortedSet_ToObservableCollection_Remove_multiple
-        [TestMethod]
+        [Fact]
         public void SortedSet_ToObservableCollection_Remove_multiple()
         {
             var list = new SortedSetReactiveCollectionSource<int>();
@@ -1481,17 +1305,15 @@ namespace ExRam.ReactiveCollections.Tests
                 list.Remove(4);
                 list.Remove(5);
 
-                CollectionAssert.AreEqual(new[] { 1, 2, 6, 7 }, (ICollection)observableCollection);
+                observableCollection.Should().Equal(1, 2, 6, 7);
             }
         }
-        #endregion
 
-        #region SortedSet_ToObservableCollection_Clear
-        [TestMethod]
+        [Fact]
         public async Task SortedSet_ToObservableCollection_Clear()
         {
             var list = new ListReactiveCollectionSource<int>();
-            var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
+            var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
             var eventTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
@@ -1505,18 +1327,16 @@ namespace ExRam.ReactiveCollections.Tests
 
             var ev = await eventTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, ev.Action);
-            CollectionAssert.AreEqual(new[] { 1, 2 }, (ICollection)observableCollection);
+            ev.Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            ((ICollection)observableCollection).Should().Equal(new[] { 1, 2 });
         }
-        #endregion
 
-        #region SortedSet_ToObservableCollection_does_not_raise_events_on_event_subscription
-        [TestMethod]
+        [Fact]
         public async Task SortedSet_ToObservableCollection_does_not_raise_events_on_event_subscription()
         {
             var list = new ListReactiveCollectionSource<int> { 1, 2, 3 };
 
-            var observableCollection = ((INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection());
+            var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
             var eventsTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
@@ -1524,19 +1344,17 @@ namespace ExRam.ReactiveCollections.Tests
                 .FirstAsync()
                 .ToTask();
 
-            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, (ICollection)observableCollection);
+            ((ICollection)observableCollection).Should().Equal(1, 2, 3);
             list.Add(4);
 
             var ev = await eventsTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, ev.Action);
-            CollectionAssert.AreEqual(new[] { 4 }, ev.NewItems);
-            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4 }, (ICollection)observableCollection);
+            ev.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            ev.NewItems.Should().Equal(4);
+            ((ICollection)observableCollection).Should().Equal(1, 2, 3, 4);
         }
-        #endregion
 
-        #region GetValueObservable_Test1
-        [TestMethod]
+        [Fact]
         public async Task GetValueObservable_Test1()
         {
             var dict = new DictionaryReactiveCollectionSource<int, int>();
@@ -1554,12 +1372,10 @@ namespace ExRam.ReactiveCollections.Tests
             dict.Add(1, 2);
             dict[1] = 3;
 
-            CollectionAssert.AreEqual(new[] { 1, 1, 2, 3 }, await arrayTask);
+            (await arrayTask).Should().Equal(1, 1, 2, 3);
         }
-        #endregion
 
-        #region Concat_Add
-        [TestMethod]
+        [Fact]
         public async Task Concat_Add()
         {
             var source1 = new ListReactiveCollectionSource<int>();
@@ -1577,23 +1393,18 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(3, notifications.Length);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notifications[0].Action);
-            Assert.AreEqual(0, notifications[0].Current.Count);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[1].Action);
-            Assert.AreEqual(0, notifications[1].Index);
-            CollectionAssert.AreEqual(new[] { 1 }, notifications[1].Current);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, notifications[2].Action);
-            Assert.AreEqual(1, notifications[2].Index);
-            CollectionAssert.AreEqual(new[] { 1, 2 }, notifications[2].Current);
+            notifications.Should().HaveCount(3);
+            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notifications[0].Current.Should().BeEmpty();
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[1].Index.Should().Be(0);
+            notifications[1].Current.Should().Equal(1);
+            notifications[2].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[2].Index.Should().Be(1);
+            notifications[2].Current.Should().Equal(1, 2);
         }
-        #endregion
 
-        #region Concat_Remove
-        [TestMethod]
+        [Fact]
         public async Task Concat_Remove()
         {
             var source1 = new ListReactiveCollectionSource<int>();
@@ -1614,22 +1425,17 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(3, notifications.Length);
-
-            CollectionAssert.AreEqual(new[] { 1, 2 }, notifications[0].Current);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[1].Action);
-            Assert.AreEqual(0, notifications[1].Index);
-            CollectionAssert.AreEqual(new[] { 2 }, notifications[1].Current);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[2].Action);
-            Assert.AreEqual(0, notifications[2].Index);
-            Assert.AreEqual(0, notifications[2].Current.Count);
+            notifications.Should().HaveCount(3);
+            notifications[0].Current.Should().Equal(1, 2);
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notifications[1].Index.Should().Be(0);
+            notifications[1].Current.Should().Equal(2);
+            notifications[2].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notifications[2].Index.Should().Be(0);
+            notifications[2].Current.Should().BeEmpty();
         }
-        #endregion
 
-        #region Concat_Clear
-        [TestMethod]
+        [Fact]
         public async Task Concat_Clear()
         {
             var source1 = new ListReactiveCollectionSource<int>();
@@ -1650,24 +1456,19 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(3, notifications.Length);
-
-            CollectionAssert.AreEqual(new[] { 1, 2 }, notifications[0].Current);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[1].Action);
-            Assert.AreEqual(0, notifications[1].Index);
-            CollectionAssert.AreEqual(new[] { 1 }, notifications[1].OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 2 }, notifications[1].Current);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, notifications[2].Action);
-            Assert.AreEqual(0, notifications[2].Index);
-            CollectionAssert.AreEqual(new[] { 2 }, notifications[2].OldItems.ToArray());
-            Assert.AreEqual(0, notifications[2].Current.Count);
+            notifications.Should().HaveCount(3);
+            notifications[0].Current.Should().Equal(1, 2);
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notifications[1].Index.Should().Be(0);
+            notifications[1].OldItems.Should().Equal(1);
+            notifications[1].Current.Should().Equal(2);
+            notifications[2].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notifications[2].Index.Should().Be(0);
+            notifications[2].OldItems.Should().Equal(2);
+            notifications[2].Current.Should().BeEmpty();
         }
-        #endregion
 
-        #region Concat_Replace_single
-        [TestMethod]
+        [Fact]
         public async Task Concat_Replace_single()
         {
             var source1 = new ListReactiveCollectionSource<int>();
@@ -1688,26 +1489,21 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(3, notifications.Length);
-
-            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4, 5, 6 }, notifications[0].Current);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Replace, notifications[1].Action);
-            Assert.AreEqual(1, notifications[1].Index);
-            CollectionAssert.AreEqual(new[] { 2 }, notifications[1].OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { -2 }, notifications[1].NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 1, -2, 3, 4, 5, 6 }, notifications[1].Current);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Replace, notifications[2].Action);
-            Assert.AreEqual(4, notifications[2].Index);
-            CollectionAssert.AreEqual(new[] { 5 }, notifications[2].OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { -5 }, notifications[2].NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 1, -2, 3, 4, -5, 6 }, notifications[2].Current);
+            notifications.Should().HaveCount(3);
+            notifications[0].Current.Should().Equal(1, 2, 3, 4, 5, 6);
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Replace);
+            notifications[1].Index.Should().Be(1);
+            notifications[1].OldItems.Should().Equal(2);
+            notifications[1].NewItems.Should().Equal(-2);
+            notifications[1].Current.Should().Equal(1, -2, 3, 4, 5, 6);
+            notifications[2].Action.Should().Be(NotifyCollectionChangedAction.Replace);
+            notifications[2].Index.Should().Be(4);
+            notifications[2].OldItems.Should().Equal(5);
+            notifications[2].NewItems.Should().Equal(-5);
+            notifications[2].Current.Should().Equal(1, -2, 3, 4, -5, 6);
         }
-        #endregion
 
-        #region Concat_Replace_multiple
-        [TestMethod]
+        [Fact]
         public async Task Concat_Replace_multiple()
         {
             var changesSubject1 = new Subject<ListChangedNotification<int>>();
@@ -1735,26 +1531,22 @@ namespace ExRam.ReactiveCollections.Tests
 
             var notifications = await notificationsTask;
 
-            Assert.AreEqual(3, notifications.Length);
+            notifications.Should().HaveCount(3);
+            notifications[0].Current.Should().Equal(1, 2, 3, 4, 5, 6);
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Replace);
+            notifications[1].Index.Should().Be(1);
+            notifications[1].OldItems.Should().Equal(2, 3);
+            notifications[1].NewItems.Should().Equal(-2, -3);
+            notifications[1].Current.Should().Equal(1, -2, -3, 4, 5, 6);
 
-            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4, 5, 6 }, notifications[0].Current);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Replace, notifications[1].Action);
-            Assert.AreEqual(1, notifications[1].Index);
-            CollectionAssert.AreEqual(new[] { 2, 3 }, notifications[1].OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { -2, -3 }, notifications[1].NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 1, -2, -3, 4, 5, 6 }, notifications[1].Current);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Replace, notifications[2].Action);
-            Assert.AreEqual(4, notifications[2].Index);
-            CollectionAssert.AreEqual(new[] { 5, 6 }, notifications[2].OldItems.ToArray());
-            CollectionAssert.AreEqual(new[] { -5, -6 }, notifications[2].NewItems.ToArray());
-            CollectionAssert.AreEqual(new[] { 1, -2, -3, 4, -5, -6 }, notifications[2].Current);
+            notifications[2].Action.Should().Be(NotifyCollectionChangedAction.Replace);
+            notifications[2].Index.Should().Be(4);
+            notifications[2].OldItems.Should().Equal(5, 6);
+            notifications[2].NewItems.Should().Equal(-5, -6);
+            notifications[2].Current.Should().Equal(1, -2, -3, 4, -5, -6);
         }
-        #endregion
 
-        #region Concat_Delayed
-        [TestMethod]
+        [Fact]
         public async Task Concat_Add_Delayed()
         {
             var source1 = new ListReactiveCollectionSource<int>();
@@ -1769,13 +1561,11 @@ namespace ExRam.ReactiveCollections.Tests
                 .FirstAsync()
                 .ToTask();
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notification.Action);
-            CollectionAssert.AreEqual(new[] { 1, 2 }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notification.Current.Should().Equal(1, 2);
         }
-        #endregion
 
-        #region Concat_Delayed2
-        [TestMethod]
+        [Fact]
         public async Task Concat_Add_Delayed2()
         {
             var sources = Enumerable
@@ -1793,13 +1583,11 @@ namespace ExRam.ReactiveCollections.Tests
                 .FirstAsync()
                 .ToTask();
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, notification.Action);
-            CollectionAssert.AreEqual(new[] { 0, 1, 2, 3, 4, 5, 6 }, notification.Current);
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            notification.Current.Should().Equal(0, 1, 2, 3, 4, 5, 6);
         }
-        #endregion
 
-        #region Select_after_Where_squashes_both_operators
-        [TestMethod]
+        [Fact]
         public void Select_after_Where_squashes_both_operators()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -1809,16 +1597,14 @@ namespace ExRam.ReactiveCollections.Tests
                 .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
             var transformed = projectedList as ListTransformationReactiveCollection<int, string>;
-            Assert.IsNotNull(transformed);
 
-            Assert.AreSame(transformed.Source, list.ReactiveCollection);
-            Assert.IsNotNull(transformed.Selector);
-            Assert.IsNotNull(transformed.Filter);
+            transformed.Should().NotBeNull();
+            transformed.Source.Should().BeSameAs(list.ReactiveCollection);
+            transformed.Selector.Should().NotBeNull();
+            transformed.Filter.Should().NotBeNull();
         }
-        #endregion
 
-        #region Where_after_Where_squashes_both_operators
-        [TestMethod]
+        [Fact]
         public void Where_after_Where_squashes_both_operators()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -1828,21 +1614,18 @@ namespace ExRam.ReactiveCollections.Tests
                 .Where(x => x % 3 == 0);
 
             var transformed = projectedList as ListTransformationReactiveCollection<int, int>;
-            Assert.IsNotNull(transformed);
 
-            Assert.AreSame(transformed.Source, list.ReactiveCollection);
-            Assert.IsNull(transformed.Selector);
-            Assert.IsNotNull(transformed.Filter);
-
-            Assert.IsFalse(transformed.Filter(2));
-            Assert.IsFalse(transformed.Filter(3));
-            Assert.IsFalse(transformed.Filter(4));
-            Assert.IsTrue(transformed.Filter(6));
+            transformed.Should().NotBeNull();
+            transformed.Source.Should().BeSameAs(list.ReactiveCollection);
+            transformed.Selector.Should().BeNull();
+            transformed.Filter.Should().NotBeNull();
+            transformed.Filter(2).Should().BeFalse();
+            transformed.Filter(3).Should().BeFalse();
+            transformed.Filter(4).Should().BeFalse();
+            transformed.Filter(6).Should().BeTrue();
         }
-        #endregion
 
-        #region Select_after_Select_squashes_both_operators
-        [TestMethod]
+        [Fact]
         public void Select_after_Select_squashes_both_operators()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -1852,16 +1635,14 @@ namespace ExRam.ReactiveCollections.Tests
                 .Select(int.Parse);
 
             var transformed = projectedList as ListTransformationReactiveCollection<int, int>;
-            Assert.IsNotNull(transformed);
 
-            Assert.AreSame(transformed.Source, list.ReactiveCollection);
-            Assert.IsNotNull(transformed.Selector);
-            Assert.IsNull(transformed.Filter);
+            transformed.Should().NotBeNull();
+            transformed.Source.Should().BeSameAs(list.ReactiveCollection);
+            transformed.Selector.Should().NotBeNull();
+            transformed.Filter.Should().BeNull();
         }
-        #endregion
 
-        #region Select_after_Where_behaves_correctly
-        [TestMethod]
+        [Fact]
         public async Task Select_after_Where_behaves_correctly()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -1884,28 +1665,22 @@ namespace ExRam.ReactiveCollections.Tests
 
             var changes = await changesTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, changes[0].Action);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, changes[1].Action);
-            CollectionAssert.AreEqual(new[] { "2" }, changes[1].Current);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, changes[2].Action);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, changes[3].Action);
-            CollectionAssert.AreEqual(new[] { "4" }, changes[3].Current);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, changes[4].Action);
-            CollectionAssert.AreEqual(new[] { "4", "2" }, changes[4].Current);
-            Assert.AreEqual(1, changes[4].Index);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, changes[5].Action);
-            Assert.AreEqual(1, changes[5].Index);
-            CollectionAssert.AreEqual(new[] { "4" }, changes[5].Current);
+            changes[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            changes[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            changes[1].Current.Should().Equal("2");
+            changes[2].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            changes[3].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            changes[3].Current.Should().Equal("4");
+            changes[4].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            changes[4].Current.Should().Equal("4", "2");
+            changes[4].Index.Should().Be(1);
+            changes[5].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            changes[5].Index.Should().Be(1);
+            changes[5].Index.Should().Be(1);
+            changes[5].Current.Should().Equal("4");
         }
-        #endregion
 
-        #region Where_after_Where_behaves_correctly
-        [TestMethod]
+        [Fact]
         public async Task Where_after_Where_behaves_correctly()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -1929,18 +1704,14 @@ namespace ExRam.ReactiveCollections.Tests
 
             var changes = await changesTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, changes[0].Action);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, changes[1].Action);
-            CollectionAssert.AreEqual(new[] { 6 }, changes[1].Current);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, changes[2].Action);
-            Assert.IsTrue(changes[2].Current.IsEmpty);
+            changes[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            changes[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            changes[1].Current.Should().Equal(6);
+            changes[2].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            changes[2].Current.Should().BeEmpty();
         }
-        #endregion
         
-        #region Select_after_Where_on_dictionaries_squashes_both_operators
-        [TestMethod]
+        [Fact]
         public void Select_after_Where_on_dictionaries_squashes_both_operators()
         {
             var list = new DictionaryReactiveCollectionSource<int, int>();
@@ -1950,16 +1721,14 @@ namespace ExRam.ReactiveCollections.Tests
                 .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
             var transformed = projectedList as DictionaryTransformationReactiveCollection<int, int, string>;
-            Assert.IsNotNull(transformed);
 
-            Assert.AreSame(transformed.Source, list.ReactiveCollection);
-            Assert.IsNotNull(transformed.Selector);
-            Assert.IsNotNull(transformed.Filter);
+            transformed.Should().NotBeNull();
+            transformed.Source.Should().BeSameAs(list.ReactiveCollection);
+            transformed.Selector.Should().NotBeNull();
+            transformed.Filter.Should().NotBeNull();
         }
-        #endregion
 
-        #region Where_after_Where_on_dictionaries_squashes_both_operators
-        [TestMethod]
+        [Fact]
         public void Where_after_Where_on_dictionaries_squashes_both_operators()
         {
             var list = new DictionaryReactiveCollectionSource<int, int>();
@@ -1969,16 +1738,14 @@ namespace ExRam.ReactiveCollections.Tests
                 .Where(x => x % 3 == 0);
 
             var transformed = projectedList as DictionaryTransformationReactiveCollection<int, int, int>;
-            Assert.IsNotNull(transformed);
 
-            Assert.AreSame(transformed.Source, list.ReactiveCollection);
-            Assert.IsNull(transformed.Selector);
-            Assert.IsNotNull(transformed.Filter);
+            transformed.Should().NotBeNull();
+            transformed.Source.Should().BeSameAs(list.ReactiveCollection);
+            transformed.Selector.Should().BeNull();
+            transformed.Filter.Should().NotBeNull();
         }
-        #endregion
 
-        #region Select_after_Select_on_dictionaries_squashes_both_operators
-        [TestMethod]
+        [Fact]
         public void Select_after_Select_on_dictionaries_squashes_both_operators()
         {
             var list = new DictionaryReactiveCollectionSource<int, int>();
@@ -1988,16 +1755,14 @@ namespace ExRam.ReactiveCollections.Tests
                 .Select(int.Parse);
 
             var transformed = projectedList as DictionaryTransformationReactiveCollection<int, int, int>;
-            Assert.IsNotNull(transformed);
 
-            Assert.AreSame(transformed.Source, list.ReactiveCollection);
-            Assert.IsNotNull(transformed.Selector);
-            Assert.IsNull(transformed.Filter);
+            transformed.Should().NotBeNull();
+            transformed.Source.Should().BeSameAs(list.ReactiveCollection);
+            transformed.Selector.Should().NotBeNull();
+            transformed.Filter.Should().BeNull();
         }
-        #endregion
 
-        #region Select_after_Where_on_dictionaries_behaves_correctly
-        [TestMethod]
+        [Fact]
         public async Task Select_after_Where_on_dictionaries_behaves_correctly()
         {
             var list = new DictionaryReactiveCollectionSource<int, int>();
@@ -2019,26 +1784,20 @@ namespace ExRam.ReactiveCollections.Tests
 
             var changes = await changesTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, changes[0].Action);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, changes[1].Action);
-            Assert.AreEqual(1, changes[1].Current.Count);
-            Assert.AreEqual("36", changes[1].Current[1]);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, changes[2].Action);
-            Assert.AreEqual(0, changes[2].Current.Count);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, changes[3].Action);
-            Assert.AreEqual(1, changes[3].Current.Count);
-            Assert.AreEqual("38", changes[3].Current[4]);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, changes[4].Action);
-            Assert.AreEqual(0, changes[4].Current.Count);
+            changes[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            changes[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            changes[1].Current.Should().HaveCount(1);
+            changes[1].Current[1].Should().Be("36");
+            changes[2].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            changes[2].Current.Should().BeEmpty();
+            changes[3].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            changes[3].Current.Should().HaveCount(1);
+            changes[3].Current[4].Should().Be("38");
+            changes[4].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            changes[4].Current.Should().BeEmpty();
         }
-        #endregion
 
-        #region Select_after_Select_on_dictionaries_behaves_correctly
-        [TestMethod]
+        [Fact]
         public async Task Select_after_Select_on_dictionaries_behaves_correctly()
         {
             var list = new DictionaryReactiveCollectionSource<int, int>();
@@ -2059,32 +1818,25 @@ namespace ExRam.ReactiveCollections.Tests
 
             var changes = await changesTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, changes[0].Action);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, changes[1].Action);
-            Assert.AreEqual(1, changes[1].Current.Count);
-            Assert.AreEqual("36!", changes[1].Current[1]);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, changes[2].Action);
-            Assert.AreEqual(2, changes[2].Current.Count);
-            Assert.AreEqual("36!", changes[2].Current[1]);
-            Assert.AreEqual("37!", changes[2].Current[2]);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, changes[3].Action);
-            Assert.AreEqual(1, changes[3].Current.Count);
-            Assert.AreEqual("36!", changes[3].Current[1]);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, changes[4].Action);
-            Assert.AreEqual(0, changes[4].Current.Count);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, changes[5].Action);
-            Assert.AreEqual(1, changes[5].Current.Count);
-            Assert.AreEqual("38!", changes[5].Current[4]);
+            changes[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            changes[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            changes[1].Current.Should().HaveCount(1);
+            changes[1].Current.Should().Contain(1, "36!");
+            changes[2].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            changes[2].Current.Should().HaveCount(2);
+            changes[2].Current.Should().Contain(1, "36!");
+            changes[2].Current.Should().Contain(2, "37!");
+            changes[3].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            changes[3].Current.Should().HaveCount(1);
+            changes[3].Current.Should().Contain(1, "36!");
+            changes[4].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            changes[4].Current.Should().BeEmpty();
+            changes[5].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            changes[5].Current.Should().HaveCount(1);
+            changes[5].Current.Should().Contain(4, "38!");
         }
-        #endregion
 
-        #region Where_after_Where_on_dictionaries_behaves_correctly
-        [TestMethod]
+        [Fact]
         public async Task Where_after_Where_on_dictionaries_behaves_correctly()
         {
             var list = new DictionaryReactiveCollectionSource<int, int>();
@@ -2108,19 +1860,16 @@ namespace ExRam.ReactiveCollections.Tests
 
             var changes = await changesTask;
 
-            Assert.AreEqual(NotifyCollectionChangedAction.Reset, changes[0].Action);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Add, changes[1].Action);
-            Assert.AreEqual(1, changes[1].Current.Count);
-            Assert.AreEqual(6, changes[1].Current[4]);
-
-            Assert.AreEqual(NotifyCollectionChangedAction.Remove, changes[2].Action);
-            Assert.IsTrue(changes[2].Current.IsEmpty);
+            changes[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
+            changes[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            changes[1].Current.Should()
+                .HaveCount(1).And
+                .Contain(4, 6);
+            changes[2].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            changes[2].Current.Should().BeEmpty();
         }
-        #endregion
 
-        #region Sort_after_Where_squashes_both_operators
-        [TestMethod]
+        [Fact]
         public void Sort_after_Where_squashes_both_operators()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -2130,16 +1879,14 @@ namespace ExRam.ReactiveCollections.Tests
                 .Sort();
 
             var transformed = projectedList as SortedListTransformationReactiveCollection<int, int>;
-            Assert.IsNotNull(transformed);
 
-            Assert.AreSame(transformed.Source, list.ReactiveCollection);
-            Assert.IsNull(transformed.Selector);
-            Assert.IsNotNull(transformed.Filter);
+            transformed.Should().NotBeNull();
+            transformed.Source.Should().BeSameAs(list.ReactiveCollection);
+            transformed.Selector.Should().BeNull();
+            transformed.Filter.Should().NotBeNull();
         }
-        #endregion
 
-        #region SortSet_after_Where_squashes_both_operators
-        [TestMethod]
+        [Fact]
         public void SortSet_after_Where_squashes_both_operators()
         {
             var list = new ListReactiveCollectionSource<int>();
@@ -2149,16 +1896,14 @@ namespace ExRam.ReactiveCollections.Tests
                 .SortSet();
 
             var transformed = projectedList as SortedSetTransformationReactiveCollection<int, int>;
-            Assert.IsNotNull(transformed);
 
-            Assert.AreSame(transformed.Source, list.ReactiveCollection);
-            Assert.IsNull(transformed.Selector);
-            Assert.IsNotNull(transformed.Filter);
+            transformed.Should().NotBeNull();
+            transformed.Source.Should().BeSameAs(list.ReactiveCollection);
+            transformed.Selector.Should().BeNull();
+            transformed.Filter.Should().NotBeNull();
         }
-        #endregion
 
-        #region Select_after_SortSet_preserves_order
-        [TestMethod]
+        [Fact]
         public async Task Select_after_SortSet_preserves_order()
         {
             var list = new DictionaryReactiveCollectionSource<int, int>();
@@ -2176,10 +1921,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(4, 34);
             list.Add(0, 37);
 
-            var lastList = (await lastTask).Current;
-
-            CollectionAssert.AreEqual(new[] { "34", "35", "36", "37" }, lastList);
+            (await lastTask).Current.Should().Equal("34", "35", "36", "37");
         }
-        #endregion
     }
 }
