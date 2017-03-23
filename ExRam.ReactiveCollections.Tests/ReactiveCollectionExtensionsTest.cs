@@ -949,6 +949,66 @@ namespace ExRam.ReactiveCollections.Tests
         }
 
         [Fact]
+        public async Task Replace_in_setSorted_projected_list()
+        {
+            var list = new ListReactiveCollectionSource<int>();
+
+            var projectedList = list
+                .ReactiveCollection
+                .Select(x => x.ToString())
+                .SortSet();
+
+            var notificationsTask = projectedList.Changes
+                .Skip(4)
+                .Take(2)
+                .ToArray()
+                .ToTask();
+
+            list.AddRange(new[] { 3, 2, 1 });
+            list.Replace(2, 4);
+
+            var notifications = await notificationsTask;
+
+            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notifications[0].OldItems.Should().Equal("2");
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[1].NewItems.Should().Equal("4");
+            notifications[0].Current.Should().Equal("1", "3");
+            notifications[1].Current.Should().Equal("1", "3", "4");
+        }
+
+        [Fact]
+        public async Task Replace_in_setSorted_projected_dictionary()
+        {
+            var list = new DictionaryReactiveCollectionSource<int, int>();
+
+            var projectedList = list
+                .ReactiveCollection
+                .Select(x => x.Value.ToString())
+                .SortSet();
+
+            var notificationsTask = projectedList.Changes
+                .Skip(4)
+                .Take(2)
+                .ToArray()
+                .ToTask();
+
+            list.Add(3, 30);
+            list.Add(2, 20);
+            list.Add(1, 10);
+            list[2] = 40;
+
+            var notifications = await notificationsTask;
+
+            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            notifications[0].OldItems.Should().Equal("20");
+            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notifications[1].NewItems.Should().Equal("40");
+            notifications[0].Current.Should().Equal("10", "30");
+            notifications[1].Current.Should().Equal("10", "30", "40");
+        }
+
+        [Fact]
         public async Task Replace_in_sorted_list_with_Changes()
         {
             var list = new ListReactiveCollectionSource<int>();

@@ -30,7 +30,7 @@ namespace ExRam.ReactiveCollections
                 .Defer(() =>
                 {
                     var syncRoot = new object();
-                    var isList = collection is IList<TResult>;
+                    var isList = collection is IList<TResult> && !(collection is ISet<TResult>);
                     var canInsertAndRemoveRangesAtIndex = collection is ICanHandleIndexedRanges<TResult>;
 
                     return Observable
