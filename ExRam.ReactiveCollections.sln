@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ExRam.ReactiveCollections", "ExRam.ReactiveCollections\ExRam.ReactiveCollections.xproj", "{3F19ADDB-95AD-4909-8F10-5091BB439B3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExRam.ReactiveCollections", "ExRam.ReactiveCollections\ExRam.ReactiveCollections.csproj", "{3F19ADDB-95AD-4909-8F10-5091BB439B3F}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ExRam.ReactiveCollections.Tests", "ExRam.ReactiveCollections.Tests\ExRam.ReactiveCollections.Tests.xproj", "{120FA4A5-E564-4C09-B838-2BC1D82D7376}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExRam.ReactiveCollections.Tests", "ExRam.ReactiveCollections.Tests\ExRam.ReactiveCollections.Tests.csproj", "{120FA4A5-E564-4C09-B838-2BC1D82D7376}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +24,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {97E88564-C146-482E-A190-EB365086B284}
 	EndGlobalSection
 EndGlobal
