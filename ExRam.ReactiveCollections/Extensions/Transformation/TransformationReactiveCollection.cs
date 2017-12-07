@@ -53,7 +53,7 @@ namespace ExRam.ReactiveCollections
                                                 
                                                     var selectedItems = filteredItems.Select(localSelector);
 
-                                                    if ((filter == null) && listNotification?.Index != null && canInsertAndRemoveRangesAtIndex)
+                                                    if (filter == null && listNotification?.Index != null && canInsertAndRemoveRangesAtIndex)
                                                         ((ICanHandleIndexedRanges<TResult>)collection).InsertRange(listNotification.Index.Value, selectedItems);
                                                     else
                                                         collection.AddRange(selectedItems);
@@ -65,7 +65,7 @@ namespace ExRam.ReactiveCollections
                                                 #region Remove
                                                 case NotifyCollectionChangedAction.Remove:
                                                 {
-                                                    if ((filter == null) && (listNotification?.Index != null) && canInsertAndRemoveRangesAtIndex)
+                                                    if (filter == null && listNotification?.Index != null && canInsertAndRemoveRangesAtIndex)
                                                         ((ICanHandleIndexedRanges<TResult>)collection).RemoveRange(listNotification.Index.Value, notification.OldItems.Count);
                                                     else
                                                     {
@@ -83,7 +83,7 @@ namespace ExRam.ReactiveCollections
                                                 #region Replace
                                                 case NotifyCollectionChangedAction.Replace:
                                                 {
-                                                    if ((notification.OldItems.Count == 1) && (notification.NewItems.Count == 1))
+                                                    if (notification.OldItems.Count == 1 && notification.NewItems.Count == 1)
                                                     {
                                                         var wasIn = filter?.Invoke(notification.OldItems[0]) ?? true;
                                                         var getsIn = filter?.Invoke(notification.NewItems[0]) ?? true;
@@ -92,14 +92,13 @@ namespace ExRam.ReactiveCollections
                                                         {
                                                             var newItem = localSelector(notification.NewItems[0]);
                                                         
-                                                            if ((filter == null) && (listNotification?.Index != null) && isList)
+                                                            if (filter == null && listNotification?.Index != null && isList)
                                                                 ((IList<TResult>)collection)[listNotification.Index.Value] = newItem;
                                                             else
                                                             {
                                                                 var oldItem = localSelector(notification.OldItems[0]);
 
-                                                                var canReplace = collection as ICanReplaceValue<TResult>;
-                                                                if (canReplace != null)
+                                                                if (collection is ICanReplaceValue<TResult> canReplace)
                                                                     canReplace.Replace(oldItem, newItem, equalityComparer);
                                                                 else
                                                                 {
@@ -115,7 +114,7 @@ namespace ExRam.ReactiveCollections
                                                     }
                                                     else
                                                     {
-                                                        if ((filter == null) && (listNotification?.Index != null) && canInsertAndRemoveRangesAtIndex)
+                                                        if (filter == null && listNotification?.Index != null && canInsertAndRemoveRangesAtIndex)
                                                         {
                                                             ((ICanHandleIndexedRanges<TResult>)collection).RemoveRange(listNotification.Index.Value, notification.OldItems.Count);
                                                             ((ICanHandleIndexedRanges<TResult>)collection).InsertRange(listNotification.Index.Value, notification.NewItems.Select(localSelector));

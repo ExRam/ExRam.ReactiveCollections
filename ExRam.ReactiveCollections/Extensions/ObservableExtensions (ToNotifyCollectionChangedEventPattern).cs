@@ -27,10 +27,7 @@ namespace System.Reactive.Linq
                     base.Add(value, (o, e) => value(o, e));
                 }
 
-                remove
-                {
-                    base.Remove(value);
-                }
+                remove => base.Remove(value);
             }
         }
         #endregion
@@ -50,10 +47,7 @@ namespace System.Reactive.Linq
                     base.Add(value, (o, e) => value(o, e));
                 }
 
-                remove
-                {
-                    base.Remove(value);
-                }
+                remove => base.Remove(value);
             }
         }
         #endregion

@@ -152,21 +152,9 @@ namespace ExRam.ReactiveCollections
             return this._innerList.Count;
         }
 
-        public int Count
-        {
-            get
-            {
-                return this._innerList.Count;
-            }
-        }
+        public int Count => this._innerList.Count;
 
-        public T this[int index]
-        {
-            get
-            {
-                return this._innerList[index];
-            }
-        }
+        public T this[int index] => this._innerList[index];
 
         public IReactiveCollection<ListChangedNotification<T>> ReactiveCollection => this._innerList.ReactiveCollection;
     }

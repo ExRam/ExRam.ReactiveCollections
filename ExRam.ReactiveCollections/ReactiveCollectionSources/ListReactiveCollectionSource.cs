@@ -96,7 +96,7 @@ namespace ExRam.ReactiveCollections
             var oldList = this.Current;
             var index = oldList.IndexOf(item, equalityComparer);
 
-            return (index > -1) && this.RemoveAtInternal(index);
+            return index > -1 && this.RemoveAtInternal(index);
         }
 
         public void RemoveAll([NotNull] Predicate<T> match)
@@ -222,15 +222,9 @@ namespace ExRam.ReactiveCollections
         #region Explicit IList<T> implementation
         T IList<T>.this[int index]
         {
-            get
-            {
-                return this[index];
-            }
+            get => this[index];
 
-            set
-            {
-                this.SetItem(index, value);
-            }
+            set => this.SetItem(index, value);
         }
 
         bool ICollection<T>.IsReadOnly => false;
@@ -287,15 +281,9 @@ namespace ExRam.ReactiveCollections
 
         object IList.this[int index]
         {
-            get
-            {
-                return this[index];
-            }
+            get => this[index];
 
-            set
-            {
-                this.SetItem(index, (T)value);
-            }
+            set => this.SetItem(index, (T)value);
         }
 
         void ICollection.CopyTo(Array array, int index)
@@ -309,34 +297,16 @@ namespace ExRam.ReactiveCollections
 
         #endregion
 
-        public int Count
-        {
-            get
-            {
-                return this.Current.Count;
-            }
-        }
+        public int Count => this.Current.Count;
 
         [NotNull]
-        private ImmutableList<T> Current
-        {
-            get
-            {
-                return this.Subject.Value.Current;
-            }
-        }
+        private ImmutableList<T> Current => this.Subject.Value.Current;
 
         public T this[int index]
         {
-            get
-            {
-                return this.Current[index];
-            }
+            get => this.Current[index];
 
-            set
-            {
-                this.SetItem(index, value);
-            }
+            set => this.SetItem(index, value);
         }
     }
 }

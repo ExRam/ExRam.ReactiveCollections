@@ -114,14 +114,8 @@ namespace ExRam.ReactiveCollections
 
         public TValue this[TKey key]
         {
-            get
-            {
-                return this.Current[key];
-            }
-            set
-            {
-                this.SetItem(key, value);
-            }
+            get => this.Current[key];
+            set => this.SetItem(key, value);
         }
 
         public int Count => this.Current.Count;
@@ -213,15 +207,8 @@ namespace ExRam.ReactiveCollections
 
         object IDictionary.this[object key]
         {
-            get
-            {
-                return this[(TKey)key];
-            }
-
-            set
-            {
-                this[(TKey)key] = (TValue)value;
-            }
+            get => this[(TKey)key];
+            set => this[(TKey)key] = (TValue)value;
         }
 
         void ICollection.CopyTo(Array array, int index)
@@ -243,21 +230,9 @@ namespace ExRam.ReactiveCollections
         }
 
         [NotNull]
-        public IEnumerable<TValue> Values
-        {
-            get
-            {
-                return this.Current.Values;
-            }
-        }
+        public IEnumerable<TValue> Values => this.Current.Values;
 
         [NotNull]
-        private ImmutableDictionary<TKey, TValue> Current
-        {
-            get
-            {
-                return this.Subject.Value.Current;
-            }
-        }
+        private ImmutableDictionary<TKey, TValue> Current => this.Subject.Value.Current;
     }
 }

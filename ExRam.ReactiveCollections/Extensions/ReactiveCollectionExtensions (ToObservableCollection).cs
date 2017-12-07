@@ -24,28 +24,16 @@ namespace ExRam.ReactiveCollections
             #region Events
             public event PropertyChangedEventHandler PropertyChanged
             {
-                add
-                {
-                    this._propertyChanged.PropertyChanged += value;
-                }
+                add => this._propertyChanged.PropertyChanged += value;
 
-                remove
-                {
-                    this._propertyChanged.PropertyChanged -= value;
-                }
+                remove => this._propertyChanged.PropertyChanged -= value;
             }
 
             public event NotifyCollectionChangedEventHandler CollectionChanged
             {
-                add
-                {
-                    this._collectionChanged.CollectionChanged += value;
-                }
+                add => this._collectionChanged.CollectionChanged += value;
 
-                remove
-                {
-                    this._collectionChanged.CollectionChanged -= value;
-                }
+                remove => this._collectionChanged.CollectionChanged -= value;
             }
             #endregion
 
@@ -141,8 +129,7 @@ namespace ExRam.ReactiveCollections
 
             bool ICollection<T>.Contains(T item)
             {
-                var list = this._currentList as ICollection<T>;
-                if (list == null)
+                if (!(this._currentList is ICollection<T> list))
                     throw new InvalidOperationException();
 
                 return list.Contains(item);
@@ -150,8 +137,7 @@ namespace ExRam.ReactiveCollections
 
             void ICollection<T>.CopyTo(T[] array, int arrayIndex)
             {
-                var list = this._currentList as ICollection<T>;
-                if (list == null)
+                if (!(this._currentList is ICollection<T> list))
                     throw new InvalidOperationException();
 
                 list.CopyTo(array, arrayIndex);
@@ -199,16 +185,12 @@ namespace ExRam.ReactiveCollections
             {
                 get
                 {
-                    var list = this._currentList as IReadOnlyList<T>;
-                    if (list == null)
+                    if (!(this._currentList is IReadOnlyList<T> list))
                         throw new InvalidOperationException();
 
                     return list[index];
                 }
-                set
-                {
-                    throw new NotSupportedException();
-                }
+                set => throw new NotSupportedException();
             }
 
             T IReadOnlyList<T>.this[int index] => ((IList<T>)this)[index];
@@ -247,14 +229,8 @@ namespace ExRam.ReactiveCollections
 
             object IList.this[int index]
             {
-                get
-                {
-                    return ((IList<T>)this)[index];
-                }
-                set
-                {
-                    throw new NotSupportedException();
-                }
+                get => ((IList<T>)this)[index];
+                set => throw new NotSupportedException();
             }
 
             void ICollection.CopyTo(Array array, int index)

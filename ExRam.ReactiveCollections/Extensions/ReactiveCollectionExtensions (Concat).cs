@@ -113,10 +113,7 @@ namespace ExRam.ReactiveCollections
                             {
                                 lock(syncRoot)
                                 {
-                                    int? offset;
-                                    ImmutableList<T> oldList;
-
-                                    rootNode = rootNode.ReplaceNode(tuple.Notification.Current, tuple.Index, out offset, out oldList);
+                                    rootNode = rootNode.ReplaceNode(tuple.Notification.Current, tuple.Index, out var offset, out var oldList);
 
                                     if (rootNode.List != null)
                                     {

@@ -21,9 +21,7 @@ namespace ExRam.ReactiveCollections
         [NotNull]
         public static IReactiveCollection<ListChangedNotification<TSource>> Where<TSource>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source, [NotNull] Predicate<TSource> filter, [NotNull] IEqualityComparer<TSource> equalityComparer)
         {
-            var nonProjected = source as ListTransformationReactiveCollection<TSource, TSource>;
-
-            return (nonProjected != null) && (nonProjected.Selector == null)
+            return source is ListTransformationReactiveCollection<TSource, TSource> nonProjected && nonProjected.Selector == null
                 ? new ListTransformationReactiveCollection<TSource, TSource>(nonProjected.Source, x => nonProjected.Filter(x) && filter(x), null, nonProjected.EqualityComparer)
                 : new ListTransformationReactiveCollection<TSource, TSource>(source, filter, null, equalityComparer);
         }
@@ -31,9 +29,7 @@ namespace ExRam.ReactiveCollections
         [NotNull]
         public static IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> Where<TKey, TValue>([NotNull] this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> source, [NotNull] Predicate<TValue> filter)
         {
-            var nonProjected = source as DictionaryTransformationReactiveCollection<TKey, TValue, TValue>;
-
-            return (nonProjected != null) && (nonProjected.Selector == null)
+            return source is DictionaryTransformationReactiveCollection<TKey, TValue, TValue> nonProjected && nonProjected.Selector == null
                 ? new DictionaryTransformationReactiveCollection<TKey, TValue, TValue>(nonProjected.Source, kvp => nonProjected.Filter(kvp) && filter(kvp.Value), null, nonProjected.EqualityComparer)
                 : new DictionaryTransformationReactiveCollection<TKey, TValue, TValue>(source, kvp => filter(kvp.Value), null, EqualityComparer<KeyValuePair<TKey, TValue>>.Default);
         }

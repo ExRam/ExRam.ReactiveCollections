@@ -159,15 +159,9 @@ namespace ExRam.ReactiveCollections
 
         public T this[int index]
         {
-            get
-            {
-                return this.Current[index];
-            }
+            get => this.Current[index];
 
-            set
-            {
-                throw new NotSupportedException();
-            }
+            set => throw new NotSupportedException();
         }
         #endregion
 
@@ -259,15 +253,9 @@ namespace ExRam.ReactiveCollections
 
         object IList.this[int index]
         {
-            get
-            {
-                return this[index];
-            }
+            get => this[index];
 
-            set
-            {
-                throw new NotSupportedException();
-            }
+            set => throw new NotSupportedException();
         }
 
         void ICollection.CopyTo(Array array, int index)
@@ -309,12 +297,6 @@ namespace ExRam.ReactiveCollections
         #endregion
 
         [NotNull]
-        private ImmutableSortedSet<T> Current
-        {
-            get
-            {
-                return this.Subject.Value.Current;
-            }
-        }
+        private ImmutableSortedSet<T> Current => this.Subject.Value.Current;
     }
 }

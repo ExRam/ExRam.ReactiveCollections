@@ -29,31 +29,16 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
-        private readonly BehaviorSubject<TNotification> _subject;
-        private readonly IReactiveCollection<TNotification> _reactiveCollection;
-
         protected ReactiveCollectionSource([NotNull] TNotification initialNotification)
         {
-            this._subject = new BehaviorSubject<TNotification>(initialNotification);
-            this._reactiveCollection = new ReactiveCollectionImpl(this._subject);
+            this.Subject = new BehaviorSubject<TNotification>(initialNotification);
+            this.ReactiveCollection = new ReactiveCollectionImpl(this.Subject);
         }
 
         [NotNull]
-        public IReactiveCollection<TNotification> ReactiveCollection
-        {
-            get
-            {
-                return this._reactiveCollection;
-            }
-        }
+        public IReactiveCollection<TNotification> ReactiveCollection { get; }
 
         [NotNull]
-        protected BehaviorSubject<TNotification> Subject
-        {
-            get
-            {
-                return this._subject;
-            }
-        }
+        protected BehaviorSubject<TNotification> Subject { get; }
     }
 }

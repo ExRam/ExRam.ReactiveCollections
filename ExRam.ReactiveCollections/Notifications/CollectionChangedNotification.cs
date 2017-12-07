@@ -13,12 +13,10 @@ namespace ExRam.ReactiveCollections
 {
     public abstract class CollectionChangedNotification<T> : ICollectionChangedNotification<T>
     {
-        private readonly IReadOnlyCollection<T> _current;
-
         protected CollectionChangedNotification([NotNull] IReadOnlyCollection<T> current, NotifyCollectionChangedAction action, [NotNull] IReadOnlyList<T> oldItems, [NotNull] IReadOnlyList<T> newItems)
         {
             this.Action = action;
-            this._current = current;
+            this.Current = current;
             this.OldItems = oldItems;
             this.NewItems = newItems;
         }
@@ -31,13 +29,7 @@ namespace ExRam.ReactiveCollections
 
         public NotifyCollectionChangedAction Action { get; }
 
-        public IReadOnlyCollection<T> Current
-        {
-            get 
-            {
-                return this._current;
-            }
-        }
+        public IReadOnlyCollection<T> Current { get; }
 
         ICollectionChangedNotification ICollectionChangedNotification.ToResetNotification()
         {
