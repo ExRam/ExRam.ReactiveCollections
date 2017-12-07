@@ -5,9 +5,9 @@
 // file.
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
@@ -19,10 +19,8 @@ namespace ExRam.ReactiveCollections
         {
             private readonly IObservable<TNotification> _changes;
 
-            public ReactiveCollectionImpl(IObservable<TNotification> subject)
+            public ReactiveCollectionImpl([NotNull] IObservable<TNotification> subject)
             {
-                Contract.Requires(subject != null);
-
                 this._changes = subject
                     .Normalize();
             }
@@ -34,32 +32,26 @@ namespace ExRam.ReactiveCollections
         private readonly BehaviorSubject<TNotification> _subject;
         private readonly IReactiveCollection<TNotification> _reactiveCollection;
 
-        protected ReactiveCollectionSource(TNotification initialNotification)
+        protected ReactiveCollectionSource([NotNull] TNotification initialNotification)
         {
-            // ReSharper disable RedundantCast
-            Contract.Requires((object)initialNotification != null);
-            // ReSharper restore RedundantCast
-
             this._subject = new BehaviorSubject<TNotification>(initialNotification);
             this._reactiveCollection = new ReactiveCollectionImpl(this._subject);
         }
 
+        [NotNull]
         public IReactiveCollection<TNotification> ReactiveCollection
         {
             get
             {
-                Contract.Ensures(Contract.Result<IReactiveCollection<TNotification>>() != null);
-
                 return this._reactiveCollection;
             }
         }
 
+        [NotNull]
         protected BehaviorSubject<TNotification> Subject
         {
             get
             {
-                Contract.Ensures(Contract.Result<BehaviorSubject<TNotification>>() != null);
-
                 return this._subject;
             }
         }

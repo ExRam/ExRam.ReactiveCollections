@@ -6,7 +6,7 @@
 
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 
 namespace System.Reactive.Linq
 {
@@ -15,10 +15,9 @@ namespace System.Reactive.Linq
         #region NotifyCollectionChangedEventPatternSource
         private sealed class NotifyCollectionChangedEventPatternSource : EventPatternSourceBase<object, NotifyCollectionChangedEventArgs>, INotifyCollectionChanged
         {
-            public NotifyCollectionChangedEventPatternSource(IObservable<EventPattern<object, NotifyCollectionChangedEventArgs>> source)
+            public NotifyCollectionChangedEventPatternSource([NotNull] IObservable<EventPattern<object, NotifyCollectionChangedEventArgs>> source)
                 : base(source, (invokeAction, eventPattern) => invokeAction(eventPattern.Sender, eventPattern.EventArgs))
             {
-                Contract.Requires(source != null);
             }
 
             public event NotifyCollectionChangedEventHandler CollectionChanged
@@ -39,10 +38,9 @@ namespace System.Reactive.Linq
         #region NotifyPropertyChangedEventPatternSource
         private sealed class NotifyPropertyChangedEventPatternSource : EventPatternSourceBase<object, PropertyChangedEventArgs>, INotifyPropertyChanged
         {
-            public NotifyPropertyChangedEventPatternSource(IObservable<EventPattern<object, PropertyChangedEventArgs>> source)
+            public NotifyPropertyChangedEventPatternSource([NotNull] IObservable<EventPattern<object, PropertyChangedEventArgs>> source)
                 : base(source, (invokeAction, eventPattern) => invokeAction(eventPattern.Sender, eventPattern.EventArgs))
             {
-                Contract.Requires(source != null);
             }
 
             public event PropertyChangedEventHandler PropertyChanged
@@ -60,19 +58,15 @@ namespace System.Reactive.Linq
         }
         #endregion
 
-        public static INotifyCollectionChanged ToNotifyCollectionChangedEventPattern(this IObservable<NotifyCollectionChangedEventArgs> source, object sender)
+        [NotNull]
+        public static INotifyCollectionChanged ToNotifyCollectionChangedEventPattern([NotNull] this IObservable<NotifyCollectionChangedEventArgs> source, object sender)
         {
-            Contract.Requires(source != null);
-            Contract.Ensures(Contract.Result<INotifyCollectionChanged>() != null);
-
             return new NotifyCollectionChangedEventPatternSource(source.Select(x => new EventPattern<NotifyCollectionChangedEventArgs>(sender, x)));
         }
 
-        public static INotifyPropertyChanged ToNotifyPropertyChangedEventPattern(this IObservable<PropertyChangedEventArgs> source, object sender)
+        [NotNull]
+        public static INotifyPropertyChanged ToNotifyPropertyChangedEventPattern([NotNull] this IObservable<PropertyChangedEventArgs> source, object sender)
         {
-            Contract.Requires(source != null);
-            Contract.Ensures(Contract.Result<INotifyPropertyChanged>() != null);
-
             return new NotifyPropertyChangedEventPatternSource(source.Select(x => new EventPattern<PropertyChangedEventArgs>(sender, x)));
         }
     }

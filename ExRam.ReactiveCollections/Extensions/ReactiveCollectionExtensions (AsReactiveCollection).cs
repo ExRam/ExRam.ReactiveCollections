@@ -5,8 +5,8 @@
 // file.
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Reactive.Linq;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
@@ -18,10 +18,8 @@ namespace ExRam.ReactiveCollections
         {
             private readonly IReactiveCollection<TNotification> _reactiveCollection;
 
-            public AsReactiveCollectionImpl(IReactiveCollection<TNotification> reactiveCollection)
+            public AsReactiveCollectionImpl([NotNull] IReactiveCollection<TNotification> reactiveCollection)
             {
-                Contract.Requires(reactiveCollection != null);
-
                 this._reactiveCollection = reactiveCollection;
             }
 
@@ -29,12 +27,10 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
-        public static IReactiveCollection<TNotification> AsReactiveCollection<TNotification, T>(this IReactiveCollection<TNotification> reactiveCollection)
+        [NotNull]
+        public static IReactiveCollection<TNotification> AsReactiveCollection<TNotification, T>([NotNull] this IReactiveCollection<TNotification> reactiveCollection)
             where TNotification : ICollectionChangedNotification<T>
         {
-            Contract.Requires(reactiveCollection != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<TNotification>>() != null);
-
             return new AsReactiveCollectionImpl<TNotification, T>(reactiveCollection);
         }
     }

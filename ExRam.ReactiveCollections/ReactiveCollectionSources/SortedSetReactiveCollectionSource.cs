@@ -9,7 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
-using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
@@ -24,9 +24,9 @@ namespace ExRam.ReactiveCollections
         {
         }
 
-        public SortedSetReactiveCollectionSource(IComparer<T> comparer) : base(new SortedSetChangedNotification<T>(ImmutableSortedSet.Create(comparer), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null))
+        public SortedSetReactiveCollectionSource([NotNull] IComparer<T> comparer) : base(new SortedSetChangedNotification<T>(ImmutableSortedSet.Create(comparer), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null))
         {
-            Contract.Requires(comparer != null);
+            
         }
 
         public void Add(T value)
@@ -61,10 +61,8 @@ namespace ExRam.ReactiveCollections
                 this.Subject.OnNext(new SortedSetChangedNotification<T>(current.Clear(), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
-        public void Except(IEnumerable<T> other)
+        public void Except([NotNull] IEnumerable<T> other)
         {
-            Contract.Requires(other != null);
-
             var current = this.Current;
             var newSet = current.Except(other);
 
@@ -72,10 +70,8 @@ namespace ExRam.ReactiveCollections
                 this.Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
-        public void Intersect(IEnumerable<T> other)
+        public void Intersect([NotNull] IEnumerable<T> other)
         {
-            Contract.Requires(other != null);
-
             var current = this.Current;
             var newSet = current.Intersect(other);
 
@@ -122,10 +118,8 @@ namespace ExRam.ReactiveCollections
             return this.Current.SetEquals(other);
         }
 
-        public void SymmetricExcept(IEnumerable<T> other)
+        public void SymmetricExcept([NotNull] IEnumerable<T> other)
         {
-            Contract.Requires(other != null);
-
             var current = this.Current;
             var newSet = current.SymmetricExcept(other);
 
@@ -138,10 +132,8 @@ namespace ExRam.ReactiveCollections
             return this.Current.TryGetValue(equalValue, out actualValue);
         }
 
-        public void Union(IEnumerable<T> other)
+        public void Union([NotNull] IEnumerable<T> other)
         {
-            Contract.Requires(other != null);
-
             var current = this.Current;
             var newSet = current.Union(other);
 
@@ -316,12 +308,11 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
+        [NotNull]
         private ImmutableSortedSet<T> Current
         {
             get
             {
-                Contract.Ensures(Contract.Result<ImmutableSortedSet<T>>() != null);
-
                 return this.Subject.Value.Current;
             }
         }

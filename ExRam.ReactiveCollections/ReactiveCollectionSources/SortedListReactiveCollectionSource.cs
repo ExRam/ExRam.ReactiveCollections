@@ -7,8 +7,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
@@ -79,38 +79,28 @@ namespace ExRam.ReactiveCollections
             return this.Remove(item, EqualityComparer<T>.Default);
         }
 
-        public bool Remove(T item, IEqualityComparer<T> equalityComparer)
+        public bool Remove(T item, [NotNull] IEqualityComparer<T> equalityComparer)
         {
-            Contract.Requires(equalityComparer != null);
-
             return this._innerList.Remove(item, equalityComparer);
         }
 
-        public void RemoveAll(Predicate<T> match)
+        public void RemoveAll([NotNull] Predicate<T> match)
         {
-            Contract.Requires(match != null);
-
             this._innerList.RemoveAll(match);
         }
 
         public void RemoveAt(int index)
         {
-            Contract.Requires(index > 0);
-
             this._innerList.RemoveAt(index);
         }
 
         public void RemoveRange(int index, int count)
         {
-            Contract.Requires(index >= 0);
-
             this._innerList.RemoveRange(index, count);
         }
 
-        public void RemoveRange(IEnumerable<T> items)
+        public void RemoveRange([NotNull] IEnumerable<T> items)
         {
-            Contract.Requires(items != null);
-
             this.RemoveRange(items, EqualityComparer<T>.Default);
         }
 
@@ -152,8 +142,6 @@ namespace ExRam.ReactiveCollections
 
         private int FindInsertionIndex(T item)
         {
-            Contract.Ensures(Contract.Result<int>() >= 0);
-
             // TODO: Optimize, do a binary search or something.
             for (var newInsertionIndex = 0; newInsertionIndex < this._innerList.Count; newInsertionIndex++)
             {
@@ -168,8 +156,6 @@ namespace ExRam.ReactiveCollections
         {
             get
             {
-                Contract.Ensures(Contract.Result<int>() >= 0);
-
                 return this._innerList.Count;
             }
         }
@@ -178,8 +164,6 @@ namespace ExRam.ReactiveCollections
         {
             get
             {
-                Contract.Requires(index >= 0);
-
                 return this._innerList[index];
             }
         }

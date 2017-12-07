@@ -7,17 +7,18 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
-using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
     public sealed class DictionaryChangedNotification<TKey, TValue> : CollectionChangedNotification<KeyValuePair<TKey, TValue>>
     {
-        public DictionaryChangedNotification(ImmutableDictionary<TKey, TValue> current, NotifyCollectionChangedAction action, IReadOnlyList<KeyValuePair<TKey, TValue>> oldItems, IReadOnlyList<KeyValuePair<TKey, TValue>> newItems) : base(current, action, oldItems, newItems)
+        public DictionaryChangedNotification([NotNull] ImmutableDictionary<TKey, TValue> current,
+            NotifyCollectionChangedAction action,
+            [NotNull] IReadOnlyList<KeyValuePair<TKey, TValue>> oldItems,
+            [NotNull] IReadOnlyList<KeyValuePair<TKey, TValue>> newItems) : base(current, action, oldItems, newItems)
         {
-            Contract.Requires(current != null);
-            Contract.Requires(oldItems != null);
-            Contract.Requires(newItems != null);
+            
         }
 
         public override ICollectionChangedNotification<KeyValuePair<TKey, TValue>> ToResetNotification()

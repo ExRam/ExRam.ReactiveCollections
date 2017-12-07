@@ -4,32 +4,26 @@
 // Full License description can be found in the LICENSE
 // file.
 
-using System.Diagnostics.Contracts;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        public static IReactiveCollection<TNotification> ObserveOn<TNotification, TSource>(this IReactiveCollection<TNotification> source, SynchronizationContext syncContext) where TNotification : ICollectionChangedNotification<TSource>
+        [NotNull]
+        public static IReactiveCollection<TNotification> ObserveOn<TNotification, TSource>([NotNull] this IReactiveCollection<TNotification> source, [NotNull] SynchronizationContext syncContext) where TNotification : ICollectionChangedNotification<TSource>
         {
-            Contract.Requires(source != null);
-            Contract.Requires(syncContext != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<TNotification>>() != null);
-
             return source.Changes
                 .ObserveOn(syncContext)
                 .ToReactiveCollection();
         }
 
-        public static IReactiveCollection<TNotification> ObserveOn<TNotification, TSource>(this IReactiveCollection<TNotification> source, IScheduler scheduler) where TNotification : ICollectionChangedNotification<TSource>
+        [NotNull]
+        public static IReactiveCollection<TNotification> ObserveOn<TNotification, TSource>([NotNull] this IReactiveCollection<TNotification> source, [NotNull] IScheduler scheduler) where TNotification : ICollectionChangedNotification<TSource>
         {
-            Contract.Requires(source != null);
-            Contract.Requires(scheduler != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<TNotification>>() != null);
-
             return source.Changes
                 .ObserveOn(scheduler)
                 .ToReactiveCollection();

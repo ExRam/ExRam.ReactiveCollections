@@ -8,9 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reactive.Linq;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
@@ -20,7 +20,6 @@ namespace ExRam.ReactiveCollections
         private sealed class ConcatListReactiveCollection<T> : IReactiveCollection<ListChangedNotification<T>>
         {
             #region Node
-            [ContractClass(typeof(ConcatListReactiveCollection<>.NodeContracts))]
             private abstract class Node
             {
                 protected Node(ImmutableList<T> list, int maxIndex)
@@ -29,28 +28,11 @@ namespace ExRam.ReactiveCollections
                     this.MaxIndex = maxIndex;
                 }
 
+                [NotNull]
                 public abstract Node ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList);
 
                 public int MaxIndex { get; }
                 public ImmutableList<T> List { get; }
-            }
-
-            [ContractClassFor(typeof(ConcatListReactiveCollection<>.Node))]
-            private abstract class NodeContracts : Node
-            {
-                protected NodeContracts(ImmutableList<T> list, int maxIndex) : base(list, maxIndex)
-                {
-                }
-
-                public override Node ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
-                {
-                    Contract.Ensures(Contract.Result<Node>() != null);
-
-                    replacementOffset = default(int);
-                    oldList = default(ImmutableList<T>);
-
-                    return default(Node);
-                }
             }
 
             private sealed class InnerNode : Node
@@ -58,15 +40,12 @@ namespace ExRam.ReactiveCollections
                 private readonly Node _left;
                 private readonly Node _right;
 
-                public InnerNode(Node left, Node right) : base(
+                public InnerNode([NotNull] Node left, [NotNull] Node right) : base(
                     left.List != null && right.List != null
                         ? left.List.AddRange(right.List)
                         : null,
                     Math.Max(left.MaxIndex, right.MaxIndex))
                 {
-                    Contract.Requires(left != null);
-                    Contract.Requires(right != null);
-
                     this._left = left;
                     this._right = right;
                 }
@@ -117,12 +96,9 @@ namespace ExRam.ReactiveCollections
             #endregion
 
             public ConcatListReactiveCollection(
-                IObservable<ListChangedNotification<T>>[] sources,
-                IEqualityComparer<T> equalityComparer)
+                [NotNull] IObservable<ListChangedNotification<T>>[] sources,
+                [NotNull] IEqualityComparer<T> equalityComparer)
             {
-                Contract.Requires(sources != null);
-                Contract.Requires(equalityComparer != null);
-
                 this.Changes = Observable
                     .Defer(() =>
                     {
@@ -221,22 +197,15 @@ namespace ExRam.ReactiveCollections
                 : new ConcatListReactiveCollection<T>(sourcesArray, equalityComparer);
         }
 
-        public static IReactiveCollection<ListChangedNotification<T>> Concat<T>(this IReactiveCollection<ListChangedNotification<T>> source1, IReactiveCollection<ListChangedNotification<T>> source2)
+        [NotNull]
+        public static IReactiveCollection<ListChangedNotification<T>> Concat<T>([NotNull] this IReactiveCollection<ListChangedNotification<T>> source1, [NotNull] IReactiveCollection<ListChangedNotification<T>> source2)
         {
-            Contract.Requires(source1 != null);
-            Contract.Requires(source2 != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<T>>>() != null);
-
             return source1.Concat(source2, EqualityComparer<T>.Default);
         }
 
-        public static IReactiveCollection<ListChangedNotification<T>> Concat<T>(this IReactiveCollection<ListChangedNotification<T>> source1, IReactiveCollection<ListChangedNotification<T>> source2, IEqualityComparer<T> equalityComparer)
+        [NotNull]
+        public static IReactiveCollection<ListChangedNotification<T>> Concat<T>([NotNull] this IReactiveCollection<ListChangedNotification<T>> source1, [NotNull] IReactiveCollection<ListChangedNotification<T>> source2, [NotNull] IEqualityComparer<T> equalityComparer)
         {
-            Contract.Requires(source1 != null);
-            Contract.Requires(source2 != null);
-            Contract.Requires(equalityComparer != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<T>>>() != null);
-
             return new ConcatListReactiveCollection<T>(new[] { source1.Changes, source2.Changes } , equalityComparer);
         }
     }

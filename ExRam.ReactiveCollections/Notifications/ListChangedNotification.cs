@@ -7,19 +7,15 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
-using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
     public sealed class ListChangedNotification<T> : CollectionChangedNotification<T>, IIndexedCollectionChangedNotification<T>
     {
         // ReSharper disable once SuggestBaseTypeForParameter
-        public ListChangedNotification(ImmutableList<T> current, NotifyCollectionChangedAction action, IReadOnlyList<T> oldItems, IReadOnlyList<T> newItems, int? index) : base(current, action, oldItems, newItems)
+        public ListChangedNotification([NotNull] ImmutableList<T> current, NotifyCollectionChangedAction action, [NotNull] IReadOnlyList<T> oldItems, [NotNull] IReadOnlyList<T> newItems, int? index) : base(current, action, oldItems, newItems)
         {
-            Contract.Requires(current != null);
-            Contract.Requires(oldItems != null);
-            Contract.Requires(newItems != null);
-
             this.Index = index;
         }
 

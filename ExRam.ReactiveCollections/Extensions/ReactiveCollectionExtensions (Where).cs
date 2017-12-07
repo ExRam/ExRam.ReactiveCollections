@@ -6,28 +6,21 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        public static IReactiveCollection<ListChangedNotification<TSource>> Where<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter)
+        [NotNull]
+        public static IReactiveCollection<ListChangedNotification<TSource>> Where<TSource>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source, [NotNull] Predicate<TSource> filter)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(filter != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
-
             return source.Where(filter, EqualityComparer<TSource>.Default);
         }
 
-        public static IReactiveCollection<ListChangedNotification<TSource>> Where<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, IEqualityComparer<TSource> equalityComparer)
+        [NotNull]
+        public static IReactiveCollection<ListChangedNotification<TSource>> Where<TSource>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source, [NotNull] Predicate<TSource> filter, [NotNull] IEqualityComparer<TSource> equalityComparer)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(filter != null);
-            Contract.Requires(equalityComparer != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
-
             var nonProjected = source as ListTransformationReactiveCollection<TSource, TSource>;
 
             return (nonProjected != null) && (nonProjected.Selector == null)
@@ -35,12 +28,9 @@ namespace ExRam.ReactiveCollections
                 : new ListTransformationReactiveCollection<TSource, TSource>(source, filter, null, equalityComparer);
         }
 
-        public static IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> Where<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> source, Predicate<TValue> filter)
+        [NotNull]
+        public static IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> Where<TKey, TValue>([NotNull] this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> source, [NotNull] Predicate<TValue> filter)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(filter != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<DictionaryChangedNotification<TKey, TValue>>>() != null);
-
             var nonProjected = source as DictionaryTransformationReactiveCollection<TKey, TValue, TValue>;
 
             return (nonProjected != null) && (nonProjected.Selector == null)

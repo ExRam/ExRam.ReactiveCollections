@@ -4,8 +4,8 @@
 // Full License description can be found in the LICENSE
 // file.
 
-using System.Diagnostics.Contracts;
 using ExRam.ReactiveCollections;
+using JetBrains.Annotations;
 
 namespace System.Reactive.Linq
 {
@@ -25,12 +25,10 @@ namespace System.Reactive.Linq
         }
         #endregion
 
-        internal static IObservable<TNotification> Normalize<TNotification>(this IObservable<TNotification> observable)
+        [NotNull]
+        internal static IObservable<TNotification> Normalize<TNotification>([NotNull] this IObservable<TNotification> observable)
             where TNotification : ICollectionChangedNotification
         {
-            Contract.Requires(observable != null);
-            Contract.Ensures(Contract.Result<IObservable<TNotification>>() != null);
-
             return observable
                 .Scan(new StateHolder<TNotification>(true, default(TNotification)), (state, notification) => new StateHolder<TNotification>(false, state.First ? (TNotification)notification.ToResetNotification() : notification))
                 .Select(x => x.Notification);

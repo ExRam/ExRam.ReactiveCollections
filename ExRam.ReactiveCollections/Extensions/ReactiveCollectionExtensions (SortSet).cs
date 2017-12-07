@@ -5,26 +5,21 @@
 // file.
 
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        public static IReactiveCollection<SortedSetChangedNotification<TSource>> SortSet<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source)
+        [NotNull]
+        public static IReactiveCollection<SortedSetChangedNotification<TSource>> SortSet<TSource>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source)
         {
-            Contract.Requires(source != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<SortedSetChangedNotification<TSource>>>() != null);
-
             return source.SortSet(Comparer<TSource>.Default);
         }
 
-        public static IReactiveCollection<SortedSetChangedNotification<TSource>> SortSet<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer)
+        [NotNull]
+        public static IReactiveCollection<SortedSetChangedNotification<TSource>> SortSet<TSource>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source, [NotNull] IComparer<TSource> comparer)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(comparer != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<SortedSetChangedNotification<TSource>>>() != null);
-
             if (source is ICanSortSet<TSource>)
                 return ((ICanSortSet<TSource>)source).Sort(comparer);
 

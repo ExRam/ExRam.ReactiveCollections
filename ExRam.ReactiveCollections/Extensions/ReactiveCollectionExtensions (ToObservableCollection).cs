@@ -10,9 +10,9 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics.Contracts;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
@@ -54,10 +54,8 @@ namespace ExRam.ReactiveCollections
 
             private IReadOnlyCollection<T> _currentList = ImmutableList<T>.Empty;
 
-            public ReactiveReadOnlyObservableCollection(IObservable<IIndexedCollectionChangedNotification<T>> source)
+            public ReactiveReadOnlyObservableCollection([NotNull] IObservable<IIndexedCollectionChangedNotification<T>> source)
             {
-                Contract.Requires(source != null);
-
                 var eventArgs = source
                     .Do(notification => this._currentList = notification.Current)
                     .Skip(1)
@@ -270,11 +268,9 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
-        public static ICollection<T> ToObservableCollection<T>(this IReactiveCollection<IIndexedCollectionChangedNotification<T>> source)
+        [NotNull]
+        public static ICollection<T> ToObservableCollection<T>([NotNull] this IReactiveCollection<IIndexedCollectionChangedNotification<T>> source)
         {
-            Contract.Requires(source != null);
-            Contract.Ensures(Contract.Result<ICollection<T>>() != null);
-
             return new ReactiveReadOnlyObservableCollection<T>(source.Changes);
         }
     }

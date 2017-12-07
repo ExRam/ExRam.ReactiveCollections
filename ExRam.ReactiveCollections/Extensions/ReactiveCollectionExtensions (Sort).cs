@@ -5,45 +5,33 @@
 // file.
 
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source)
+        [NotNull]
+        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source)
         {
-            Contract.Requires(source != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
-
             return source.Sort(Comparer<TSource>.Default, EqualityComparer<TSource>.Default);
         }
 
-        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer)
+        [NotNull]
+        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source, [NotNull] IComparer<TSource> comparer)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(comparer != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
-
             return source.Sort(comparer, EqualityComparer<TSource>.Default);
         }
 
-        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IEqualityComparer<TSource> equalityComparer)
+        [NotNull]
+        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source, [NotNull] IEqualityComparer<TSource> equalityComparer)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(equalityComparer != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
-
             return source.Sort(Comparer<TSource>.Default, equalityComparer);
         }
 
-        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer, IEqualityComparer<TSource> equalityComparer)
+        [NotNull]
+        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source, [NotNull] IComparer<TSource> comparer, [NotNull] IEqualityComparer<TSource> equalityComparer)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(comparer != null);
-            Contract.Requires(equalityComparer != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TSource>>>() != null);
-
             if (source is ICanSortList<TSource>)
                 return ((ICanSortList<TSource>)source).Sort(comparer);
 

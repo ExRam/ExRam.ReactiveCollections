@@ -4,9 +4,9 @@
 // Full License description can be found in the LICENSE
 // file.
 
-using System.Diagnostics.Contracts;
 using System.Reactive.Subjects;
 using ExRam.ReactiveCollections;
+using JetBrains.Annotations;
 
 namespace System.Reactive.Linq
 {
@@ -19,11 +19,8 @@ namespace System.Reactive.Linq
             private readonly Func<IDisposable> _connectFunction;
             private readonly IObservable<TNotification> _changes;
 
-            public ToConnectableReactiveCollectionImpl(IObservable<TNotification> changes, Func<IDisposable> connectFunction)
+            public ToConnectableReactiveCollectionImpl([NotNull] IObservable<TNotification> changes, [NotNull] Func<IDisposable> connectFunction)
             {
-                Contract.Requires(changes != null);
-                Contract.Requires(connectFunction != null);
-
                 this._changes = changes
                     .Normalize();
 
@@ -39,22 +36,17 @@ namespace System.Reactive.Linq
         }
         #endregion
 
-        public static IConnectableReactiveCollection<TNotification> ToConnectableReactiveCollection<TNotification, T>(this IObservable<TNotification> changesObservable, Func<IDisposable> connectFunction)
+        [NotNull]
+        public static IConnectableReactiveCollection<TNotification> ToConnectableReactiveCollection<TNotification, T>([NotNull] this IObservable<TNotification> changesObservable, [NotNull] Func<IDisposable> connectFunction)
             where TNotification : ICollectionChangedNotification<T>
         {
-            Contract.Requires(changesObservable != null);
-            Contract.Requires(connectFunction != null);
-            Contract.Ensures(Contract.Result<IConnectableReactiveCollection<TNotification>>() != null);
-
             return new ToConnectableReactiveCollectionImpl<TNotification, T>(changesObservable, connectFunction);
         }
 
-        public static IConnectableReactiveCollection<TNotification> ToConnectableReactiveCollection<TNotification, T>(this IConnectableObservable<TNotification> changesObservable)
+        [NotNull]
+        public static IConnectableReactiveCollection<TNotification> ToConnectableReactiveCollection<TNotification, T>([NotNull] this IConnectableObservable<TNotification> changesObservable)
            where TNotification : ICollectionChangedNotification<T>
         {
-            Contract.Requires(changesObservable != null);
-            Contract.Ensures(Contract.Result<IConnectableReactiveCollection<TNotification>>() != null);
-
             return new ToConnectableReactiveCollectionImpl<TNotification, T>(changesObservable, changesObservable.Connect);
         }
     }

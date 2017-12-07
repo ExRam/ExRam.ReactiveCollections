@@ -4,32 +4,17 @@
 // Full License description can be found in the LICENSE
 // file.
 
-using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
-    [ContractClass(typeof(ReactiveCollectionSourceContracts<>))]
     public interface IReactiveCollectionSource<out TNotification>
          where TNotification : ICollectionChangedNotification
     {
+        [NotNull]
         IReactiveCollection<TNotification> ReactiveCollection
         {
             get;
-        }
-    }
-
-    [ContractClassFor(typeof(IReactiveCollectionSource<>))]
-    public abstract class ReactiveCollectionSourceContracts<TNotification> : IReactiveCollectionSource<TNotification>
-        where TNotification : ICollectionChangedNotification
-    {
-        IReactiveCollection<TNotification> IReactiveCollectionSource<TNotification>.ReactiveCollection
-        {
-            get 
-            {
-                Contract.Ensures(Contract.Result<IReactiveCollection<TNotification>>() != null);
-
-                return default(IReactiveCollection<TNotification>);
-            }
         }
     }
 }

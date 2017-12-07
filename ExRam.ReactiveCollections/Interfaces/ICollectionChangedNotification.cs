@@ -7,20 +7,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
-    [ContractClass(typeof(CollectionChangedNotificationContracts))]
     public interface ICollectionChangedNotification
     {
+        [NotNull]
         ICollectionChangedNotification ToResetNotification();
 
+        [NotNull]
         IEnumerable OldItems
         {
             get;
         }
 
+        [NotNull]
         IEnumerable NewItems
         {
             get;
@@ -31,130 +33,34 @@ namespace ExRam.ReactiveCollections
             get;
         }
 
+        [NotNull]
         IEnumerable Current
         {
             get;
         }
     }
 
-    [ContractClass(typeof(CollectionChangedNotificationContracts<>))]
     public interface ICollectionChangedNotification<out T> : ICollectionChangedNotification
     {
+        [NotNull]
         new ICollectionChangedNotification<T> ToResetNotification();
 
+        [NotNull]
         new IReadOnlyList<T> OldItems
         {
             get;
         }
 
+        [NotNull]
         new IReadOnlyList<T> NewItems
         {
             get;
         }
 
+        [NotNull]
         new IReadOnlyCollection<T> Current
         {
             get;
-        }
-    }
-
-    [ContractClassFor(typeof(ICollectionChangedNotification))]
-    public abstract class CollectionChangedNotificationContracts : ICollectionChangedNotification
-    {
-        ICollectionChangedNotification ICollectionChangedNotification.ToResetNotification()
-        {
-            Contract.Ensures(Contract.Result<ICollectionChangedNotification>() != null);
-
-            return default(ICollectionChangedNotification);
-        }
-
-        IEnumerable ICollectionChangedNotification.NewItems
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable>() != null);
-
-                return default(IEnumerable);
-            }
-        }
-
-        NotifyCollectionChangedAction ICollectionChangedNotification.Action => default(NotifyCollectionChangedAction);
-
-        IEnumerable ICollectionChangedNotification.OldItems
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable>() != null);
-
-                return default(IEnumerable);
-            }
-        }
-
-        IEnumerable ICollectionChangedNotification.Current
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable>() != null);
-
-                return default(IEnumerable);
-            }
-        }
-    }
-
-    [ContractClassFor(typeof(ICollectionChangedNotification<>))]
-    public abstract class CollectionChangedNotificationContracts<T> : ICollectionChangedNotification<T>
-    {
-        public ICollectionChangedNotification<T> ToResetNotification()
-        {
-            Contract.Ensures(Contract.Result<ICollectionChangedNotification<T>>() != null);
-
-            return default(ICollectionChangedNotification<T>);
-        }
-
-        public IReadOnlyList<T> OldItems
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IReadOnlyList<T>>() != null);
-
-                return default(IReadOnlyList<T>);
-            }
-        }
-
-        public IReadOnlyList<T> NewItems
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IReadOnlyList<T>>() != null);
-
-                return default(IReadOnlyList<T>);
-            }
-        }
-
-        public abstract NotifyCollectionChangedAction Action
-        {
-            get;
-        }
-
-        IEnumerable ICollectionChangedNotification.Current => this.Current;
-
-        public IReadOnlyCollection<T> Current
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IReadOnlyCollection<T>>() != null);
-
-                return default(IReadOnlyCollection<T>);
-            }
-        }
-
-        IEnumerable ICollectionChangedNotification.OldItems => default(IEnumerable<T>);
-
-        IEnumerable ICollectionChangedNotification.NewItems => default(IEnumerable<T>);
-
-        ICollectionChangedNotification ICollectionChangedNotification.ToResetNotification()
-        {
-            return default(ICollectionChangedNotification);
         }
     }
 }

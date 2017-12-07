@@ -6,39 +6,29 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        public static IReactiveCollection<ListChangedNotification<TResult>> Select<TSource, TResult>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Func<TSource, TResult> selector)
+        [NotNull]
+        public static IReactiveCollection<ListChangedNotification<TResult>> Select<TSource, TResult>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source, [NotNull] Func<TSource, TResult> selector)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(selector != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TResult>>>() != null);
-
             return source.Select(selector, EqualityComparer<TResult>.Default);
         }
 
-        public static IReactiveCollection<ListChangedNotification<TResult>> Select<TSource, TResult>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Func<TSource, TResult> selector, IEqualityComparer<TResult> equalityComparer)
+        [NotNull]
+        public static IReactiveCollection<ListChangedNotification<TResult>> Select<TSource, TResult>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source, [NotNull] Func<TSource, TResult> selector, [NotNull] IEqualityComparer<TResult> equalityComparer)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(selector != null);
-            Contract.Requires(equalityComparer != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<ListChangedNotification<TResult>>>() != null);
-
             var ret = (source as ICanProjectList<TSource>)?.Select(selector, equalityComparer);
 
             return ret ?? new ListTransformationReactiveCollection<TSource, TResult>(source, null, selector, equalityComparer);
         }
 
-        public static IReactiveCollection<DictionaryChangedNotification<TKey, TResult>> Select<TKey, TSource, TResult>(this IReactiveCollection<DictionaryChangedNotification<TKey, TSource>> source, Func<TSource, TResult> selector)
+        [NotNull]
+        public static IReactiveCollection<DictionaryChangedNotification<TKey, TResult>> Select<TKey, TSource, TResult>([NotNull] this IReactiveCollection<DictionaryChangedNotification<TKey, TSource>> source, [NotNull] Func<TSource, TResult> selector)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(selector != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<DictionaryChangedNotification<TKey, TResult>>>() != null);
-
             var ret = (source as ICanProjectDictionary<TKey, TSource>)?.Select(selector);
 
             return ret ?? new DictionaryTransformationReactiveCollection<TKey, TSource, TResult>(source, null, kvp => new KeyValuePair<TKey, TResult>(kvp.Key, selector(kvp.Value)), EqualityComparer<KeyValuePair<TKey, TResult>>.Default);

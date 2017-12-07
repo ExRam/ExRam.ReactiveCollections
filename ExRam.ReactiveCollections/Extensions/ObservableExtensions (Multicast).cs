@@ -4,9 +4,9 @@
 // Full License description can be found in the LICENSE
 // file.
 
-using System.Diagnostics.Contracts;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
+using JetBrains.Annotations;
 
 namespace System.Reactive.Linq
 {
@@ -22,11 +22,8 @@ namespace System.Reactive.Linq
             private ISubject<T> _currentSubject;
             private IDisposable _currentSubscription;
 
-            public MulticastConnectableObservable(IObservable<T> source, Func<ISubject<T>> subjectFactory)
+            public MulticastConnectableObservable([NotNull] IObservable<T> source, [NotNull] Func<ISubject<T>> subjectFactory)
             {
-                Contract.Requires(source != null);
-                Contract.Requires(subjectFactory != null);
-
                 this._source = source;
                 this._subjectFactory = subjectFactory;
             }
@@ -74,11 +71,9 @@ namespace System.Reactive.Linq
         }
         #endregion
 
-        internal static IConnectableObservable<T> Multicast<T>(this IObservable<T> source, Func<ISubject<T>> subjectFactory)
+        [NotNull]
+        internal static IConnectableObservable<T> Multicast<T>([NotNull] this IObservable<T> source, [NotNull] Func<ISubject<T>> subjectFactory)
         {
-            Contract.Requires(source != null);
-            Contract.Ensures(Contract.Result<IObservable<T>>() != null);
-
             return new MulticastConnectableObservable<T>(source, subjectFactory);
         }
 

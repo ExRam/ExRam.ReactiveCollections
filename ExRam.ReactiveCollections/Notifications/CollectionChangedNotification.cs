@@ -7,7 +7,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
@@ -15,14 +15,8 @@ namespace ExRam.ReactiveCollections
     {
         private readonly IReadOnlyCollection<T> _current;
 
-        protected CollectionChangedNotification(IReadOnlyCollection<T> current, NotifyCollectionChangedAction action, IReadOnlyList<T> oldItems, IReadOnlyList<T> newItems)
+        protected CollectionChangedNotification([NotNull] IReadOnlyCollection<T> current, NotifyCollectionChangedAction action, [NotNull] IReadOnlyList<T> oldItems, [NotNull] IReadOnlyList<T> newItems)
         {
-            // ReSharper disable RedundantCast
-            Contract.Requires((object)current != null);
-            // ReSharper restore RedundantCast
-            Contract.Requires(oldItems != null);
-            Contract.Requires(newItems != null);
-
             this.Action = action;
             this._current = current;
             this.OldItems = oldItems;
@@ -41,10 +35,6 @@ namespace ExRam.ReactiveCollections
         {
             get 
             {
-                // ReSharper disable RedundantCast
-                Contract.Ensures((object)Contract.Result<IReadOnlyCollection<T>>() != null);
-                // ReSharper restore RedundantCast
-
                 return this._current;
             }
         }

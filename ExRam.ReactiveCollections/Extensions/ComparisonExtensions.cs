@@ -5,7 +5,7 @@
 // file.
 
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 
 namespace System
 {
@@ -16,10 +16,8 @@ namespace System
         {
             private readonly Comparison<T> _comparison;
 
-            public ComparerImpl(Comparison<T> comparison)
+            public ComparerImpl([NotNull] Comparison<T> comparison)
             {
-                Contract.Requires(comparison != null);
-
                 this._comparison = comparison;
             }
 
@@ -30,10 +28,8 @@ namespace System
         }
         #endregion
 
-        public static IComparer<T> ToComparer<T>(this Comparison<T> comparison)
+        public static IComparer<T> ToComparer<T>([NotNull] this Comparison<T> comparison)
         {
-            Contract.Requires(comparison != null);
-
             return new ComparerImpl<T>(comparison);
         }
     }

@@ -5,19 +5,16 @@
 // file.
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Reactive.Linq;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        public static IReactiveCollection<TNotification> WithChanges<TNotification>(this IReactiveCollection<TNotification> source, Func<IObservable<TNotification>, IObservable<TNotification>> changesTransformation) where TNotification : ICollectionChangedNotification
+        [NotNull]
+        public static IReactiveCollection<TNotification> WithChanges<TNotification>([NotNull] this IReactiveCollection<TNotification> source, [NotNull] Func<IObservable<TNotification>, IObservable<TNotification>> changesTransformation) where TNotification : ICollectionChangedNotification
         {
-            Contract.Requires(source != null);
-            Contract.Requires(changesTransformation != null);
-            Contract.Ensures(Contract.Result<IReactiveCollection<TNotification>>() != null);
-
             return changesTransformation(source.Changes)
                 .ToReactiveCollection();
         }

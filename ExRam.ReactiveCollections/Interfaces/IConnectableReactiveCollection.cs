@@ -5,31 +5,14 @@
 // file.
 
 using System;
-using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
-    [ContractClass(typeof(ConnectableReactiveCollectionContracts<>))]
     public interface IConnectableReactiveCollection<out TNotification> : IReactiveCollection<TNotification>
         where TNotification : ICollectionChangedNotification
     {
+        [NotNull]
         IDisposable Connect();
-    }
-
-    [ContractClassFor(typeof(IConnectableReactiveCollection<>))]
-    public abstract class ConnectableReactiveCollectionContracts<TNotification> : IConnectableReactiveCollection<TNotification>
-         where TNotification : ICollectionChangedNotification
-    {
-        public abstract IObservable<TNotification> Changes
-        {
-            get;
-        }
-
-        public IDisposable Connect()
-        {
-            Contract.Ensures(Contract.Result<IDisposable>() != null);
-
-            return default(IDisposable);
-        }
     }
 }

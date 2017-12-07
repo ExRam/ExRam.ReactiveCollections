@@ -4,8 +4,8 @@
 // Full License description can be found in the LICENSE
 // file.
 
-using System.Diagnostics.Contracts;
 using ExRam.ReactiveCollections;
+using JetBrains.Annotations;
 
 namespace System.Reactive.Linq
 {
@@ -17,10 +17,8 @@ namespace System.Reactive.Linq
         {
             private readonly IObservable<TNotification> _changes;
 
-            public ToReactiveCollectionImpl(IObservable<TNotification> changes)
+            public ToReactiveCollectionImpl([NotNull] IObservable<TNotification> changes)
             {
-                Contract.Requires(changes != null);
-
                 this._changes = changes
                     .Normalize();
             }
@@ -29,11 +27,9 @@ namespace System.Reactive.Linq
         }
         #endregion
 
-        public static IReactiveCollection<TNotification> ToReactiveCollection<TNotification>(this IObservable<TNotification> changesObservable)
+        public static IReactiveCollection<TNotification> ToReactiveCollection<TNotification>([NotNull] this IObservable<TNotification> changesObservable)
             where TNotification : ICollectionChangedNotification
         {
-            Contract.Requires(changesObservable != null);
-
             return new ToReactiveCollectionImpl<TNotification>(changesObservable);
         }
     }
