@@ -1273,7 +1273,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .FirstAsync()
                 .ToTask();
 
-            ((ICollection)observableCollection).ShouldBeEquivalentTo(new[] { 1, 2, 3 });
+            ((ICollection)observableCollection).Should().BeEquivalentTo(new[] { 1, 2, 3 });
             list.Add(4);
 
             var ev = await eventsTask;
