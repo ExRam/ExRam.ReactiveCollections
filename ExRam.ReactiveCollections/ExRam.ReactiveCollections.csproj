@@ -2,12 +2,7 @@
 
   <PropertyGroup>
     <Description>ExRam.ReactiveCollections</Description>
-    <VersionPrefix>1.5.0-preview.1</VersionPrefix>
-    <Authors>ExRam EDV GmbH &amp; Co. KG</Authors>
     <TargetFramework>netstandard1.0</TargetFramework>
-    <NoWarn>$(NoWarn);CS1998</NoWarn>
-    <AssemblyName>ExRam.ReactiveCollections</AssemblyName>
-    <PackageId>ExRam.ReactiveCollections</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
