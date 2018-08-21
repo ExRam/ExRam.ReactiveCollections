@@ -1,0 +1,76 @@
+resources:
+- repo: self
+
+queue:
+  name: Hosted VS2017
+  demands: 
+  - msbuild
+  - visualstudio
+  - vstest
+
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - '*'
+
+variables:
+  BuildPlatform: 'any cpu'
+  BuildConfiguration: 'release'
+
+steps:
+- task: NuGetToolInstaller@0
+  displayName: Use NuGet 4.7.1
+  inputs:
+    versionSpec: 4.7.1
+
+- task: NuGetCommand@2
+  displayName: NuGet restore
+  inputs:
+    restoreSolution: '**\*.sln'
+
+- task: VSBuild@1
+  displayName: Build solution
+  inputs:
+    platform: '$(BuildPlatform)'
+    configuration: '$(BuildConfiguration)'
+
+- task: VSTest@2
+  displayName: Test
+  inputs:
+    testAssemblyVer2: '**\bin\$(BuildConfiguration)\**\*.Tests.dll'
+    platform: '$(BuildPlatform)'
+    configuration: '$(BuildConfiguration)'
+
+- task: CopyFiles@2
+  displayName: Copy Files
+  inputs:
+    SourceFolder: '$(build.sourcesdirectory)'
+    Contents: '**\bin\$(BuildConfiguration)\**\*.nupkg'
+    TargetFolder: '$(build.artifactstagingdirectory)'
+
+- task: PublishSymbols@2
+  displayName: Publish symbols path
+  inputs:
+    SymbolServerType: TeamServices
+
+- task: NuGetCommand@2
+  displayName: Push (VSTS)
+  inputs:
+    command: push
+    packagesToPush: '$(Build.ArtifactStagingDirectory)\**\*.nupkg'
+    publishVstsFeed: '422a5c2e-9d99-4a55-a1a9-ea0440d4bff8'
+  continueOnError: true
+
+- task: NuGetCommand@2
+  displayName: Push (nuget.org)
+  inputs:
+    command: push
+    packagesToPush: '$(Build.ArtifactStagingDirectory)\**\*.nupkg'
+    nuGetFeedType: external
+    publishFeedCredentials: Nuget.org
+  continueOnError: true
+
+
