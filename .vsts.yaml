@@ -51,26 +51,7 @@ steps:
     Contents: '**\bin\$(BuildConfiguration)\**\*.nupkg'
     TargetFolder: '$(build.artifactstagingdirectory)'
 
-- task: PublishSymbols@2
-  displayName: Publish symbols path
-  inputs:
-    SymbolServerType: TeamServices
-
-- task: NuGetCommand@2
-  displayName: Push (VSTS)
-  inputs:
-    command: push
-    packagesToPush: '$(Build.ArtifactStagingDirectory)\**\*.nupkg'
-    publishVstsFeed: '422a5c2e-9d99-4a55-a1a9-ea0440d4bff8'
-  continueOnError: true
-
-- task: NuGetCommand@2
-  displayName: Push (nuget.org)
-  inputs:
-    command: push
-    packagesToPush: '$(Build.ArtifactStagingDirectory)\**\*.nupkg'
-    nuGetFeedType: external
-    publishFeedCredentials: Nuget.org
-  continueOnError: true
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
 
 
