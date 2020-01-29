@@ -18,6 +18,7 @@ namespace ExRam.ReactiveCollections
         ReactiveCollectionSource<DictionaryChangedNotification<TKey, TValue>>,
         IDictionary<TKey, TValue>, 
         IDictionary,
+        IReadOnlyDictionary<TKey, TValue>,
         ICanHandleRanges<KeyValuePair<TKey, TValue>>
     {
         public DictionaryReactiveCollectionSource() : base(new DictionaryChangedNotification<TKey, TValue>(ImmutableDictionary<TKey, TValue>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList<KeyValuePair<TKey, TValue>>.Empty))
@@ -143,7 +144,6 @@ namespace ExRam.ReactiveCollections
         }
 
         ICollection<TValue> IDictionary<TKey, TValue>.Values => this.Current.Values.ToList();
-
         #endregion
 
         #region ICollection<KeyValuePair<TKey, TValue>> implementation
@@ -234,5 +234,7 @@ namespace ExRam.ReactiveCollections
 
         [NotNull]
         private ImmutableDictionary<TKey, TValue> Current => this.Subject.Value.Current;
+
+        IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => ((IDictionary<TKey, TValue>)this).Keys;
     }
 }
