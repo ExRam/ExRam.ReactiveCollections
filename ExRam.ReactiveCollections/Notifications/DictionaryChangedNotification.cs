@@ -23,7 +23,7 @@ namespace ExRam.ReactiveCollections
 
         public override ICollectionChangedNotification<KeyValuePair<TKey, TValue>> ToResetNotification()
         {
-            return new DictionaryChangedNotification<TKey, TValue>(this.Current, NotifyCollectionChangedAction.Reset, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList<KeyValuePair<TKey, TValue>>.Empty);
+            return new DictionaryChangedNotification<TKey, TValue>(Current, NotifyCollectionChangedAction.Reset, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList<KeyValuePair<TKey, TValue>>.Empty);
         }
 
         public new ImmutableDictionary<TKey, TValue> Current => (ImmutableDictionary<TKey, TValue>)base.Current;

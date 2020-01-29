@@ -21,17 +21,17 @@ namespace System.Reactive.Linq
 
             public ToConnectableReactiveCollectionImpl([NotNull] IObservable<TNotification> changes, [NotNull] Func<IDisposable> connectFunction)
             {
-                this._changes = changes
+                _changes = changes
                     .Normalize();
 
-                this._connectFunction = connectFunction;
+                _connectFunction = connectFunction;
             }
 
-            IObservable<TNotification> IReactiveCollection<TNotification>.Changes => this._changes;
+            IObservable<TNotification> IReactiveCollection<TNotification>.Changes => _changes;
 
             public IDisposable Connect()
             {
-                return this._connectFunction();
+                return _connectFunction();
             }
         }
         #endregion

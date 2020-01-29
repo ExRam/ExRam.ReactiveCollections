@@ -13,10 +13,10 @@ namespace ExRam.ReactiveCollections
         public IReactiveCollection<ListChangedNotification<TChainedResult>> Select<TChainedResult>(Func<TResult, TChainedResult> selector, IEqualityComparer<TChainedResult> equalityComparer)
         {
             return new ListTransformationReactiveCollection<TSource, TChainedResult>(
-                this.Source,
-                this.Filter,
-                this.Selector != null
-                    ? (Func<TSource, TChainedResult>)(x => selector(this.Selector(x)))
+                Source,
+                Filter,
+                Selector != null
+                    ? (Func<TSource, TChainedResult>)(x => selector(Selector(x)))
                     : x => selector((TResult)(object)x),
                 equalityComparer);
         }
@@ -24,19 +24,19 @@ namespace ExRam.ReactiveCollections
         IReactiveCollection<ListChangedNotification<TResult>> ICanSortList<TResult>.Sort(IComparer<TResult> comparer)
         {
             return new SortedListTransformationReactiveCollection<TSource,TResult>(
-                this.Source,
-                this.Filter,
-                this.Selector,
+                Source,
+                Filter,
+                Selector,
                 comparer,
-                this.EqualityComparer);
+                EqualityComparer);
         }
 
         IReactiveCollection<SortedSetChangedNotification<TResult>> ICanSortSet<TResult>.Sort(IComparer<TResult> comparer)
         {
             return new SortedSetTransformationReactiveCollection<TSource, TResult>(
-                 this.Source,
-                 this.Filter,
-                 this.Selector,
+                 Source,
+                 Filter,
+                 Selector,
                  comparer);
         }
     }

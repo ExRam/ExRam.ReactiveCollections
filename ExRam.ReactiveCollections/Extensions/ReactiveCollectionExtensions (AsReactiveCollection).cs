@@ -20,10 +20,10 @@ namespace ExRam.ReactiveCollections
 
             public AsReactiveCollectionImpl([NotNull] IReactiveCollection<TNotification> reactiveCollection)
             {
-                this._reactiveCollection = reactiveCollection;
+                _reactiveCollection = reactiveCollection;
             }
 
-            IObservable<TNotification> IReactiveCollection<TNotification>.Changes => this._reactiveCollection.Changes.AsObservable();
+            IObservable<TNotification> IReactiveCollection<TNotification>.Changes => _reactiveCollection.Changes.AsObservable();
         }
         #endregion
 

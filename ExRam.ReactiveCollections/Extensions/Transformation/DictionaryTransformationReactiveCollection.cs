@@ -12,10 +12,10 @@ namespace ExRam.ReactiveCollections
         public IReactiveCollection<DictionaryChangedNotification<TKey, TResult>> Select<TResult>(Func<TProjectedValue, TResult> selector)
         {
             return new DictionaryTransformationReactiveCollection<TKey, TOriginalValue, TResult>(
-               this.Source,
-               this.Filter,
-               this.Selector != null
-                   ? (Func<KeyValuePair<TKey, TOriginalValue>, KeyValuePair<TKey, TResult>>)(kvp => new KeyValuePair<TKey, TResult>(kvp.Key, selector(this.Selector(kvp).Value)))
+               Source,
+               Filter,
+               Selector != null
+                   ? (Func<KeyValuePair<TKey, TOriginalValue>, KeyValuePair<TKey, TResult>>)(kvp => new KeyValuePair<TKey, TResult>(kvp.Key, selector(Selector(kvp).Value)))
                    : (kvp => new KeyValuePair<TKey, TResult>(kvp.Key, selector((TProjectedValue)(object)kvp.Value))),
                EqualityComparer<KeyValuePair<TKey, TResult>>.Default);
         }

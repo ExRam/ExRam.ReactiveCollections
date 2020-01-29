@@ -28,96 +28,96 @@ namespace ExRam.ReactiveCollections
 
         public SortedListReactiveCollectionSource(IComparer<T> comparer)
         {
-            this._comparer = comparer;
+            _comparer = comparer;
         }
 
         public void Add(T item)
         {
-            this._innerList.Insert(this.FindInsertionIndex(item), item);
+            _innerList.Insert(FindInsertionIndex(item), item);
         }
 
         public void AddRange(IEnumerable<T> items)
         {
-            if (this._innerList.Count == 0)
-                this._innerList.AddRange(items.OrderBy(x => x, this._comparer));
+            if (_innerList.Count == 0)
+                _innerList.AddRange(items.OrderBy(x => x, _comparer));
             else
             {
                 foreach (var item in items)
                 {
-                    this.Add(item);
+                    Add(item);
                 }
             }
         }
 
         public void Clear()
         {
-            this._innerList.Clear();
+            _innerList.Clear();
         }
 
         public bool Contains(T item)
         {
-            return this._innerList.Contains(item);
+            return _innerList.Contains(item);
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            this._innerList.CopyTo(array, arrayIndex);
+            _innerList.CopyTo(array, arrayIndex);
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            return this._innerList.GetEnumerator();
+            return _innerList.GetEnumerator();
         }
 
         public int IndexOf(T item)
         {
-            return this._innerList.IndexOf(item);
+            return _innerList.IndexOf(item);
         }
 
         public bool Remove(T item)
         {
-            return this.Remove(item, EqualityComparer<T>.Default);
+            return Remove(item, EqualityComparer<T>.Default);
         }
 
         public bool Remove(T item, [NotNull] IEqualityComparer<T> equalityComparer)
         {
-            return this._innerList.Remove(item, equalityComparer);
+            return _innerList.Remove(item, equalityComparer);
         }
 
         public void RemoveAll([NotNull] Predicate<T> match)
         {
-            this._innerList.RemoveAll(match);
+            _innerList.RemoveAll(match);
         }
 
         public void RemoveAt(int index)
         {
-            this._innerList.RemoveAt(index);
+            _innerList.RemoveAt(index);
         }
 
         public void RemoveRange(int index, int count)
         {
-            this._innerList.RemoveRange(index, count);
+            _innerList.RemoveRange(index, count);
         }
 
         public void RemoveRange([NotNull] IEnumerable<T> items)
         {
-            this.RemoveRange(items, EqualityComparer<T>.Default);
+            RemoveRange(items, EqualityComparer<T>.Default);
         }
 
         public void RemoveRange(IEnumerable<T> items, IEqualityComparer<T> itemsequalityComparer)
         {
-            this._innerList.RemoveRange(items);
+            _innerList.RemoveRange(items);
         }
 
         public void Replace(T oldValue, T newValue)
         {
-            this.Replace(oldValue, newValue, EqualityComparer<T>.Default);
+            Replace(oldValue, newValue, EqualityComparer<T>.Default);
         }
 
         public void Replace(T oldValue, T newValue, IEqualityComparer<T> equalityComparer)
         {
-            this.Remove(oldValue, equalityComparer);
-            this.Add(newValue);
+            Remove(oldValue, equalityComparer);
+            Add(newValue);
         }
 
         #region Explicit ICollection implementation
@@ -125,13 +125,13 @@ namespace ExRam.ReactiveCollections
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
 
 
         void ICollection.CopyTo(Array array, int index)
         {
-            this.CopyTo((T[])array, index);
+            CopyTo((T[])array, index);
         }
 
         bool ICollection.IsSynchronized => false;
@@ -143,19 +143,19 @@ namespace ExRam.ReactiveCollections
         private int FindInsertionIndex(T item)
         {
             // TODO: Optimize, do a binary search or something.
-            for (var newInsertionIndex = 0; newInsertionIndex < this._innerList.Count; newInsertionIndex++)
+            for (var newInsertionIndex = 0; newInsertionIndex < _innerList.Count; newInsertionIndex++)
             {
-                if (this._comparer.Compare(item, this._innerList[newInsertionIndex]) < 0)
+                if (_comparer.Compare(item, _innerList[newInsertionIndex]) < 0)
                     return newInsertionIndex;
             }
 
-            return this._innerList.Count;
+            return _innerList.Count;
         }
 
-        public int Count => this._innerList.Count;
+        public int Count => _innerList.Count;
 
-        public T this[int index] => this._innerList[index];
+        public T this[int index] => _innerList[index];
 
-        public IReactiveCollection<ListChangedNotification<T>> ReactiveCollection => this._innerList.ReactiveCollection;
+        public IReactiveCollection<ListChangedNotification<T>> ReactiveCollection => _innerList.ReactiveCollection;
     }
 }

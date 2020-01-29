@@ -18,12 +18,12 @@ namespace System
 
             public ComparerImpl([NotNull] Comparison<T> comparison)
             {
-                this._comparison = comparison;
+                _comparison = comparison;
             }
 
             public int Compare(T x, T y)
             {
-                return this._comparison(x, y);
+                return _comparison(x, y);
             }
         }
         #endregion

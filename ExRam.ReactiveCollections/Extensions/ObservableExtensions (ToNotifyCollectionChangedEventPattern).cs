@@ -24,10 +24,10 @@ namespace System.Reactive.Linq
             {
                 add
                 {
-                    base.Add(value, (o, e) => value(o, e));
+                    Add(value, (o, e) => value(o, e));
                 }
 
-                remove => base.Remove(value);
+                remove => Remove(value);
             }
         }
         #endregion
@@ -44,10 +44,10 @@ namespace System.Reactive.Linq
             {
                 add
                 {
-                    base.Add(value, (o, e) => value(o, e));
+                    Add(value, (o, e) => value(o, e));
                 }
 
-                remove => base.Remove(value);
+                remove => Remove(value);
             }
         }
         #endregion

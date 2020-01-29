@@ -19,8 +19,8 @@ namespace System.Reactive.Linq
 
             public StateHolder(bool first, TNotification notification)
             {
-                this.First = first;
-                this.Notification = notification;
+                First = first;
+                Notification = notification;
             }
         }
         #endregion

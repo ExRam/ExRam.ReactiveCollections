@@ -31,17 +31,17 @@ namespace ExRam.ReactiveCollections
 
         public void Add(T value)
         {
-            var current = this.Current;
+            var current = Current;
             var newSet = current.Add(value);
             if (newSet != current)
-                this.Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, ImmutableList.Create(value), newSet.IndexOf(value)));
+                Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, ImmutableList.Create(value), newSet.IndexOf(value)));
         }
 
         public void AddRange(IEnumerable<T> items)
         {
             foreach (var item in items)
             {
-                this.Add(item);
+                Add(item);
             }
         }
 
@@ -49,102 +49,102 @@ namespace ExRam.ReactiveCollections
         {
             foreach (var item in items)
             {
-                this.Remove(item);
+                Remove(item);
             }
         }
 
         public void Clear()
         {
-            var current = this.Current;
+            var current = Current;
 
             if (!current.IsEmpty)
-                this.Subject.OnNext(new SortedSetChangedNotification<T>(current.Clear(), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+                Subject.OnNext(new SortedSetChangedNotification<T>(current.Clear(), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
         public void Except([NotNull] IEnumerable<T> other)
         {
-            var current = this.Current;
+            var current = Current;
             var newSet = current.Except(other);
 
             if (newSet != current)
-                this.Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+                Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
         public void Intersect([NotNull] IEnumerable<T> other)
         {
-            var current = this.Current;
+            var current = Current;
             var newSet = current.Intersect(other);
 
             if (newSet != current)
-                this.Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+                Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
         public bool IsProperSubsetOf(IEnumerable<T> other)
         {
-            return this.Current.IsProperSubsetOf(other);
+            return Current.IsProperSubsetOf(other);
         }
 
         public bool IsProperSupersetOf(IEnumerable<T> other)
         {
-            return this.Current.IsProperSupersetOf(other);
+            return Current.IsProperSupersetOf(other);
         }
 
         public bool IsSubsetOf(IEnumerable<T> other)
         {
-            return this.Current.IsSubsetOf(other);
+            return Current.IsSubsetOf(other);
         }
 
         public bool IsSupersetOf(IEnumerable<T> other)
         {
-            return this.Current.IsSupersetOf(other);
+            return Current.IsSupersetOf(other);
         }
 
         public bool Overlaps(IEnumerable<T> other)
         {
-            return this.Current.Overlaps(other);
+            return Current.Overlaps(other);
         }
 
         public void Remove(T value)
         {
-            var current = this.Current;
+            var current = Current;
             var newSet = current.Remove(value);
 
             if (newSet != current)
-                this.Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Remove, ImmutableList.Create(value), ImmutableList<T>.Empty, this.Current.IndexOf(value)));
+                Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Remove, ImmutableList.Create(value), ImmutableList<T>.Empty, Current.IndexOf(value)));
         }
 
         public bool SetEquals(IEnumerable<T> other)
         {
-            return this.Current.SetEquals(other);
+            return Current.SetEquals(other);
         }
 
         public void SymmetricExcept([NotNull] IEnumerable<T> other)
         {
-            var current = this.Current;
+            var current = Current;
             var newSet = current.SymmetricExcept(other);
 
             if (newSet != current)
-                this.Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+                Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
         public bool TryGetValue(T equalValue, out T actualValue)
         {
-            return this.Current.TryGetValue(equalValue, out actualValue);
+            return Current.TryGetValue(equalValue, out actualValue);
         }
 
         public void Union([NotNull] IEnumerable<T> other)
         {
-            var current = this.Current;
+            var current = Current;
             var newSet = current.Union(other);
 
             if (newSet != current)
-                this.Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+                Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
         #region IList<T> implementation
         public int IndexOf(T item)
         {
-            return this.Current.IndexOf(item);
+            return Current.IndexOf(item);
         }
 
         void IList<T>.Insert(int index, T item)
@@ -159,7 +159,7 @@ namespace ExRam.ReactiveCollections
 
         public T this[int index]
         {
-            get => this.Current[index];
+            get => Current[index];
 
             set => throw new NotSupportedException();
         }
@@ -168,41 +168,41 @@ namespace ExRam.ReactiveCollections
         #region ICollection<T> implementation
         void ICollection<T>.Add(T item)
         {
-            this.Add(item);
+            Add(item);
         }
 
         void ICollection<T>.Clear()
         {
-            this.Clear();
+            Clear();
         }
 
         public bool Contains(T item)
         {
-            return this.Current.Contains(item);
+            return Current.Contains(item);
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            ((ICollection<T>)this.Current).CopyTo(array, arrayIndex);
+            ((ICollection<T>)Current).CopyTo(array, arrayIndex);
         }
 
-        public int Count => this.Current.Count;
+        public int Count => Current.Count;
 
         bool ICollection<T>.IsReadOnly => false;
 
         bool ICollection<T>.Remove(T item)
         {
-            var oldList = this.Current;
-            this.Remove(item);
+            var oldList = Current;
+            Remove(item);
 
-            return this.Current != oldList;
+            return Current != oldList;
         }
         #endregion
 
         #region IEnumerable<T> implemenation
         public IEnumerator<T> GetEnumerator()
         {
-            return this.Current.GetEnumerator();
+            return Current.GetEnumerator();
         }
         #endregion
 
@@ -214,17 +214,17 @@ namespace ExRam.ReactiveCollections
 
         void IList.Clear()
         {
-            this.Clear();
+            Clear();
         }
 
         bool IList.Contains(object value)
         {
-            return this.Contains((T)value);
+            return Contains((T)value);
         }
 
         int IList.IndexOf(object value)
         {
-            return this.IndexOf((T)value);
+            return IndexOf((T)value);
         }
 
         void IList.Insert(int index, object value)
@@ -234,7 +234,7 @@ namespace ExRam.ReactiveCollections
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
 
         bool IList.IsFixedSize => false;
@@ -243,7 +243,7 @@ namespace ExRam.ReactiveCollections
 
         void IList.Remove(object value)
         {
-            this.Remove((T)value);
+            Remove((T)value);
         }
 
         void IList.RemoveAt(int index)
@@ -260,7 +260,7 @@ namespace ExRam.ReactiveCollections
 
         void ICollection.CopyTo(Array array, int index)
         {
-            this.CopyTo((T[])array, index);
+            CopyTo((T[])array, index);
         }
 
         bool ICollection.IsSynchronized => false;
@@ -297,6 +297,6 @@ namespace ExRam.ReactiveCollections
         #endregion
 
         [NotNull]
-        private ImmutableSortedSet<T> Current => this.Subject.Value.Current;
+        private ImmutableSortedSet<T> Current => Subject.Value.Current;
     }
 }

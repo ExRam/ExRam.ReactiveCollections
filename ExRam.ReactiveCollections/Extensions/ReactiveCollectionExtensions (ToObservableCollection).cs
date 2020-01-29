@@ -24,16 +24,16 @@ namespace ExRam.ReactiveCollections
             #region Events
             public event PropertyChangedEventHandler PropertyChanged
             {
-                add => this._propertyChanged.PropertyChanged += value;
+                add => _propertyChanged.PropertyChanged += value;
 
-                remove => this._propertyChanged.PropertyChanged -= value;
+                remove => _propertyChanged.PropertyChanged -= value;
             }
 
             public event NotifyCollectionChangedEventHandler CollectionChanged
             {
-                add => this._collectionChanged.CollectionChanged += value;
+                add => _collectionChanged.CollectionChanged += value;
 
-                remove => this._collectionChanged.CollectionChanged -= value;
+                remove => _collectionChanged.CollectionChanged -= value;
             }
             #endregion
 
@@ -45,7 +45,7 @@ namespace ExRam.ReactiveCollections
             public ReactiveReadOnlyObservableCollection([NotNull] IObservable<IIndexedCollectionChangedNotification<T>> source)
             {
                 var eventArgs = source
-                    .Do(notification => this._currentList = notification.Current)
+                    .Do(notification => _currentList = notification.Current)
                     .Skip(1)
                     .SelectMany(notification => Observable
                         .Create<EventArgs>(obs =>
@@ -81,9 +81,9 @@ namespace ExRam.ReactiveCollections
 
                                 default:
                                 {
-                                    if (this._currentList.Count > 0)
+                                    if (_currentList.Count > 0)
                                     {
-                                        this._currentList = ImmutableList<T>.Empty;
+                                        _currentList = ImmutableList<T>.Empty;
 
                                         obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
                                         obs.OnNext(new PropertyChangedEventArgs("Count"));
@@ -92,7 +92,7 @@ namespace ExRam.ReactiveCollections
 
                                     if (notification.Current.Count > 0)
                                     {
-                                        this._currentList = notification.Current;
+                                        _currentList = notification.Current;
 
                                         obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)notification.Current, 0));
                                         obs.OnNext(new PropertyChangedEventArgs("Count"));
@@ -108,11 +108,11 @@ namespace ExRam.ReactiveCollections
                     .Publish()
                     .RefCount();
 
-                this._collectionChanged = eventArgs
+                _collectionChanged = eventArgs
                     .OfType<NotifyCollectionChangedEventArgs>()
                     .ToNotifyCollectionChangedEventPattern(this);
 
-                this._propertyChanged = eventArgs
+                _propertyChanged = eventArgs
                     .OfType<PropertyChangedEventArgs>()
                     .ToNotifyPropertyChangedEventPattern(this);
             }
@@ -129,7 +129,7 @@ namespace ExRam.ReactiveCollections
 
             bool ICollection<T>.Contains(T item)
             {
-                if (!(this._currentList is ICollection<T> list))
+                if (!(_currentList is ICollection<T> list))
                     throw new InvalidOperationException();
 
                 return list.Contains(item);
@@ -137,13 +137,13 @@ namespace ExRam.ReactiveCollections
 
             void ICollection<T>.CopyTo(T[] array, int arrayIndex)
             {
-                if (!(this._currentList is ICollection<T> list))
+                if (!(_currentList is ICollection<T> list))
                     throw new InvalidOperationException();
 
                 list.CopyTo(array, arrayIndex);
             }
 
-            public int Count => this._currentList.Count;
+            public int Count => _currentList.Count;
 
             public bool IsReadOnly => true;
 
@@ -154,17 +154,17 @@ namespace ExRam.ReactiveCollections
 
             IEnumerator<T> IEnumerable<T>.GetEnumerator()
             {
-                return this._currentList.GetEnumerator();
+                return _currentList.GetEnumerator();
             }
 
             IEnumerator IEnumerable.GetEnumerator()
             {
-                return this._currentList.GetEnumerator();
+                return _currentList.GetEnumerator();
             }
 
             int IList<T>.IndexOf(T item)
             {
-                var list = this._currentList as IList<T>;
+                var list = _currentList as IList<T>;
                 if (list == null)
                     throw new InvalidOperationException();
 
@@ -185,7 +185,7 @@ namespace ExRam.ReactiveCollections
             {
                 get
                 {
-                    if (!(this._currentList is IReadOnlyList<T> list))
+                    if (!(_currentList is IReadOnlyList<T> list))
                         throw new InvalidOperationException();
 
                     return list[index];
@@ -202,12 +202,12 @@ namespace ExRam.ReactiveCollections
 
             bool IList.Contains(object value)
             {
-                return ((IList)this._currentList).Contains(value);
+                return ((IList)_currentList).Contains(value);
             }
 
             int IList.IndexOf(object value)
             {
-                return ((IList)this._currentList).IndexOf(value);
+                return ((IList)_currentList).IndexOf(value);
             }
 
             void IList.Insert(int index, object value)
@@ -235,7 +235,7 @@ namespace ExRam.ReactiveCollections
 
             void ICollection.CopyTo(Array array, int index)
             {
-                ((ICollection)this._currentList).CopyTo(array, index);
+                ((ICollection)_currentList).CopyTo(array, index);
             }
 
             bool ICollection.IsSynchronized => false;

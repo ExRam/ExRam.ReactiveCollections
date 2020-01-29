@@ -21,21 +21,20 @@ namespace ExRam.ReactiveCollections
 
             public ReactiveCollectionImpl([NotNull] IObservable<TNotification> subject)
             {
-                this._changes = subject
+                _changes = subject
                     .Normalize();
             }
 
-            IObservable<TNotification> IReactiveCollection<TNotification>.Changes => this._changes;
+            IObservable<TNotification> IReactiveCollection<TNotification>.Changes => _changes;
         }
         #endregion
 
         protected ReactiveCollectionSource([NotNull] TNotification initialNotification)
         {
-            this.Subject = new BehaviorSubject<TNotification>(initialNotification);
-            this.ReactiveCollection = new ReactiveCollectionImpl(this.Subject);
+            Subject = new BehaviorSubject<TNotification>(initialNotification);
+            ReactiveCollection = new ReactiveCollectionImpl(Subject);
         }
 
-        [NotNull]
         public IReactiveCollection<TNotification> ReactiveCollection { get; }
 
         [NotNull]

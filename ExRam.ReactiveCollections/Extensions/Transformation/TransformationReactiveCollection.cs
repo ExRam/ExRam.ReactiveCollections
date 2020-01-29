@@ -18,12 +18,12 @@ namespace ExRam.ReactiveCollections
             Func<TSource, TResult> selector,
             [NotNull] IEqualityComparer<TResult> equalityComparer)
         {
-            this.Source = source;
-            this.Filter = filter;
-            this.Selector = selector;
-            this.EqualityComparer = equalityComparer;
+            Source = source;
+            Filter = filter;
+            Selector = selector;
+            EqualityComparer = equalityComparer;
 
-            this.Changes = Observable
+            Changes = Observable
                 .Defer(() =>
                 {
                     var syncRoot = new object();

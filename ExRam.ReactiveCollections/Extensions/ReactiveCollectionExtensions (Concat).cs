@@ -24,8 +24,8 @@ namespace ExRam.ReactiveCollections
             {
                 protected Node(ImmutableList<T> list, int maxIndex)
                 {
-                    this.List = list;
-                    this.MaxIndex = maxIndex;
+                    List = list;
+                    MaxIndex = maxIndex;
                 }
 
                 [NotNull]
@@ -46,20 +46,20 @@ namespace ExRam.ReactiveCollections
                         : null,
                     Math.Max(left.MaxIndex, right.MaxIndex))
                 {
-                    this._left = left;
-                    this._right = right;
+                    _left = left;
+                    _right = right;
                 }
 
                 public override Node ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
                 {
-                    if (this.MaxIndex < index)
+                    if (MaxIndex < index)
                         throw new InvalidOperationException();
 
-                    if (this._left.MaxIndex >= index)
-                        return new InnerNode(this._left.ReplaceNode(newList, index, out replacementOffset, out oldList), this._right);
+                    if (_left.MaxIndex >= index)
+                        return new InnerNode(_left.ReplaceNode(newList, index, out replacementOffset, out oldList), _right);
 
-                    var newNode = new InnerNode(this._left, this._right.ReplaceNode(newList, index, out replacementOffset, out oldList));
-                    replacementOffset += this._left.List?.Count;
+                    var newNode = new InnerNode(_left, _right.ReplaceNode(newList, index, out replacementOffset, out oldList));
+                    replacementOffset += _left.List?.Count;
 
                     return newNode;
                 }
@@ -73,7 +73,7 @@ namespace ExRam.ReactiveCollections
 
                 public override Node ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
                 {
-                    oldList = this.List;
+                    oldList = List;
                     replacementOffset = 0;
 
                     return new TerminalNode(newList, index);
@@ -89,8 +89,8 @@ namespace ExRam.ReactiveCollections
 
                 public IndexedNotification(int index, ListChangedNotification<T> notification)
                 {
-                    this.Index = index;
-                    this.Notification = notification;
+                    Index = index;
+                    Notification = notification;
                 }
             }
             #endregion
@@ -99,11 +99,11 @@ namespace ExRam.ReactiveCollections
                 [NotNull] IObservable<ListChangedNotification<T>>[] sources,
                 [NotNull] IEqualityComparer<T> equalityComparer)
             {
-                this.Changes = Observable
+                Changes = Observable
                     .Defer(() =>
                     {
                         var syncRoot = new object();
-                        var rootNode = this.GetTree(0, sources.Length - 1);
+                        var rootNode = GetTree(0, sources.Length - 1);
 
                         return sources
                             .Select((observable, i) => observable
@@ -166,7 +166,7 @@ namespace ExRam.ReactiveCollections
 
                 var half = (max - min + 1) / 2;
                
-                return new InnerNode(this.GetTree(min, min + half - 1), this.GetTree(min + half, max));
+                return new InnerNode(GetTree(min, min + half - 1), GetTree(min + half, max));
             } 
         }
         #endregion

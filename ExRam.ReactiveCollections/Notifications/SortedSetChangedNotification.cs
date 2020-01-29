@@ -16,12 +16,12 @@ namespace ExRam.ReactiveCollections
         // ReSharper disable once SuggestBaseTypeForParameter
         public SortedSetChangedNotification([NotNull] ImmutableSortedSet<T> current, NotifyCollectionChangedAction action, [NotNull] IReadOnlyList<T> oldItems, [NotNull] IReadOnlyList<T> newItems, int? index) : base(current, action, oldItems, newItems)
         {
-            this.Index = index;
+            Index = index;
         }
 
         public override ICollectionChangedNotification<T> ToResetNotification()
         {
-            return new SortedSetChangedNotification<T>(this.Current, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
+            return new SortedSetChangedNotification<T>(Current, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
         }
 
         public int? Index { get; }

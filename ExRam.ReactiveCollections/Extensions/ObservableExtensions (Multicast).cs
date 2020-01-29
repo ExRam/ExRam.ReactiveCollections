@@ -24,34 +24,34 @@ namespace System.Reactive.Linq
 
             public MulticastConnectableObservable([NotNull] IObservable<T> source, [NotNull] Func<ISubject<T>> subjectFactory)
             {
-                this._source = source;
-                this._subjectFactory = subjectFactory;
+                _source = source;
+                _subjectFactory = subjectFactory;
             }
 
             public IDisposable Connect()
             {
-                lock (this._syncRoot)
+                lock (_syncRoot)
                 {
-                    if (this._currentSubscription != null)
+                    if (_currentSubscription != null)
                         throw new InvalidOperationException();
 
-                    if (this._currentSubject == null)
-                        this._currentSubject = this._subjectFactory();
+                    if (_currentSubject == null)
+                        _currentSubject = _subjectFactory();
 
-                    var sourceSubscription = this._currentSubscription = this._source.Subscribe(this._currentSubject);
+                    var sourceSubscription = _currentSubscription = _source.Subscribe(_currentSubject);
 
                     return new CompositeDisposable(
                         sourceSubscription,
                         Disposable.Create(() =>
                         {
-                            lock (this._syncRoot)
+                            lock (_syncRoot)
                             {
-                                if (object.ReferenceEquals(this._currentSubscription, sourceSubscription))
+                                if (ReferenceEquals(_currentSubscription, sourceSubscription))
                                 {
-                                    this._currentSubscription = null;
+                                    _currentSubscription = null;
 
-                                    (this._currentSubject as IDisposable)?.Dispose();
-                                    this._currentSubject = null;
+                                    (_currentSubject as IDisposable)?.Dispose();
+                                    _currentSubject = null;
                                 }
                             }
                         }));
@@ -60,12 +60,12 @@ namespace System.Reactive.Linq
 
             public IDisposable Subscribe(IObserver<T> observer)
             {
-                lock (this._syncRoot)
+                lock (_syncRoot)
                 {
-                    if (this._currentSubject == null)
-                        this._currentSubject = this._subjectFactory();
+                    if (_currentSubject == null)
+                        _currentSubject = _subjectFactory();
 
-                    return this._currentSubject.Subscribe(observer);
+                    return _currentSubject.Subscribe(observer);
                 }
             }
         }

@@ -19,11 +19,11 @@ namespace System.Reactive.Linq
 
             public ToReactiveCollectionImpl([NotNull] IObservable<TNotification> changes)
             {
-                this._changes = changes
+                _changes = changes
                     .Normalize();
             }
 
-            IObservable<TNotification> IReactiveCollection<TNotification>.Changes => this._changes;
+            IObservable<TNotification> IReactiveCollection<TNotification>.Changes => _changes;
         }
         #endregion
 

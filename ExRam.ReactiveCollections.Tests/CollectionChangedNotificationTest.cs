@@ -17,7 +17,7 @@ namespace ExRam.ReactiveCollections.Tests
 
             public override ICollectionChangedNotification<int> ToResetNotification()
             {
-                return new NotificationImpl((ImmutableList<int>)this.Current, NotifyCollectionChangedAction.Reset, ImmutableList<int>.Empty, ImmutableList<int>.Empty);
+                return new NotificationImpl((ImmutableList<int>)Current, NotifyCollectionChangedAction.Reset, ImmutableList<int>.Empty, ImmutableList<int>.Empty);
             }
         }
         #endregion

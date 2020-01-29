@@ -16,12 +16,12 @@ namespace ExRam.ReactiveCollections
         // ReSharper disable once SuggestBaseTypeForParameter
         public ListChangedNotification([NotNull] ImmutableList<T> current, NotifyCollectionChangedAction action, [NotNull] IReadOnlyList<T> oldItems, [NotNull] IReadOnlyList<T> newItems, int? index) : base(current, action, oldItems, newItems)
         {
-            this.Index = index;
+            Index = index;
         }
 
         public override ICollectionChangedNotification<T> ToResetNotification()
         {
-            return new ListChangedNotification<T>(this.Current, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
+            return new ListChangedNotification<T>(Current, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
         }
 
         public int? Index { get; }
