@@ -18,15 +18,16 @@ namespace ExRam.ReactiveCollections
 
         public static IReactiveCollection<ListChangedNotification<TSource>> Where<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, IEqualityComparer<TSource> equalityComparer)
         {
-            return source is ListTransformationReactiveCollection<TSource, TSource> nonProjected && nonProjected.Selector == null
-                ? new ListTransformationReactiveCollection<TSource, TSource>(nonProjected.Source, x => nonProjected.Filter(x) && filter(x), null, nonProjected.EqualityComparer)
+            return source is ListTransformationReactiveCollection<TSource, TSource> {Selector: null, Filter: not null} nonProjected
+                ? new ListTransformationReactiveCollection<TSource, TSource>(nonProjected.Source, x => nonProjected.Filter!(x) && filter(x), null, nonProjected.EqualityComparer)
                 : new ListTransformationReactiveCollection<TSource, TSource>(source, filter, null, equalityComparer);
         }
 
         public static IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> Where<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> source, Predicate<TValue> filter)
+            where TKey : notnull
         {
-            return source is DictionaryTransformationReactiveCollection<TKey, TValue, TValue> nonProjected && nonProjected.Selector == null
-                ? new DictionaryTransformationReactiveCollection<TKey, TValue, TValue>(nonProjected.Source, kvp => nonProjected.Filter(kvp) && filter(kvp.Value), null, nonProjected.EqualityComparer)
+            return source is DictionaryTransformationReactiveCollection<TKey, TValue, TValue> {Selector: null, Filter: not null} nonProjected
+                ? new DictionaryTransformationReactiveCollection<TKey, TValue, TValue>(nonProjected.Source, kvp => nonProjected.Filter!(kvp) && filter(kvp.Value), null, nonProjected.EqualityComparer)
                 : new DictionaryTransformationReactiveCollection<TKey, TValue, TValue>(source, kvp => filter(kvp.Value), null, EqualityComparer<KeyValuePair<TKey, TValue>>.Default);
         }
     }

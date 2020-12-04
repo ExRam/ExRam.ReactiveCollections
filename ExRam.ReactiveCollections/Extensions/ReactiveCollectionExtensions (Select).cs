@@ -24,6 +24,7 @@ namespace ExRam.ReactiveCollections
         }
 
         public static IReactiveCollection<DictionaryChangedNotification<TKey, TResult>> Select<TKey, TSource, TResult>(this IReactiveCollection<DictionaryChangedNotification<TKey, TSource>> source, Func<TSource, TResult> selector)
+            where TKey : notnull
         {
             var ret = (source as ICanProjectDictionary<TKey, TSource>)?.Select(selector);
 

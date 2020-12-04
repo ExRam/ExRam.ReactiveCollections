@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>ExRam.ReactiveCollections.Tests</Description>
     <Authors>ExRam EDV GmbH &amp; Co. KG</Authors>
-    <TargetFramework>netcoreapp31</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <NoWarn>$(NoWarn);CS1998</NoWarn>
     <AssemblyName>ExRam.ReactiveCollections.Tests</AssemblyName>
     <PackageId>ExRam.ReactiveCollections.Tests</PackageId>

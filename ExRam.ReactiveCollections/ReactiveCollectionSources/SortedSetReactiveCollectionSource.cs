@@ -206,7 +206,7 @@ namespace ExRam.ReactiveCollections
         #endregion
 
         #region IList implementation
-        int IList.Add(object value)
+        int IList.Add(object? value)
         {
             throw new NotSupportedException();
         }
@@ -216,17 +216,17 @@ namespace ExRam.ReactiveCollections
             Clear();
         }
 
-        bool IList.Contains(object value)
+        bool IList.Contains(object? value)
         {
             return Contains((T)value);
         }
 
-        int IList.IndexOf(object value)
+        int IList.IndexOf(object? value)
         {
             return IndexOf((T)value);
         }
 
-        void IList.Insert(int index, object value)
+        void IList.Insert(int index, object? value)
         {
             throw new NotSupportedException();
         }
@@ -240,7 +240,7 @@ namespace ExRam.ReactiveCollections
 
         bool IList.IsReadOnly => false;
 
-        void IList.Remove(object value)
+        void IList.Remove(object? value)
         {
             Remove((T)value);
         }
@@ -250,10 +250,9 @@ namespace ExRam.ReactiveCollections
             throw new NotSupportedException();
         }
 
-        object IList.this[int index]
+        object? IList.this[int index]
         {
             get => this[index];
-
             set => throw new NotSupportedException();
         }
 

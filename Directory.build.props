@@ -6,6 +6,7 @@
     <NoWarn>$(NoWarn);CS1998</NoWarn>
     <PublicRelease>true</PublicRelease>
     <LangVersion>9.0</LangVersion>
+	<Nullable>enable</Nullable>
     <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
   </PropertyGroup>
 

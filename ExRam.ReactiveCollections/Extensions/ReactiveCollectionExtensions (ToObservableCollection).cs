@@ -21,14 +21,14 @@ namespace ExRam.ReactiveCollections
         private sealed class ReactiveReadOnlyObservableCollection<T> : IList<T>, IReadOnlyList<T>, IList, INotifyCollectionChanged, INotifyPropertyChanged
         {
             #region Events
-            public event PropertyChangedEventHandler PropertyChanged
+            public event PropertyChangedEventHandler? PropertyChanged
             {
                 add => _propertyChanged.PropertyChanged += value;
 
                 remove => _propertyChanged.PropertyChanged -= value;
             }
 
-            public event NotifyCollectionChangedEventHandler CollectionChanged
+            public event NotifyCollectionChangedEventHandler? CollectionChanged
             {
                 add => _collectionChanged.CollectionChanged += value;
 
@@ -53,7 +53,7 @@ namespace ExRam.ReactiveCollections
                             {
                                 case NotifyCollectionChangedAction.Add:
                                 {
-                                    obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)notification.NewItems, notification.Index.Value));
+                                    obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)notification.NewItems, notification.Index!.Value));
                                     obs.OnNext(new PropertyChangedEventArgs("Count"));
                                     obs.OnNext(new PropertyChangedEventArgs("Item[]"));
 
@@ -63,7 +63,7 @@ namespace ExRam.ReactiveCollections
                                 case NotifyCollectionChangedAction.Remove:
                                 {
 
-                                    obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, (IList)notification.OldItems, notification.Index.Value));
+                                    obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, (IList)notification.OldItems, notification.Index!.Value));
                                     obs.OnNext(new PropertyChangedEventArgs("Count"));
                                     obs.OnNext(new PropertyChangedEventArgs("Item[]"));
 
@@ -72,7 +72,7 @@ namespace ExRam.ReactiveCollections
 
                                 case NotifyCollectionChangedAction.Replace:
                                 {
-                                    obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, (IList)notification.NewItems, (IList)notification.OldItems, notification.Index.Value));
+                                    obs.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, (IList)notification.NewItems, (IList)notification.OldItems, notification.Index!.Value));
                                     obs.OnNext(new PropertyChangedEventArgs("Item[]"));
 
                                     break;
@@ -194,29 +194,29 @@ namespace ExRam.ReactiveCollections
 
             T IReadOnlyList<T>.this[int index] => ((IList<T>)this)[index];
 
-            int IList.Add(object value)
+            int IList.Add(object? value)
             {
                 throw new NotSupportedException();
             }
 
-            bool IList.Contains(object value)
+            bool IList.Contains(object? value)
             {
                 return ((IList)_currentList).Contains(value);
             }
 
-            int IList.IndexOf(object value)
+            int IList.IndexOf(object? value)
             {
                 return ((IList)_currentList).IndexOf(value);
             }
 
-            void IList.Insert(int index, object value)
+            void IList.Insert(int index, object? value)
             {
                 throw new NotSupportedException();
             }
 
             bool IList.IsFixedSize => false;
 
-            void IList.Remove(object value)
+            void IList.Remove(object? value)
             {
                 throw new NotSupportedException();
             }
@@ -226,7 +226,7 @@ namespace ExRam.ReactiveCollections
                 throw new NotSupportedException();
             }
 
-            object IList.this[int index]
+            object? IList.this[int index]
             {
                 get => ((IList<T>)this)[index];
                 set => throw new NotSupportedException();

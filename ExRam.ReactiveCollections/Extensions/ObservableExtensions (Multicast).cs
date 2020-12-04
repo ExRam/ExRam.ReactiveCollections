@@ -18,8 +18,8 @@ namespace System.Reactive.Linq
             private readonly object _syncRoot = new();
             private readonly Func<ISubject<T>> _subjectFactory;
 
-            private ISubject<T> _currentSubject;
-            private IDisposable _currentSubscription;
+            private ISubject<T>? _currentSubject;
+            private IDisposable? _currentSubscription;
 
             public MulticastConnectableObservable(IObservable<T> source, Func<ISubject<T>> subjectFactory)
             {

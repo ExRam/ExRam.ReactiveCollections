@@ -19,14 +19,22 @@ namespace System.Reactive.Linq
             {
             }
 
-            public event NotifyCollectionChangedEventHandler CollectionChanged
+            public event NotifyCollectionChangedEventHandler? CollectionChanged
             {
                 add
                 {
-                    Add(value, (o, e) => value(o, e));
-                }
+                    if (value is null)
+                        throw new ArgumentNullException();
 
-                remove => Remove(value);
+                    Add(value, (o, e) => value?.Invoke(o, e));
+                }
+                remove
+                {
+                    if (value is null)
+                        throw new ArgumentNullException();
+
+                    Remove(value);
+                }
             }
         }
         #endregion
@@ -39,14 +47,23 @@ namespace System.Reactive.Linq
             {
             }
 
-            public event PropertyChangedEventHandler PropertyChanged
+            public event PropertyChangedEventHandler? PropertyChanged
             {
                 add
                 {
-                    Add(value, (o, e) => value(o, e));
+                    if (value is null)
+                        throw new ArgumentNullException();
+
+                    Add(value, (o, e) => value?.Invoke(o, e));
                 }
 
-                remove => Remove(value);
+                remove
+                {
+                    if (value is null)
+                        throw new ArgumentNullException();
+
+                    Remove(value);
+                }
             }
         }
         #endregion

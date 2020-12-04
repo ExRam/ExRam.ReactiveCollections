@@ -11,8 +11,10 @@ using System.Collections.Specialized;
 namespace ExRam.ReactiveCollections
 {
     public sealed class DictionaryChangedNotification<TKey, TValue> : CollectionChangedNotification<KeyValuePair<TKey, TValue>>
+        where TKey: notnull
     {
-        public DictionaryChangedNotification(ImmutableDictionary<TKey, TValue> current,
+        public DictionaryChangedNotification(
+            ImmutableDictionary<TKey, TValue> current,
             NotifyCollectionChangedAction action,
             IReadOnlyList<KeyValuePair<TKey, TValue>> oldItems,
             IReadOnlyList<KeyValuePair<TKey, TValue>> newItems) : base(current, action, oldItems, newItems)

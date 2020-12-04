@@ -14,9 +14,9 @@ namespace System.Reactive.Linq
         private readonly struct StateHolder<TNotification>
         {
             public readonly bool First;
-            public readonly TNotification Notification;
+            public readonly TNotification? Notification;
 
-            public StateHolder(bool first, TNotification notification)
+            public StateHolder(bool first, TNotification? notification)
             {
                 First = first;
                 Notification = notification;
@@ -28,8 +28,8 @@ namespace System.Reactive.Linq
             where TNotification : ICollectionChangedNotification
         {
             return observable
-                .Scan(new StateHolder<TNotification>(true, default(TNotification)), (state, notification) => new StateHolder<TNotification>(false, state.First ? (TNotification)notification.ToResetNotification() : notification))
-                .Select(x => x.Notification);
+                .Scan(new StateHolder<TNotification>(true, default), (state, notification) => new StateHolder<TNotification>(false, state.First ? (TNotification)notification.ToResetNotification() : notification))
+                .Select(x => x.Notification!);
         }
     }
 }
