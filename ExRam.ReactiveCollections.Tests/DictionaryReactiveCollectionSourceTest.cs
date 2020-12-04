@@ -47,6 +47,26 @@ namespace ExRam.ReactiveCollections.Tests
         }
 
         [Fact]
+        public async Task Add_null()
+        {
+            var list = new DictionaryReactiveCollectionSource<string, string?>();
+
+            var notificationTask = list.ReactiveCollection.Changes
+                .Skip(1)
+                .FirstAsync()
+                .ToTask();
+
+            list.Add("Key", null);
+
+            var notification = await notificationTask;
+
+            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
+            notification.OldItems.Should().BeEmpty();
+            notification.NewItems.Should().Equal(new KeyValuePair<string, string?>("Key", null));
+            notification.Current.Should().Contain("Key", null);
+        }
+
+        [Fact]
         public void Adding_existing_key_throws()
         {
             Assert.Throws<ArgumentException>(
