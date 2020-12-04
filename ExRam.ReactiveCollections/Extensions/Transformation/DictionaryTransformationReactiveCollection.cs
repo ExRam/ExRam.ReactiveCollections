@@ -17,7 +17,7 @@ namespace ExRam.ReactiveCollections
                Filter,
                Selector != null
                    ? (Func<KeyValuePair<TKey, TOriginalValue>, KeyValuePair<TKey, TResult>>)(kvp => new KeyValuePair<TKey, TResult>(kvp.Key, selector(Selector(kvp).Value)))
-                   : (kvp => new KeyValuePair<TKey, TResult>(kvp.Key, selector((TProjectedValue)(object)kvp.Value))),
+                   : (kvp => new KeyValuePair<TKey, TResult>(kvp.Key, selector((TProjectedValue)(object)kvp.Value!))),
                EqualityComparer<KeyValuePair<TKey, TResult>>.Default);
         }
     }
