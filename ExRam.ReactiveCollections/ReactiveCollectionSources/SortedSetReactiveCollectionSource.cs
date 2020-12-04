@@ -206,39 +206,21 @@ namespace ExRam.ReactiveCollections
             Clear();
         }
 
-        bool IList.Contains(object? value)
-        {
-            return Contains((T)value);
-        }
+        bool IList.Contains(object? value) => Contains((T)value!);
 
-        int IList.IndexOf(object? value)
-        {
-            return IndexOf((T)value);
-        }
+        int IList.IndexOf(object? value) => IndexOf((T)value!);
 
-        void IList.Insert(int index, object? value)
-        {
-            throw new NotSupportedException();
-        }
+        void IList.Insert(int index, object? value) => throw new NotSupportedException();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         bool IList.IsFixedSize => false;
 
         bool IList.IsReadOnly => false;
 
-        void IList.Remove(object? value)
-        {
-            Remove((T)value);
-        }
+        void IList.Remove(object? value) => throw new NotSupportedException();
 
-        void IList.RemoveAt(int index)
-        {
-            throw new NotSupportedException();
-        }
+        void IList.RemoveAt(int index) => throw new NotSupportedException();
 
         object? IList.this[int index]
         {
