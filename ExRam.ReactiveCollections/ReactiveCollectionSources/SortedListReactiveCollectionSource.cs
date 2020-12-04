@@ -103,9 +103,9 @@ namespace ExRam.ReactiveCollections
             RemoveRange(items, EqualityComparer<T>.Default);
         }
 
-        public void RemoveRange(IEnumerable<T> items, IEqualityComparer<T> itemsequalityComparer)
+        public void RemoveRange(IEnumerable<T> items, IEqualityComparer<T> itemsEqualityComparer)
         {
-            _innerList.RemoveRange(items);
+            _innerList.RemoveRange(items, itemsEqualityComparer);
         }
 
         public void Replace(T oldValue, T newValue)
