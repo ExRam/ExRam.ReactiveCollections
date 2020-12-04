@@ -1,13 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;net5.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
-    <PackageReference Include="System.Reactive" Version="4.3.2" />
+    <PackageReference Condition="'$(TargetFramework)' == 'netstandard2.1'" Include="System.Collections.Immutable" Version="1.7.0" />
+    <PackageReference Condition="'$(TargetFramework)' == 'net5.0'" Include="System.Collections.Immutable" Version="5.0.0" />
+
+    <PackageReference Condition="'$(TargetFramework)' == 'netstandard2.1'" Include="System.Reactive" Version="4.3.2" />
+    <PackageReference Condition="'$(TargetFramework)' == 'net5.0'" Include="System.Reactive" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>

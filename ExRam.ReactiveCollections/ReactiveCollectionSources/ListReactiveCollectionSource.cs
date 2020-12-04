@@ -75,7 +75,7 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        public int IndexOf(T item)
+        public int IndexOf(T? item)
         {
             return Current.IndexOf(item);
         }
@@ -231,7 +231,7 @@ namespace ExRam.ReactiveCollections
         #endregion
 
         #region Explicit IList implementation
-        int IList.Add(object value)
+        int IList.Add(object? value)
         {
             var oldList = Current;
             Insert(oldList.Count, (T)value);
@@ -244,17 +244,17 @@ namespace ExRam.ReactiveCollections
             Clear();
         }
 
-        bool IList.Contains(object value)
+        bool IList.Contains(object? value)
         {
             return Contains((T)value);
         }
 
-        int IList.IndexOf(object value)
+        int IList.IndexOf(object? value)
         {
             return IndexOf((T)value);
         }
 
-        void IList.Insert(int index, object value)
+        void IList.Insert(int index, object? value)
         {
             Insert(index, (T)value);
         }
@@ -268,7 +268,7 @@ namespace ExRam.ReactiveCollections
 
         bool IList.IsReadOnly => false;
 
-        void IList.Remove(object value)
+        void IList.Remove(object? value)
         {
             Remove((T)value);
         }
@@ -278,10 +278,9 @@ namespace ExRam.ReactiveCollections
             RemoveAt(index);
         }
 
-        object IList.this[int index]
+        object? IList.this[int index]
         {
             get => this[index];
-
             set => SetItem(index, (T)value);
         }
 

@@ -21,16 +21,16 @@ namespace ExRam.ReactiveCollections
             #region Node
             private abstract class Node
             {
-                protected Node(ImmutableList<T> list, int maxIndex)
+                protected Node(ImmutableList<T>? list, int maxIndex)
                 {
                     List = list;
                     MaxIndex = maxIndex;
                 }
 
-                public abstract Node ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList);
+                public abstract Node ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T>? oldList);
 
                 public int MaxIndex { get; }
-                public ImmutableList<T> List { get; }
+                public ImmutableList<T>? List { get; }
             }
 
             private sealed class InnerNode : Node
@@ -48,7 +48,7 @@ namespace ExRam.ReactiveCollections
                     _right = right;
                 }
 
-                public override Node ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
+                public override Node ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T>? oldList)
                 {
                     if (MaxIndex < index)
                         throw new InvalidOperationException();
@@ -65,11 +65,11 @@ namespace ExRam.ReactiveCollections
 
             private sealed class TerminalNode : Node
             {
-                public TerminalNode(ImmutableList<T> list, int maxIndex) : base(list, maxIndex)
+                public TerminalNode(ImmutableList<T>? list, int maxIndex) : base(list, maxIndex)
                 {
                 }
 
-                public override Node ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList)
+                public override Node ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T>? oldList)
                 {
                     oldList = List;
                     replacementOffset = 0;
@@ -148,7 +148,8 @@ namespace ExRam.ReactiveCollections
                                     return null;
                                 }
                             })
-                            .Where(x => x != null);
+                            .Where(x => x != null)
+                            .Select(x => x!);
                     })
                     .ReplayFresh(1)
                     .RefCount()

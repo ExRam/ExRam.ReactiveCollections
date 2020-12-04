@@ -20,8 +20,11 @@ namespace System
                 _comparison = comparison;
             }
 
-            public int Compare(T x, T y)
+            public int Compare(T? x, T? y)
             {
+                if (x is null || y is null)
+                    return x is null && y is null ? 0 : x is null ? -1 : 1;
+
                 return _comparison(x, y);
             }
         }

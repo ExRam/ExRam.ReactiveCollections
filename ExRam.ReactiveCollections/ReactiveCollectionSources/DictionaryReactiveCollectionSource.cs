@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace ExRam.ReactiveCollections
@@ -18,7 +19,7 @@ namespace ExRam.ReactiveCollections
         IDictionary<TKey, TValue>, 
         IDictionary,
         IReadOnlyDictionary<TKey, TValue>,
-        ICanHandleRanges<KeyValuePair<TKey, TValue>>
+        ICanHandleRanges<KeyValuePair<TKey, TValue>> where TKey : notnull
     {
         public DictionaryReactiveCollectionSource() : base(new DictionaryChangedNotification<TKey, TValue>(ImmutableDictionary<TKey, TValue>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList<KeyValuePair<TKey, TValue>>.Empty))
         {
@@ -107,7 +108,7 @@ namespace ExRam.ReactiveCollections
             return Current.ContainsKey(key);
         }
 
-        public bool TryGetValue(TKey key, out TValue value)
+        public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
         {
             return Current.TryGetValue(key, out value);
         }
@@ -171,7 +172,7 @@ namespace ExRam.ReactiveCollections
         #endregion
 
         #region IDictionary implementation
-        void IDictionary.Add(object key, object value)
+        void IDictionary.Add(object key, object? value)
         {
             Add((TKey)key, (TValue)value);
         }
@@ -204,7 +205,7 @@ namespace ExRam.ReactiveCollections
 
         ICollection IDictionary.Values => Current.Values.ToList();
 
-        object IDictionary.this[object key]
+        object? IDictionary.this[object key]
         {
             get => this[(TKey)key];
             set => this[(TKey)key] = (TValue)value;

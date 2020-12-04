@@ -13,8 +13,8 @@ namespace ExRam.ReactiveCollections
         protected TransformationReactiveCollection(
             IReactiveCollection<ICollectionChangedNotification<TSource>> source,
             TCollection collection,
-            Predicate<TSource> filter,
-            Func<TSource, TResult> selector,
+            Predicate<TSource>? filter,
+            Func<TSource, TResult>? selector,
             IEqualityComparer<TResult> equalityComparer)
         {
             Source = source;
@@ -162,8 +162,8 @@ namespace ExRam.ReactiveCollections
                 .Normalize();
         }
 
-        public Predicate<TSource> Filter { get; }
-        public Func<TSource, TResult> Selector { get; }
+        public Predicate<TSource>? Filter { get; }
+        public Func<TSource, TResult>? Selector { get; }
         public IObservable<TNotification> Changes { get; }
         public IEqualityComparer<TResult> EqualityComparer { get; }
         public IReactiveCollection<ICollectionChangedNotification<TSource>> Source { get; }
