@@ -165,16 +165,6 @@ namespace ExRam.ReactiveCollections
         #endregion
 
         #region ICollection<T> implementation
-        void ICollection<T>.Add(T item)
-        {
-            Add(item);
-        }
-
-        void ICollection<T>.Clear()
-        {
-            Clear();
-        }
-
         public bool Contains(T item)
         {
             return Current.Contains(item);
