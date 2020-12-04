@@ -5,7 +5,6 @@
 // file.
 
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace System
 {
@@ -16,7 +15,7 @@ namespace System
         {
             private readonly Comparison<T> _comparison;
 
-            public ComparerImpl([NotNull] Comparison<T> comparison)
+            public ComparerImpl(Comparison<T> comparison)
             {
                 _comparison = comparison;
             }
@@ -28,7 +27,7 @@ namespace System
         }
         #endregion
 
-        public static IComparer<T> ToComparer<T>([NotNull] this Comparison<T> comparison)
+        public static IComparer<T> ToComparer<T>(this Comparison<T> comparison)
         {
             return new ComparerImpl<T>(comparison);
         }

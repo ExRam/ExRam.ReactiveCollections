@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
-using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
@@ -12,11 +11,11 @@ namespace ExRam.ReactiveCollections
         where TNotification : ICollectionChangedNotification<TResult>
     {
         protected TransformationReactiveCollection(
-            [NotNull] IReactiveCollection<ICollectionChangedNotification<TSource>> source,
+            IReactiveCollection<ICollectionChangedNotification<TSource>> source,
             TCollection collection,
             Predicate<TSource> filter,
             Func<TSource, TResult> selector,
-            [NotNull] IEqualityComparer<TResult> equalityComparer)
+            IEqualityComparer<TResult> equalityComparer)
         {
             Source = source;
             Filter = filter;

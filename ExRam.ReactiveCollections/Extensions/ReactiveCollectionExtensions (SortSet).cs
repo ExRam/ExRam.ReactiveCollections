@@ -5,20 +5,17 @@
 // file.
 
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        [NotNull]
-        public static IReactiveCollection<SortedSetChangedNotification<TSource>> SortSet<TSource>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source)
+        public static IReactiveCollection<SortedSetChangedNotification<TSource>> SortSet<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source)
         {
             return source.SortSet(Comparer<TSource>.Default);
         }
 
-        [NotNull]
-        public static IReactiveCollection<SortedSetChangedNotification<TSource>> SortSet<TSource>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source, [NotNull] IComparer<TSource> comparer)
+        public static IReactiveCollection<SortedSetChangedNotification<TSource>> SortSet<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer)
         {
             if (source is ICanSortSet<TSource>)
                 return ((ICanSortSet<TSource>)source).Sort(comparer);

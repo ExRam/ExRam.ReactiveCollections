@@ -12,7 +12,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
@@ -42,7 +41,7 @@ namespace ExRam.ReactiveCollections
 
             private IReadOnlyCollection<T> _currentList = ImmutableList<T>.Empty;
 
-            public ReactiveReadOnlyObservableCollection([NotNull] IObservable<IIndexedCollectionChangedNotification<T>> source)
+            public ReactiveReadOnlyObservableCollection(IObservable<IIndexedCollectionChangedNotification<T>> source)
             {
                 var eventArgs = source
                     .Do(notification => _currentList = notification.Current)
@@ -244,8 +243,7 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
-        [NotNull]
-        public static ICollection<T> ToObservableCollection<T>([NotNull] this IReactiveCollection<IIndexedCollectionChangedNotification<T>> source)
+        public static ICollection<T> ToObservableCollection<T>(this IReactiveCollection<IIndexedCollectionChangedNotification<T>> source)
         {
             return new ReactiveReadOnlyObservableCollection<T>(source.Changes);
         }

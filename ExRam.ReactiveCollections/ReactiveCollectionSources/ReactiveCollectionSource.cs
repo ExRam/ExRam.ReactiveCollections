@@ -7,7 +7,6 @@
 using System;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
@@ -19,7 +18,7 @@ namespace ExRam.ReactiveCollections
         {
             private readonly IObservable<TNotification> _changes;
 
-            public ReactiveCollectionImpl([NotNull] IObservable<TNotification> subject)
+            public ReactiveCollectionImpl(IObservable<TNotification> subject)
             {
                 _changes = subject
                     .Normalize();
@@ -29,7 +28,7 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
-        protected ReactiveCollectionSource([NotNull] TNotification initialNotification)
+        protected ReactiveCollectionSource(TNotification initialNotification)
         {
             Subject = new BehaviorSubject<TNotification>(initialNotification);
             ReactiveCollection = new ReactiveCollectionImpl(Subject);
@@ -37,7 +36,6 @@ namespace ExRam.ReactiveCollections
 
         public IReactiveCollection<TNotification> ReactiveCollection { get; }
 
-        [NotNull]
         protected BehaviorSubject<TNotification> Subject { get; }
     }
 }

@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Linq;
-using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
@@ -31,7 +30,7 @@ namespace ExRam.ReactiveCollections
             Subject.OnNext(new DictionaryChangedNotification<TKey, TValue>(Current.Add(key, value), NotifyCollectionChangedAction.Add, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList.Create(new KeyValuePair<TKey, TValue>(key, value))));
         }
 
-        public void AddRange([NotNull] IEnumerable<TValue> values, [NotNull] Func<TValue, TKey> keySelector)
+        public void AddRange(IEnumerable<TValue> values, Func<TValue, TKey> keySelector)
         {
             AddRange(values.Select(x => new KeyValuePair<TKey, TValue>(keySelector(x), x)));
         }
@@ -73,7 +72,7 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        public void RemoveRange([NotNull] IEnumerable<TKey> keys)
+        public void RemoveRange(IEnumerable<TKey> keys)
         {
             // TODO: Optimize!
             foreach (var key in keys)
@@ -94,7 +93,7 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        public void SetItems([NotNull] IEnumerable<KeyValuePair<TKey, TValue>> items)
+        public void SetItems(IEnumerable<KeyValuePair<TKey, TValue>> items)
         {
             var oldList = Current;
             var newList = oldList.SetItems(items);
@@ -231,7 +230,6 @@ namespace ExRam.ReactiveCollections
 
         public IEnumerable<TValue> Values => Current.Values;
 
-        [NotNull]
         private ImmutableDictionary<TKey, TValue> Current => Subject.Value.Current;
 
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => ((IDictionary<TKey, TValue>)this).Keys;

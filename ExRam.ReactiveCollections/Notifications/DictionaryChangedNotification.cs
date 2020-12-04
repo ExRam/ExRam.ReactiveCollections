@@ -7,16 +7,15 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
-using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
     public sealed class DictionaryChangedNotification<TKey, TValue> : CollectionChangedNotification<KeyValuePair<TKey, TValue>>
     {
-        public DictionaryChangedNotification([NotNull] ImmutableDictionary<TKey, TValue> current,
+        public DictionaryChangedNotification(ImmutableDictionary<TKey, TValue> current,
             NotifyCollectionChangedAction action,
-            [NotNull] IReadOnlyList<KeyValuePair<TKey, TValue>> oldItems,
-            [NotNull] IReadOnlyList<KeyValuePair<TKey, TValue>> newItems) : base(current, action, oldItems, newItems)
+            IReadOnlyList<KeyValuePair<TKey, TValue>> oldItems,
+            IReadOnlyList<KeyValuePair<TKey, TValue>> newItems) : base(current, action, oldItems, newItems)
         {
             
         }

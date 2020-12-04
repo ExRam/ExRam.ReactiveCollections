@@ -7,22 +7,19 @@
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
-using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        [NotNull]
-        public static IReactiveCollection<TNotification> SubscribeOn<TNotification, TSource>([NotNull] this IReactiveCollection<TNotification> source, [NotNull] SynchronizationContext syncContext) where TNotification : ICollectionChangedNotification<TSource>
+        public static IReactiveCollection<TNotification> SubscribeOn<TNotification, TSource>(this IReactiveCollection<TNotification> source, SynchronizationContext syncContext) where TNotification : ICollectionChangedNotification<TSource>
         {
             return source.Changes
                 .SubscribeOn(syncContext)
                 .ToReactiveCollection();
         }
 
-        [NotNull]
-        public static IReactiveCollection<TNotification> SubscribeOn<TNotification, TSource>([NotNull] this IReactiveCollection<TNotification> source, [NotNull] IScheduler scheduler) where TNotification : ICollectionChangedNotification<TSource>
+        public static IReactiveCollection<TNotification> SubscribeOn<TNotification, TSource>(this IReactiveCollection<TNotification> source, IScheduler scheduler) where TNotification : ICollectionChangedNotification<TSource>
         {
             return source.Changes
                 .SubscribeOn(scheduler)

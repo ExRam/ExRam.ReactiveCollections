@@ -6,14 +6,12 @@
 
 using System;
 using System.Reactive.Linq;
-using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        [NotNull]
-        public static IObservable<TValue> GetValueObservable<TKey, TValue>([NotNull] this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> reactiveCollection, TKey key)
+        public static IObservable<TValue> GetValueObservable<TKey, TValue>( this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> reactiveCollection, TKey key)
         {
             return reactiveCollection.Changes
                 .Where(x => x.Current.ContainsKey(key))
