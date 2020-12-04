@@ -18,17 +18,17 @@ namespace ExRam.ReactiveCollections
 
         public static IReactiveCollection<ListChangedNotification<TResult>> Select<TSource, TResult>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Func<TSource, TResult> selector, IEqualityComparer<TResult> equalityComparer)
         {
-            var ret = (source as ICanProjectList<TSource>)?.Select(selector, equalityComparer);
-
-            return ret ?? new ListTransformationReactiveCollection<TSource, TResult>(source, null, selector, equalityComparer);
+            return source is ICanProjectList<TSource> canProject
+                ? canProject.Select(selector, equalityComparer)
+                : new ListTransformationReactiveCollection<TSource, TResult>(source, null, selector, equalityComparer);
         }
 
         public static IReactiveCollection<DictionaryChangedNotification<TKey, TResult>> Select<TKey, TSource, TResult>(this IReactiveCollection<DictionaryChangedNotification<TKey, TSource>> source, Func<TSource, TResult> selector)
             where TKey : notnull
         {
-            var ret = (source as ICanProjectDictionary<TKey, TSource>)?.Select(selector);
-
-            return ret ?? new DictionaryTransformationReactiveCollection<TKey, TSource, TResult>(source, null, kvp => new KeyValuePair<TKey, TResult>(kvp.Key, selector(kvp.Value)), EqualityComparer<KeyValuePair<TKey, TResult>>.Default);
+            return source is ICanProjectDictionary<TKey, TSource> canProject
+                ? canProject.Select(selector)
+                : new DictionaryTransformationReactiveCollection<TKey, TSource, TResult>(source, null, kvp => new KeyValuePair<TKey, TResult>(kvp.Key, selector(kvp.Value)), EqualityComparer<KeyValuePair<TKey, TResult>>.Default);
         }
     }
 }

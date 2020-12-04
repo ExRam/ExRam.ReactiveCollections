@@ -36,7 +36,7 @@ namespace ExRam.ReactiveCollections
                                 .Subscribe(
                                     notification =>
                                     {
-                                        var localSelector = selector ?? (x => (TResult)(object)x);
+                                        var localSelector = selector ?? (x => (TResult)(object)x!);
                                         var listNotification = notification as IIndexedCollectionChangedNotification<TSource>;
 
                                         lock (syncRoot)
