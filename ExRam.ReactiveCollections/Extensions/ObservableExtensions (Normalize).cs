@@ -11,7 +11,7 @@ namespace System.Reactive.Linq
     public static partial class ObservableExtensions
     {
         #region StateHolder
-        private struct StateHolder<TNotification>
+        private readonly struct StateHolder<TNotification>
         {
             public readonly bool First;
             public readonly TNotification Notification;

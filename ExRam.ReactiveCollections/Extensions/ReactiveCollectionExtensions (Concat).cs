@@ -80,7 +80,7 @@ namespace ExRam.ReactiveCollections
             #endregion
 
             #region IndexedNotification
-            private struct IndexedNotification
+            private readonly struct IndexedNotification
             {
                 public int Index { get; }
                 public ListChangedNotification<T> Notification { get; }

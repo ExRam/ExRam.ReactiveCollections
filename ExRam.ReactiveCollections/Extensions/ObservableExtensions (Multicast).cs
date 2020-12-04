@@ -15,7 +15,7 @@ namespace System.Reactive.Linq
         internal sealed class MulticastConnectableObservable<T> : IConnectableObservable<T>
         {
             private readonly IObservable<T> _source;
-            private readonly object _syncRoot = new object();
+            private readonly object _syncRoot = new();
             private readonly Func<ISubject<T>> _subjectFactory;
 
             private ISubject<T> _currentSubject;
@@ -34,8 +34,7 @@ namespace System.Reactive.Linq
                     if (_currentSubscription != null)
                         throw new InvalidOperationException();
 
-                    if (_currentSubject == null)
-                        _currentSubject = _subjectFactory();
+                    _currentSubject ??= _subjectFactory();
 
                     var sourceSubscription = _currentSubscription = _source.Subscribe(_currentSubject);
 
@@ -61,8 +60,7 @@ namespace System.Reactive.Linq
             {
                 lock (_syncRoot)
                 {
-                    if (_currentSubject == null)
-                        _currentSubject = _subjectFactory();
+                    _currentSubject ??= _subjectFactory();
 
                     return _currentSubject.Subscribe(observer);
                 }
