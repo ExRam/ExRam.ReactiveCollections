@@ -6,28 +6,24 @@
 
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        [NotNull]
-        public static IReactiveCollection<ListChangedNotification<TResult>> Select<TSource, TResult>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source, [NotNull] Func<TSource, TResult> selector)
+        public static IReactiveCollection<ListChangedNotification<TResult>> Select<TSource, TResult>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Func<TSource, TResult> selector)
         {
             return source.Select(selector, EqualityComparer<TResult>.Default);
         }
 
-        [NotNull]
-        public static IReactiveCollection<ListChangedNotification<TResult>> Select<TSource, TResult>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source, [NotNull] Func<TSource, TResult> selector, [NotNull] IEqualityComparer<TResult> equalityComparer)
+        public static IReactiveCollection<ListChangedNotification<TResult>> Select<TSource, TResult>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Func<TSource, TResult> selector, IEqualityComparer<TResult> equalityComparer)
         {
             var ret = (source as ICanProjectList<TSource>)?.Select(selector, equalityComparer);
 
             return ret ?? new ListTransformationReactiveCollection<TSource, TResult>(source, null, selector, equalityComparer);
         }
 
-        [NotNull]
-        public static IReactiveCollection<DictionaryChangedNotification<TKey, TResult>> Select<TKey, TSource, TResult>([NotNull] this IReactiveCollection<DictionaryChangedNotification<TKey, TSource>> source, [NotNull] Func<TSource, TResult> selector)
+        public static IReactiveCollection<DictionaryChangedNotification<TKey, TResult>> Select<TKey, TSource, TResult>(this IReactiveCollection<DictionaryChangedNotification<TKey, TSource>> source, Func<TSource, TResult> selector)
         {
             var ret = (source as ICanProjectDictionary<TKey, TSource>)?.Select(selector);
 

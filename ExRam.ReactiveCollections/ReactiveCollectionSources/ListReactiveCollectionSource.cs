@@ -9,7 +9,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
-using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
@@ -25,7 +24,7 @@ namespace ExRam.ReactiveCollections
         {
         }
 
-        public ListReactiveCollectionSource([NotNull] IEnumerable<T> items) : base(new ListChangedNotification<T>(ImmutableList<T>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null))
+        public ListReactiveCollectionSource(IEnumerable<T> items) : base(new ListChangedNotification<T>(ImmutableList<T>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null))
         {
             if (!ReferenceEquals(items, ImmutableList<T>.Empty))
                 AddRange(items);
@@ -91,7 +90,7 @@ namespace ExRam.ReactiveCollections
             return Remove(item, EqualityComparer<T>.Default);
         }
 
-        public bool Remove(T item, [NotNull] IEqualityComparer<T> equalityComparer)
+        public bool Remove(T item, IEqualityComparer<T> equalityComparer)
         {
             var oldList = Current;
             var index = oldList.IndexOf(item, equalityComparer);
@@ -99,7 +98,7 @@ namespace ExRam.ReactiveCollections
             return index > -1 && RemoveAtInternal(index);
         }
 
-        public void RemoveAll([NotNull] Predicate<T> match)
+        public void RemoveAll(Predicate<T> match)
         {
             var newList = Current.RemoveAll(match);
             Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
@@ -135,7 +134,7 @@ namespace ExRam.ReactiveCollections
                 Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Remove, range, ImmutableList<T>.Empty, index));
         }
 
-        public void RemoveRange([NotNull] IEnumerable<T> items)
+        public void RemoveRange(IEnumerable<T> items)
         {
             RemoveRange(items, EqualityComparer<T>.Default);
         }
@@ -200,17 +199,17 @@ namespace ExRam.ReactiveCollections
             Sort(Comparer<T>.Default);
         }
 
-        public void Sort([NotNull] Comparison<T> comparison)
+        public void Sort(Comparison<T> comparison)
         {
             Sort(comparison.ToComparer());
         }
 
-        public void Sort([NotNull] IComparer<T> comparer)
+        public void Sort(IComparer<T> comparer)
         {
             Sort(0, Count, comparer);
         }
 
-        public void Sort(int index, int count, [NotNull] IComparer<T> comparer)
+        public void Sort(int index, int count, IComparer<T> comparer)
         {
             var current = Current;
             var newList = current.Sort(index, count, comparer);
@@ -299,7 +298,6 @@ namespace ExRam.ReactiveCollections
 
         public int Count => Current.Count;
 
-        [NotNull]
         private ImmutableList<T> Current => Subject.Value.Current;
 
         public T this[int index]

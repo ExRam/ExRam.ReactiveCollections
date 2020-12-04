@@ -6,7 +6,6 @@
 
 using System;
 using System.Reactive.Linq;
-using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
@@ -18,7 +17,7 @@ namespace ExRam.ReactiveCollections
         {
             private readonly IReactiveCollection<TNotification> _reactiveCollection;
 
-            public AsReactiveCollectionImpl([NotNull] IReactiveCollection<TNotification> reactiveCollection)
+            public AsReactiveCollectionImpl(IReactiveCollection<TNotification> reactiveCollection)
             {
                 _reactiveCollection = reactiveCollection;
             }
@@ -27,8 +26,7 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
-        [NotNull]
-        public static IReactiveCollection<TNotification> AsReactiveCollection<TNotification, T>([NotNull] this IReactiveCollection<TNotification> reactiveCollection)
+        public static IReactiveCollection<TNotification> AsReactiveCollection<TNotification, T>(this IReactiveCollection<TNotification> reactiveCollection)
             where TNotification : ICollectionChangedNotification<T>
         {
             return new AsReactiveCollectionImpl<TNotification, T>(reactiveCollection);

@@ -7,13 +7,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
     public abstract class CollectionChangedNotification<T> : ICollectionChangedNotification<T>
     {
-        protected CollectionChangedNotification([NotNull] IReadOnlyCollection<T> current, NotifyCollectionChangedAction action, [NotNull] IReadOnlyList<T> oldItems, [NotNull] IReadOnlyList<T> newItems)
+        protected CollectionChangedNotification(IReadOnlyCollection<T> current, NotifyCollectionChangedAction action, IReadOnlyList<T> oldItems, IReadOnlyList<T> newItems)
         {
             Action = action;
             Current = current;

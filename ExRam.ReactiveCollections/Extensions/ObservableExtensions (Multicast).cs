@@ -6,7 +6,6 @@
 
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
-using JetBrains.Annotations;
 
 namespace System.Reactive.Linq
 {
@@ -22,7 +21,7 @@ namespace System.Reactive.Linq
             private ISubject<T> _currentSubject;
             private IDisposable _currentSubscription;
 
-            public MulticastConnectableObservable([NotNull] IObservable<T> source, [NotNull] Func<ISubject<T>> subjectFactory)
+            public MulticastConnectableObservable(IObservable<T> source, Func<ISubject<T>> subjectFactory)
             {
                 _source = source;
                 _subjectFactory = subjectFactory;
@@ -71,8 +70,7 @@ namespace System.Reactive.Linq
         }
         #endregion
 
-        [NotNull]
-        internal static IConnectableObservable<T> Multicast<T>([NotNull] this IObservable<T> source, [NotNull] Func<ISubject<T>> subjectFactory)
+        internal static IConnectableObservable<T> Multicast<T>(this IObservable<T> source, Func<ISubject<T>> subjectFactory)
         {
             return new MulticastConnectableObservable<T>(source, subjectFactory);
         }

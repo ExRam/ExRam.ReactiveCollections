@@ -5,7 +5,6 @@
 // file.
 
 using ExRam.ReactiveCollections;
-using JetBrains.Annotations;
 
 namespace System.Reactive.Linq
 {
@@ -25,8 +24,7 @@ namespace System.Reactive.Linq
         }
         #endregion
 
-        [NotNull]
-        internal static IObservable<TNotification> Normalize<TNotification>([NotNull] this IObservable<TNotification> observable)
+        internal static IObservable<TNotification> Normalize<TNotification>(this IObservable<TNotification> observable)
             where TNotification : ICollectionChangedNotification
         {
             return observable

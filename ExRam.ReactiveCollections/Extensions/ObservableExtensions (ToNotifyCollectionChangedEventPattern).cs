@@ -6,7 +6,6 @@
 
 using System.Collections.Specialized;
 using System.ComponentModel;
-using JetBrains.Annotations;
 
 namespace System.Reactive.Linq
 {
@@ -15,7 +14,7 @@ namespace System.Reactive.Linq
         #region NotifyCollectionChangedEventPatternSource
         private sealed class NotifyCollectionChangedEventPatternSource : EventPatternSourceBase<object, NotifyCollectionChangedEventArgs>, INotifyCollectionChanged
         {
-            public NotifyCollectionChangedEventPatternSource([NotNull] IObservable<EventPattern<object, NotifyCollectionChangedEventArgs>> source)
+            public NotifyCollectionChangedEventPatternSource(IObservable<EventPattern<object, NotifyCollectionChangedEventArgs>> source)
                 : base(source, (invokeAction, eventPattern) => invokeAction(eventPattern.Sender, eventPattern.EventArgs))
             {
             }
@@ -35,7 +34,7 @@ namespace System.Reactive.Linq
         #region NotifyPropertyChangedEventPatternSource
         private sealed class NotifyPropertyChangedEventPatternSource : EventPatternSourceBase<object, PropertyChangedEventArgs>, INotifyPropertyChanged
         {
-            public NotifyPropertyChangedEventPatternSource([NotNull] IObservable<EventPattern<object, PropertyChangedEventArgs>> source)
+            public NotifyPropertyChangedEventPatternSource(IObservable<EventPattern<object, PropertyChangedEventArgs>> source)
                 : base(source, (invokeAction, eventPattern) => invokeAction(eventPattern.Sender, eventPattern.EventArgs))
             {
             }
@@ -52,14 +51,12 @@ namespace System.Reactive.Linq
         }
         #endregion
 
-        [NotNull]
-        public static INotifyCollectionChanged ToNotifyCollectionChangedEventPattern([NotNull] this IObservable<NotifyCollectionChangedEventArgs> source, object sender)
+        public static INotifyCollectionChanged ToNotifyCollectionChangedEventPattern(this IObservable<NotifyCollectionChangedEventArgs> source, object sender)
         {
             return new NotifyCollectionChangedEventPatternSource(source.Select(x => new EventPattern<NotifyCollectionChangedEventArgs>(sender, x)));
         }
 
-        [NotNull]
-        public static INotifyPropertyChanged ToNotifyPropertyChangedEventPattern([NotNull] this IObservable<PropertyChangedEventArgs> source, object sender)
+        public static INotifyPropertyChanged ToNotifyPropertyChangedEventPattern(this IObservable<PropertyChangedEventArgs> source, object sender)
         {
             return new NotifyPropertyChangedEventPatternSource(source.Select(x => new EventPattern<PropertyChangedEventArgs>(sender, x)));
         }

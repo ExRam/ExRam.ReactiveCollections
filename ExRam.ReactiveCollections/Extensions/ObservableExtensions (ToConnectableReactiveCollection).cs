@@ -6,7 +6,6 @@
 
 using System.Reactive.Subjects;
 using ExRam.ReactiveCollections;
-using JetBrains.Annotations;
 
 namespace System.Reactive.Linq
 {
@@ -19,7 +18,7 @@ namespace System.Reactive.Linq
             private readonly Func<IDisposable> _connectFunction;
             private readonly IObservable<TNotification> _changes;
 
-            public ToConnectableReactiveCollectionImpl([NotNull] IObservable<TNotification> changes, [NotNull] Func<IDisposable> connectFunction)
+            public ToConnectableReactiveCollectionImpl(IObservable<TNotification> changes, Func<IDisposable> connectFunction)
             {
                 _changes = changes
                     .Normalize();
@@ -36,15 +35,13 @@ namespace System.Reactive.Linq
         }
         #endregion
 
-        [NotNull]
-        public static IConnectableReactiveCollection<TNotification> ToConnectableReactiveCollection<TNotification, T>([NotNull] this IObservable<TNotification> changesObservable, [NotNull] Func<IDisposable> connectFunction)
+        public static IConnectableReactiveCollection<TNotification> ToConnectableReactiveCollection<TNotification, T>(this IObservable<TNotification> changesObservable, Func<IDisposable> connectFunction)
             where TNotification : ICollectionChangedNotification<T>
         {
             return new ToConnectableReactiveCollectionImpl<TNotification, T>(changesObservable, connectFunction);
         }
 
-        [NotNull]
-        public static IConnectableReactiveCollection<TNotification> ToConnectableReactiveCollection<TNotification, T>([NotNull] this IConnectableObservable<TNotification> changesObservable)
+        public static IConnectableReactiveCollection<TNotification> ToConnectableReactiveCollection<TNotification, T>(this IConnectableObservable<TNotification> changesObservable)
            where TNotification : ICollectionChangedNotification<T>
         {
             return new ToConnectableReactiveCollectionImpl<TNotification, T>(changesObservable, changesObservable.Connect);

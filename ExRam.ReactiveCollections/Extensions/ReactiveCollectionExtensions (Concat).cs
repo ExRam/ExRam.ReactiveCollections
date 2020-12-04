@@ -10,7 +10,6 @@ using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
-using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
@@ -28,7 +27,6 @@ namespace ExRam.ReactiveCollections
                     MaxIndex = maxIndex;
                 }
 
-                [NotNull]
                 public abstract Node ReplaceNode(ImmutableList<T> newList, int index, out int? replacementOffset, out ImmutableList<T> oldList);
 
                 public int MaxIndex { get; }
@@ -40,7 +38,7 @@ namespace ExRam.ReactiveCollections
                 private readonly Node _left;
                 private readonly Node _right;
 
-                public InnerNode([NotNull] Node left, [NotNull] Node right) : base(
+                public InnerNode(Node left, Node right) : base(
                     left.List != null && right.List != null
                         ? left.List.AddRange(right.List)
                         : null,
@@ -96,8 +94,8 @@ namespace ExRam.ReactiveCollections
             #endregion
 
             public ConcatListReactiveCollection(
-                [NotNull] IObservable<ListChangedNotification<T>>[] sources,
-                [NotNull] IEqualityComparer<T> equalityComparer)
+                IObservable<ListChangedNotification<T>>[] sources,
+                IEqualityComparer<T> equalityComparer)
             {
                 Changes = Observable
                     .Defer(() =>
@@ -194,14 +192,12 @@ namespace ExRam.ReactiveCollections
                 : new ConcatListReactiveCollection<T>(sourcesArray, equalityComparer);
         }
 
-        [NotNull]
-        public static IReactiveCollection<ListChangedNotification<T>> Concat<T>([NotNull] this IReactiveCollection<ListChangedNotification<T>> source1, [NotNull] IReactiveCollection<ListChangedNotification<T>> source2)
+        public static IReactiveCollection<ListChangedNotification<T>> Concat<T>(this IReactiveCollection<ListChangedNotification<T>> source1, IReactiveCollection<ListChangedNotification<T>> source2)
         {
             return source1.Concat(source2, EqualityComparer<T>.Default);
         }
 
-        [NotNull]
-        public static IReactiveCollection<ListChangedNotification<T>> Concat<T>([NotNull] this IReactiveCollection<ListChangedNotification<T>> source1, [NotNull] IReactiveCollection<ListChangedNotification<T>> source2, [NotNull] IEqualityComparer<T> equalityComparer)
+        public static IReactiveCollection<ListChangedNotification<T>> Concat<T>(this IReactiveCollection<ListChangedNotification<T>> source1, IReactiveCollection<ListChangedNotification<T>> source2, IEqualityComparer<T> equalityComparer)
         {
             return new ConcatListReactiveCollection<T>(new[] { source1.Changes, source2.Changes } , equalityComparer);
         }

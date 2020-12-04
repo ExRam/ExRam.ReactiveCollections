@@ -4,14 +4,11 @@
 // Full License description can be found in the LICENSE
 // file.
 
-using JetBrains.Annotations;
-
 namespace ExRam.ReactiveCollections
 {
     public interface IReactiveCollectionSource<out TNotification>
          where TNotification : ICollectionChangedNotification
     {
-        [NotNull]
         IReactiveCollection<TNotification> ReactiveCollection
         {
             get;

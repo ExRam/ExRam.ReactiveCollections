@@ -5,7 +5,6 @@
 // file.
 
 using ExRam.ReactiveCollections;
-using JetBrains.Annotations;
 
 namespace System.Reactive.Linq
 {
@@ -17,7 +16,7 @@ namespace System.Reactive.Linq
         {
             private readonly IObservable<TNotification> _changes;
 
-            public ToReactiveCollectionImpl([NotNull] IObservable<TNotification> changes)
+            public ToReactiveCollectionImpl(IObservable<TNotification> changes)
             {
                 _changes = changes
                     .Normalize();
@@ -27,7 +26,7 @@ namespace System.Reactive.Linq
         }
         #endregion
 
-        public static IReactiveCollection<TNotification> ToReactiveCollection<TNotification>([NotNull] this IObservable<TNotification> changesObservable)
+        public static IReactiveCollection<TNotification> ToReactiveCollection<TNotification>(this IObservable<TNotification> changesObservable)
             where TNotification : ICollectionChangedNotification
         {
             return new ToReactiveCollectionImpl<TNotification>(changesObservable);

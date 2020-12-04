@@ -8,7 +8,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
@@ -79,12 +78,12 @@ namespace ExRam.ReactiveCollections
             return Remove(item, EqualityComparer<T>.Default);
         }
 
-        public bool Remove(T item, [NotNull] IEqualityComparer<T> equalityComparer)
+        public bool Remove(T item, IEqualityComparer<T> equalityComparer)
         {
             return _innerList.Remove(item, equalityComparer);
         }
 
-        public void RemoveAll([NotNull] Predicate<T> match)
+        public void RemoveAll(Predicate<T> match)
         {
             _innerList.RemoveAll(match);
         }
@@ -99,7 +98,7 @@ namespace ExRam.ReactiveCollections
             _innerList.RemoveRange(index, count);
         }
 
-        public void RemoveRange([NotNull] IEnumerable<T> items)
+        public void RemoveRange(IEnumerable<T> items)
         {
             RemoveRange(items, EqualityComparer<T>.Default);
         }

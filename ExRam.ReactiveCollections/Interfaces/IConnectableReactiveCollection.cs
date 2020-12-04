@@ -5,14 +5,12 @@
 // file.
 
 using System;
-using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
     public interface IConnectableReactiveCollection<out TNotification> : IReactiveCollection<TNotification>
         where TNotification : ICollectionChangedNotification
     {
-        [NotNull]
         IDisposable Connect();
     }
 }

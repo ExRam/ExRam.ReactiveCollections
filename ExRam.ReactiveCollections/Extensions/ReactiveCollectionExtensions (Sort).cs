@@ -5,32 +5,27 @@
 // file.
 
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        [NotNull]
-        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source)
+        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source)
         {
             return source.Sort(Comparer<TSource>.Default, EqualityComparer<TSource>.Default);
         }
 
-        [NotNull]
-        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source, [NotNull] IComparer<TSource> comparer)
+        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer)
         {
             return source.Sort(comparer, EqualityComparer<TSource>.Default);
         }
 
-        [NotNull]
-        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source, [NotNull] IEqualityComparer<TSource> equalityComparer)
+        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IEqualityComparer<TSource> equalityComparer)
         {
             return source.Sort(Comparer<TSource>.Default, equalityComparer);
         }
 
-        [NotNull]
-        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>([NotNull] this IReactiveCollection<ICollectionChangedNotification<TSource>> source, [NotNull] IComparer<TSource> comparer, [NotNull] IEqualityComparer<TSource> equalityComparer)
+        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer, IEqualityComparer<TSource> equalityComparer)
         {
             if (source is ICanSortList<TSource>)
                 return ((ICanSortList<TSource>)source).Sort(comparer);
