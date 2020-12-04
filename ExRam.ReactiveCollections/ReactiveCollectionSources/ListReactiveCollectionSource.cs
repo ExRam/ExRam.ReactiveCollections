@@ -37,7 +37,7 @@ namespace ExRam.ReactiveCollections
         public void Clear()
         {
             if (!Current.IsEmpty)
-                Subject.OnNext(new ListChangedNotification<T>(ImmutableList<T>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+                OnNext(ImmutableList<T>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
         }
 
         public bool Contains(T item) => Current.Contains(item);
@@ -56,7 +56,7 @@ namespace ExRam.ReactiveCollections
                 var newList = current.InsertRange(index, immutableItems);
 
                 if (newList != current)
-                    Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, immutableItems, index));
+                    OnNext(newList, NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, immutableItems, index);
             }
         }
 
@@ -64,13 +64,10 @@ namespace ExRam.ReactiveCollections
 
         public void Insert(int index, T item)
         {
-            Subject.OnNext(new ListChangedNotification<T>(Current.Insert(index, item), NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, ImmutableList.Create(item), index));
+            OnNext(Current.Insert(index, item), NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, ImmutableList.Create(item), index);
         }
 
-        public bool Remove(T item)
-        {
-            return Remove(item, EqualityComparer<T>.Default);
-        }
+        public bool Remove(T item) => Remove(item, EqualityComparer<T>.Default);
 
         public bool Remove(T item, IEqualityComparer<T> equalityComparer)
         {
@@ -83,7 +80,7 @@ namespace ExRam.ReactiveCollections
         public void RemoveAll(Predicate<T> match)
         {
             var newList = Current.RemoveAll(match);
-            Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+            OnNext(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
         }
 
         public void RemoveAt(int index) => RemoveAtInternal(index);
@@ -96,7 +93,7 @@ namespace ExRam.ReactiveCollections
 
             if (oldList != newList)
             {
-                Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Remove, ImmutableList.Create(oldItem), ImmutableList<T>.Empty, index));
+                OnNext(newList, NotifyCollectionChangedAction.Remove, ImmutableList.Create(oldItem), ImmutableList<T>.Empty, index);
                 return true;
             }
 
@@ -110,7 +107,7 @@ namespace ExRam.ReactiveCollections
             var newList = oldList.RemoveRange(index, count);
 
             if (newList != oldList)
-                Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Remove, range, ImmutableList<T>.Empty, index));
+                OnNext(newList, NotifyCollectionChangedAction.Remove, range, ImmutableList<T>.Empty, index);
         }
 
         public void RemoveRange(IEnumerable<T> items) => RemoveRange(items, EqualityComparer<T>.Default);
@@ -126,7 +123,7 @@ namespace ExRam.ReactiveCollections
                     var current = Current;
                     var newList = current.RemoveRange(removedItems, equalityComparer);
                     if (current != newList)
-                       Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+                       OnNext(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
                 }
                 else
                     Remove(removedItems[0], equalityComparer);
@@ -151,7 +148,7 @@ namespace ExRam.ReactiveCollections
             var newList = current.Reverse(index, count);
 
             if (newList != current)
-                Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+                OnNext(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
         }
 
         public void SetItem(int index, T value)
@@ -161,7 +158,7 @@ namespace ExRam.ReactiveCollections
             var newList = oldList.SetItem(index, value);
 
             if (oldList != newList)
-                Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Replace, ImmutableList.Create(oldItem), ImmutableList.Create(value), index));
+                OnNext(newList, NotifyCollectionChangedAction.Replace, ImmutableList.Create(oldItem), ImmutableList.Create(value), index);
         }
 
         public void Sort() => Sort(Comparer<T>.Default);
@@ -176,7 +173,7 @@ namespace ExRam.ReactiveCollections
             var newList = current.Sort(index, count, comparer);
 
             if (newList != current)
-                Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+                OnNext(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
         }
 
         public T this[int index]
@@ -188,6 +185,8 @@ namespace ExRam.ReactiveCollections
         public int Count => Current.Count;
 
         private ImmutableList<T> Current => Subject.Value.Current;
+
+        private void OnNext(ImmutableList<T> newList, NotifyCollectionChangedAction action, IReadOnlyList<T> oldItems, IReadOnlyList<T> newItems, int? index) => Subject.OnNext(new ListChangedNotification<T>(newList, action, oldItems, newItems, index));
 
         #region Explicit IList<T> implementation
         T IList<T>.this[int index]
