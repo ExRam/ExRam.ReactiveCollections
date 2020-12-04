@@ -30,10 +30,7 @@ namespace ExRam.ReactiveCollections
             _comparer = comparer;
         }
 
-        public void Add(T item)
-        {
-            _innerList.Insert(FindInsertionIndex(item), item);
-        }
+        public void Add(T item) => _innerList.Insert(FindInsertionIndex(item), item);
 
         public void AddRange(IEnumerable<T> items)
         {
@@ -48,70 +45,31 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        public void Clear()
-        {
-            _innerList.Clear();
-        }
+        public void Clear() => _innerList.Clear();
 
-        public bool Contains(T item)
-        {
-            return _innerList.Contains(item);
-        }
+        public bool Contains(T item) => _innerList.Contains(item);
 
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            _innerList.CopyTo(array, arrayIndex);
-        }
+        public void CopyTo(T[] array, int arrayIndex) => _innerList.CopyTo(array, arrayIndex);
 
-        public IEnumerator<T> GetEnumerator()
-        {
-            return _innerList.GetEnumerator();
-        }
+        public IEnumerator<T> GetEnumerator() => _innerList.GetEnumerator();
 
-        public int IndexOf(T item)
-        {
-            return _innerList.IndexOf(item);
-        }
+        public int IndexOf(T item) => _innerList.IndexOf(item);
 
-        public bool Remove(T item)
-        {
-            return Remove(item, EqualityComparer<T>.Default);
-        }
+        public bool Remove(T item) => Remove(item, EqualityComparer<T>.Default);
 
-        public bool Remove(T item, IEqualityComparer<T> equalityComparer)
-        {
-            return _innerList.Remove(item, equalityComparer);
-        }
+        public bool Remove(T item, IEqualityComparer<T> equalityComparer) => _innerList.Remove(item, equalityComparer);
 
-        public void RemoveAll(Predicate<T> match)
-        {
-            _innerList.RemoveAll(match);
-        }
+        public void RemoveAll(Predicate<T> match) => _innerList.RemoveAll(match);
 
-        public void RemoveAt(int index)
-        {
-            _innerList.RemoveAt(index);
-        }
+        public void RemoveAt(int index) => _innerList.RemoveAt(index);
 
-        public void RemoveRange(int index, int count)
-        {
-            _innerList.RemoveRange(index, count);
-        }
+        public void RemoveRange(int index, int count) => _innerList.RemoveRange(index, count);
 
-        public void RemoveRange(IEnumerable<T> items)
-        {
-            RemoveRange(items, EqualityComparer<T>.Default);
-        }
+        public void RemoveRange(IEnumerable<T> items) => RemoveRange(items, EqualityComparer<T>.Default);
 
-        public void RemoveRange(IEnumerable<T> items, IEqualityComparer<T> itemsEqualityComparer)
-        {
-            _innerList.RemoveRange(items, itemsEqualityComparer);
-        }
+        public void RemoveRange(IEnumerable<T> items, IEqualityComparer<T> itemsEqualityComparer) => _innerList.RemoveRange(items, itemsEqualityComparer);
 
-        public void Replace(T oldValue, T newValue)
-        {
-            Replace(oldValue, newValue, EqualityComparer<T>.Default);
-        }
+        public void Replace(T oldValue, T newValue) => Replace(oldValue, newValue, EqualityComparer<T>.Default);
 
         public void Replace(T oldValue, T newValue, IEqualityComparer<T> equalityComparer)
         {
@@ -119,25 +77,11 @@ namespace ExRam.ReactiveCollections
             Add(newValue);
         }
 
-        #region Explicit ICollection implementation
-        bool ICollection<T>.IsReadOnly => false;
+        public int Count => _innerList.Count;
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        public T this[int index] => _innerList[index];
 
-
-        void ICollection.CopyTo(Array array, int index)
-        {
-            CopyTo((T[])array, index);
-        }
-
-        bool ICollection.IsSynchronized => false;
-
-        object ICollection.SyncRoot => this;
-
-        #endregion
+        public IReactiveCollection<ListChangedNotification<T>> ReactiveCollection => _innerList.ReactiveCollection;
 
         private int FindInsertionIndex(T item)
         {
@@ -151,10 +95,16 @@ namespace ExRam.ReactiveCollections
             return _innerList.Count;
         }
 
-        public int Count => _innerList.Count;
+        #region Explicit ICollection implementation
+        bool ICollection<T>.IsReadOnly => false;
 
-        public T this[int index] => _innerList[index];
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public IReactiveCollection<ListChangedNotification<T>> ReactiveCollection => _innerList.ReactiveCollection;
+        void ICollection.CopyTo(Array array, int index) => CopyTo((T[])array, index);
+
+        bool ICollection.IsSynchronized => false;
+
+        object ICollection.SyncRoot => this;
+        #endregion
     }
 }

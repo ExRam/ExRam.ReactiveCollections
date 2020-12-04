@@ -78,30 +78,15 @@ namespace ExRam.ReactiveCollections
                 Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
-        public bool IsProperSubsetOf(IEnumerable<T> other)
-        {
-            return Current.IsProperSubsetOf(other);
-        }
+        public bool IsProperSubsetOf(IEnumerable<T> other) => Current.IsProperSubsetOf(other);
 
-        public bool IsProperSupersetOf(IEnumerable<T> other)
-        {
-            return Current.IsProperSupersetOf(other);
-        }
+        public bool IsProperSupersetOf(IEnumerable<T> other) => Current.IsProperSupersetOf(other);
 
-        public bool IsSubsetOf(IEnumerable<T> other)
-        {
-            return Current.IsSubsetOf(other);
-        }
+        public bool IsSubsetOf(IEnumerable<T> other) => Current.IsSubsetOf(other);
 
-        public bool IsSupersetOf(IEnumerable<T> other)
-        {
-            return Current.IsSupersetOf(other);
-        }
+        public bool IsSupersetOf(IEnumerable<T> other) => Current.IsSupersetOf(other);
 
-        public bool Overlaps(IEnumerable<T> other)
-        {
-            return Current.Overlaps(other);
-        }
+        public bool Overlaps(IEnumerable<T> other) => Current.Overlaps(other);
 
         public void Remove(T value)
         {
@@ -112,10 +97,7 @@ namespace ExRam.ReactiveCollections
                 Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Remove, ImmutableList.Create(value), ImmutableList<T>.Empty, Current.IndexOf(value)));
         }
 
-        public bool SetEquals(IEnumerable<T> other)
-        {
-            return Current.SetEquals(other);
-        }
+        public bool SetEquals(IEnumerable<T> other) => Current.SetEquals(other);
 
         public void SymmetricExcept(IEnumerable<T> other)
         {
@@ -126,10 +108,7 @@ namespace ExRam.ReactiveCollections
                 Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
-        public bool TryGetValue(T equalValue, out T actualValue)
-        {
-            return Current.TryGetValue(equalValue, out actualValue);
-        }
+        public bool TryGetValue(T equalValue, out T actualValue) => Current.TryGetValue(equalValue, out actualValue);
 
         public void Union(IEnumerable<T> other)
         {
@@ -140,40 +119,26 @@ namespace ExRam.ReactiveCollections
                 Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
+        private ImmutableSortedSet<T> Current => Subject.Value.Current;
+
         #region IList<T> implementation
-        public int IndexOf(T item)
-        {
-            return Current.IndexOf(item);
-        }
+        public int IndexOf(T item) => Current.IndexOf(item);
 
-        void IList<T>.Insert(int index, T item)
-        {
-            throw new NotSupportedException();
-        }
+        void IList<T>.Insert(int index, T item) => throw new NotSupportedException();
 
-        void IList<T>.RemoveAt(int index)
-        {
-            throw new NotSupportedException();
-        }
+        void IList<T>.RemoveAt(int index) => throw new NotSupportedException();
 
         public T this[int index]
         {
             get => Current[index];
-
             set => throw new NotSupportedException();
         }
         #endregion
 
         #region ICollection<T> implementation
-        public bool Contains(T item)
-        {
-            return Current.Contains(item);
-        }
+        public bool Contains(T item) => Current.Contains(item);
 
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            ((ICollection<T>)Current).CopyTo(array, arrayIndex);
-        }
+        public void CopyTo(T[] array, int arrayIndex) => ((ICollection<T>)Current).CopyTo(array, arrayIndex);
 
         public int Count => Current.Count;
 
@@ -196,15 +161,9 @@ namespace ExRam.ReactiveCollections
         #endregion
 
         #region IList implementation
-        int IList.Add(object? value)
-        {
-            throw new NotSupportedException();
-        }
+        int IList.Add(object? value) => throw new NotSupportedException();
 
-        void IList.Clear()
-        {
-            Clear();
-        }
+        void IList.Clear() => Clear();
 
         bool IList.Contains(object? value) => Contains((T)value!);
 
@@ -236,36 +195,18 @@ namespace ExRam.ReactiveCollections
         bool ICollection.IsSynchronized => false;
 
         object ICollection.SyncRoot => this;
-
         #endregion
 
         #region ISet implementation
-        void ISet<T>.ExceptWith(IEnumerable<T> other)
-        {
-            throw new NotSupportedException();
-        }
+        void ISet<T>.ExceptWith(IEnumerable<T> other) => throw new NotSupportedException();
 
-        void ISet<T>.IntersectWith(IEnumerable<T> other)
-        {
-            throw new NotSupportedException();
-        }
+        void ISet<T>.IntersectWith(IEnumerable<T> other) => throw new NotSupportedException();
 
-        void ISet<T>.SymmetricExceptWith(IEnumerable<T> other)
-        {
-            throw new NotSupportedException();
-        }
+        void ISet<T>.SymmetricExceptWith(IEnumerable<T> other) => throw new NotSupportedException();
 
-        void ISet<T>.UnionWith(IEnumerable<T> other)
-        {
-            throw new NotSupportedException();
-        }
+        void ISet<T>.UnionWith(IEnumerable<T> other) => throw new NotSupportedException();
 
-        bool ISet<T>.Add(T item)
-        {
-            throw new NotSupportedException();
-        }
+        bool ISet<T>.Add(T item) => throw new NotSupportedException();
         #endregion
-
-        private ImmutableSortedSet<T> Current => Subject.Value.Current;
     }
 }
