@@ -19,7 +19,7 @@ namespace ExRam.ReactiveCollections
         ICanHandleRanges<T>
     {
         private readonly IComparer<T> _comparer;
-        private readonly ListReactiveCollectionSource<T> _innerList = new ListReactiveCollectionSource<T>();
+        private readonly ListReactiveCollectionSource<T> _innerList = new();
 
         public SortedListReactiveCollectionSource() : this(Comparer<T>.Default)
         {

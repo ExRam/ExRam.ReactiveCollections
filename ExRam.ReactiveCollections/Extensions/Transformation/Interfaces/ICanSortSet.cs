@@ -4,6 +4,6 @@ namespace ExRam.ReactiveCollections
 {
     internal interface ICanSortSet<T>
     {
-        IReactiveCollection<SortedSetChangedNotification<T>> Sort(IComparer<T> cmparer);
+        IReactiveCollection<SortedSetChangedNotification<T>> Sort(IComparer<T> comparer);
     }
 }
