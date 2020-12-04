@@ -30,15 +30,9 @@ namespace ExRam.ReactiveCollections
                 AddRange(items);
         }
 
-        public void Add(T item)
-        {
-            Insert(Current.Count, item);
-        }
+        public void Add(T item) => Insert(Current.Count, item);
 
-        public void AddRange(IEnumerable<T> items)
-        {
-            InsertRange(Current.Count, items);
-        }
+        public void AddRange(IEnumerable<T> items) => InsertRange(Current.Count, items);
 
         public void Clear()
         {
@@ -46,20 +40,11 @@ namespace ExRam.ReactiveCollections
                 Subject.OnNext(new ListChangedNotification<T>(ImmutableList<T>.Empty, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
-        public bool Contains(T item)
-        {
-            return Current.Contains(item);
-        }
+        public bool Contains(T item) => Current.Contains(item);
 
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            Current.CopyTo(array, arrayIndex);
-        }
+        public void CopyTo(T[] array, int arrayIndex) => Current.CopyTo(array, arrayIndex);
 
-        public IEnumerator<T> GetEnumerator()
-        {
-            return Current.GetEnumerator();
-        }
+        public IEnumerator<T> GetEnumerator() => Current.GetEnumerator();
 
         public void InsertRange(int index, IEnumerable<T> items)
         {
@@ -75,10 +60,7 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        public int IndexOf(T item)
-        {
-            return Current.IndexOf(item);
-        }
+        public int IndexOf(T item) => Current.IndexOf(item);
 
         public void Insert(int index, T item)
         {
@@ -104,10 +86,7 @@ namespace ExRam.ReactiveCollections
             Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
-        public void RemoveAt(int index)
-        {
-            RemoveAtInternal(index);
-        }
+        public void RemoveAt(int index) => RemoveAtInternal(index);
 
         private bool RemoveAtInternal(int index)
         {
@@ -134,10 +113,7 @@ namespace ExRam.ReactiveCollections
                 Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Remove, range, ImmutableList<T>.Empty, index));
         }
 
-        public void RemoveRange(IEnumerable<T> items)
-        {
-            RemoveRange(items, EqualityComparer<T>.Default);
-        }
+        public void RemoveRange(IEnumerable<T> items) => RemoveRange(items, EqualityComparer<T>.Default);
 
         public void RemoveRange(IEnumerable<T> items, IEqualityComparer<T> equalityComparer)
         {
@@ -157,10 +133,7 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        public void Replace(T oldValue, T newValue)
-        {
-            Replace(oldValue, newValue, EqualityComparer<T>.Default);
-        }
+        public void Replace(T oldValue, T newValue) => Replace(oldValue, newValue, EqualityComparer<T>.Default);
 
         public void Replace(T oldValue, T newValue, IEqualityComparer<T> equalityComparer)
         {
@@ -170,10 +143,7 @@ namespace ExRam.ReactiveCollections
                 SetItem(index, newValue);
         }
 
-        public void Reverse()
-        {
-            Reverse(0, Count);
-        }
+        public void Reverse() => Reverse(0, Count);
 
         public void Reverse(int index, int count)
         {
@@ -194,20 +164,11 @@ namespace ExRam.ReactiveCollections
                 Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Replace, ImmutableList.Create(oldItem), ImmutableList.Create(value), index));
         }
 
-        public void Sort()
-        {
-            Sort(Comparer<T>.Default);
-        }
+        public void Sort() => Sort(Comparer<T>.Default);
 
-        public void Sort(Comparison<T> comparison)
-        {
-            Sort(comparison.ToComparer());
-        }
+        public void Sort(Comparison<T> comparison) => Sort(comparison.ToComparer());
 
-        public void Sort(IComparer<T> comparer)
-        {
-            Sort(0, Count, comparer);
-        }
+        public void Sort(IComparer<T> comparer) => Sort(0, Count, comparer);
 
         public void Sort(int index, int count, IComparer<T> comparer)
         {
@@ -218,6 +179,16 @@ namespace ExRam.ReactiveCollections
                 Subject.OnNext(new ListChangedNotification<T>(newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
         }
 
+        public T this[int index]
+        {
+            get => Current[index];
+            set => SetItem(index, value);
+        }
+        
+        public int Count => Current.Count;
+
+        private ImmutableList<T> Current => Subject.Value.Current;
+
         #region Explicit IList<T> implementation
         T IList<T>.this[int index]
         {
@@ -227,83 +198,38 @@ namespace ExRam.ReactiveCollections
         }
 
         bool ICollection<T>.IsReadOnly => false;
-
         #endregion
 
         #region Explicit IList implementation
-        int IList.Add(object? value)
-        {
-            var oldList = Current;
-            Insert(oldList.Count, (T)value);
+        int IList.Add(object? value) => throw new NotSupportedException();
 
-            return oldList.Count;
-        }
+        bool IList.Contains(object? value) => IsCompatibleObject<T>(value) && Contains((T)value!);
 
-        void IList.Clear()
-        {
-            Clear();
-        }
+        int IList.IndexOf(object? value) => IsCompatibleObject<T>(value) ? IndexOf((T)value!) : -1;
 
-        bool IList.Contains(object? value)
-        {
-            return Contains((T)value);
-        }
+        void IList.Insert(int index, object? value) => throw new NotSupportedException();
 
-        int IList.IndexOf(object? value)
-        {
-            return IndexOf((T)value);
-        }
-
-        void IList.Insert(int index, object? value)
-        {
-            Insert(index, (T)value);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         bool IList.IsFixedSize => false;
 
         bool IList.IsReadOnly => false;
 
-        void IList.Remove(object? value)
-        {
-            Remove((T)value);
-        }
+        void IList.Remove(object? value) => throw new NotSupportedException();
 
-        void IList<T>.RemoveAt(int index)
-        {
-            RemoveAt(index);
-        }
+        void IList<T>.RemoveAt(int index) => RemoveAt(index);
 
         object? IList.this[int index]
         {
             get => this[index];
-            set => SetItem(index, (T)value);
+            set => throw new NotSupportedException();
         }
 
-        void ICollection.CopyTo(Array array, int index)
-        {
-            CopyTo((T[])array, index);
-        }
+        void ICollection.CopyTo(Array array, int index) => CopyTo((T[])array, index);
 
         bool ICollection.IsSynchronized => false;
 
         object ICollection.SyncRoot => this;
-
         #endregion
-
-        public int Count => Current.Count;
-
-        private ImmutableList<T> Current => Subject.Value.Current;
-
-        public T this[int index]
-        {
-            get => Current[index];
-
-            set => SetItem(index, value);
-        }
     }
 }
