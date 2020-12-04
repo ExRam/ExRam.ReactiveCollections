@@ -75,7 +75,7 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        public int IndexOf(T? item)
+        public int IndexOf(T item)
         {
             return Current.IndexOf(item);
         }
