@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Specialized;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -209,9 +210,10 @@ namespace ExRam.ReactiveCollections.Tests
         public void Item()
         {
             var list = (IList)new ListReactiveCollectionSource<int>();
-            list.Add(1);
-
-            list[0].Should().Be(1);
+            list
+                .Invoking(_ => _.Add(1))
+                .Should()
+                .Throw<NotSupportedException>();
         }
 
         [Fact]
