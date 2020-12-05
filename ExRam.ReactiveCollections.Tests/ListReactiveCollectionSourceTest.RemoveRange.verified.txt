@@ -1,0 +1,7 @@
+{
+  Current: [
+    1,
+    3
+  ],
+  Action: Reset
+}

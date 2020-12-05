@@ -1,27 +1,27 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Specialized;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using FluentAssertions;
+using VerifyXunit;
 using Xunit;
 
 namespace ExRam.ReactiveCollections.Tests
 {
-    public class ListReactiveCollectionSourceTest
+    public class ListReactiveCollectionSourceTest : VerifyBase
     {
+        public ListReactiveCollectionSourceTest() : base()
+        {
+            
+        }
+
         [Fact]
         public async Task First_notification_is_reset()
         {
             var list = new ListReactiveCollectionSource<int>();
 
-            var notification = await list.ReactiveCollection.Changes.FirstAsync().ToTask();
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notification.OldItems.Should().BeEmpty();
-            notification.NewItems.Should().BeEmpty();
-            notification.Current.Should().BeEmpty();
+            await Verify(list.ReactiveCollection.Changes.FirstAsync().ToTask());
         }
 
         [Fact]
@@ -36,13 +36,7 @@ namespace ExRam.ReactiveCollections.Tests
 
             list.Add(1);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(0);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.NewItems.Should().Equal(1);
-            notification.OldItems.Should().BeEmpty();
-            notification.Current.Should().Equal(1);
+            await Verify(notificationTask);
         }
 
         [Fact]
@@ -58,13 +52,7 @@ namespace ExRam.ReactiveCollections.Tests
             var range = new[] { 1, 2, 3 };
             list.AddRange(range);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(0);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.OldItems.Should().BeEmpty();
-            notification.NewItems.Should().Equal(range);
-            notification.Current.Should().Equal(range);
+            await Verify(notificationTask);
         }
 
         [Fact]
@@ -80,29 +68,24 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(1);
             list.Clear();
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().NotHaveValue();
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notification.NewItems.Should().BeEmpty();
-            notification.OldItems.Should().BeEmpty();
-            notification.Current.Should().BeEmpty();
+            await Verify(notificationTask);
         }
 
         [Fact]
-        public void Contains()
+        public async Task Contains()
         {
             var list = new ListReactiveCollectionSource<int>
             {
                 1
             };
 
-            list.Contains(1).Should().BeTrue();
-            list.Contains(2).Should().BeFalse();
+            await Verify((
+                list.Contains(1),
+                list.Contains(2)));
         }
 
         [Fact]
-        public void CopyTo()
+        public async Task CopyTo()
         {
             var list = new ListReactiveCollectionSource<int>();
 
@@ -112,7 +95,7 @@ namespace ExRam.ReactiveCollections.Tests
             var target = new int[5];
             list.CopyTo(target, 2);
 
-            target.Should().Equal(0, 0, 1, 2, 3);
+            await Verify(target);
         }
 
         [Fact]
@@ -141,16 +124,17 @@ namespace ExRam.ReactiveCollections.Tests
         }
 
         [Fact]
-        public void IndexOf()
+        public async Task IndexOf()
         {
             var list = new ListReactiveCollectionSource<int>
             {
                 1, 2, 3
             };
 
-            list.IndexOf(3).Should().Be(2);
-            list.IndexOf(2).Should().Be(1);
-            list.IndexOf(1).Should().Be(0);
+            await Verify((
+                list.IndexOf(3),
+                list.IndexOf(2),
+                list.IndexOf(1)));
         }
 
         [Fact]
@@ -165,13 +149,7 @@ namespace ExRam.ReactiveCollections.Tests
 
             list.Insert(0, 2);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(0);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.NewItems.Should().Equal(2);
-            notification.OldItems.Should().BeEmpty();
-            notification.Current.Should().Equal(2);
+            await Verify(notificationTask);
         }
 
         [Fact]
@@ -189,27 +167,22 @@ namespace ExRam.ReactiveCollections.Tests
             var range = new[] { 1, 2, 3 };
             list.InsertRange(1, range);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(1);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.NewItems.Should().Equal(1, 2, 3);
-            notification.OldItems.Should().BeEmpty();
-            notification.Current.Should().Equal(1, 1, 2, 3);
+            await Verify(notificationTask);
         }
 
         [Fact]
-        public void IsReadOnly()
+        public async Task IsReadOnly()
         {
             var list = (IList)new ListReactiveCollectionSource<int>();
 
-            list.IsReadOnly.Should().BeFalse();
+            await Verify(list.IsReadOnly);
         }
 
         [Fact]
         public void Item()
         {
             var list = (IList)new ListReactiveCollectionSource<int>();
+            
             list
                 .Invoking(_ => _.Add(1))
                 .Should()
@@ -229,13 +202,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(1);
             list.Remove(1);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(0);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.NewItems.Should().BeEmpty();
-            notification.OldItems.Should().Equal(1);
-            notification.Current.Should().BeEmpty();
+            await Verify(notificationTask);
         }
 
         [Fact]
@@ -251,10 +218,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.AddRange(new[] { 1, 2, 3 });
             list.RemoveAll(x => x % 2 == 0);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notification.Current.Should().Equal(1, 3);
+            await Verify(notificationTask);
         }
 
         [Fact]
@@ -271,13 +235,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(2);
             list.RemoveAt(1);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(1);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.NewItems.Should().BeEmpty();
-            notification.OldItems.Should().Equal(2);
-            notification.Current.Should().Equal(1);
+            await Verify(notificationTask);
         }
 
         [Fact]
@@ -293,12 +251,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.AddRange(new[] { 1, 2, 3, 4 });
             list.RemoveRange(new[] { 2, 4 });
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notification.NewItems.Should().BeEmpty();
-            notification.OldItems.Should().BeEmpty();
-            notification.Current.Should().Equal(1, 3);
+            await Verify(notificationTask);
         }
 
         [Fact]
@@ -314,12 +267,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.AddRange(new[] { 1, 2, 3, 4 });
             list.RemoveRange(2, 2);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.OldItems.Should().ContainInOrder(3, 4);
-            notification.NewItems.Should().BeEmpty();
-            notification.Current.Should().Equal(1, 2);
+            await Verify(notificationTask);
         }
 
         [Fact]
@@ -335,12 +283,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.AddRange(new[] { 1, 2, 3, 4, 1 });
             list.Replace(1, 5);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Replace);
-            notification.OldItems.Should().Equal(1);
-            notification.NewItems.Should().Equal(5);
-            notification.Current.Should().Equal(5, 2, 3, 4, 1);
+            await Verify(notificationTask);
         }
 
         [Fact]
@@ -356,10 +299,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.AddRange(new[] { 1, 2, 3, 4, 5 });
             list.Reverse();
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notification.Current.Should().Equal(5, 4, 3, 2, 1);
+            await Verify(notificationTask);
         }
 
         [Fact]
@@ -375,13 +315,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.AddRange(new[] { 1, 2, 3, 4, 5 });
             list.SetItem(2, 6);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Replace);
-            notification.Index.Should().Be(2);
-            notification.OldItems.Should().Equal(3);
-            notification.NewItems.Should().Equal(6);
-            notification.Current.Should().Equal(1, 2, 6, 4, 5);
+            await Verify(notificationTask);
         }
 
         [Fact]
@@ -397,10 +331,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.AddRange(new[] { 2, 1, 3, 5, 0 });
             list.Sort();
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notification.Current.Should().Equal(0, 1, 2, 3, 5);
+            await Verify(notificationTask);
         }
 
         [Fact]
@@ -416,10 +347,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.AddRange(new[] { 2, 1, 3, 5, 0 });
             list.Sort((x, y) => y.CompareTo(x));
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notification.Current.Should().Equal(5, 3, 2, 1, 0);
+            await Verify(notificationTask);
         }
     }
 }

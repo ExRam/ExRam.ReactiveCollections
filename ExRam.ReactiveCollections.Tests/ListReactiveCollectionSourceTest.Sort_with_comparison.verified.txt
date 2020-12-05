@@ -1,0 +1,10 @@
+{
+  Current: [
+    5,
+    3,
+    2,
+    1,
+    0
+  ],
+  Action: Reset
+}

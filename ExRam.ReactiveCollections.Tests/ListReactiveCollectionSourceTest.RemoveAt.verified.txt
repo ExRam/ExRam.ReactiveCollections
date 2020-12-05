@@ -1,0 +1,10 @@
+{
+  Index: 1,
+  Current: [
+    1
+  ],
+  OldItems: [
+    2
+  ],
+  Action: Remove
+}
