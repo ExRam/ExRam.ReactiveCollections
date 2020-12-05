@@ -1,0 +1,7 @@
+{
+  Index: 0,
+  OldItems: [
+    1
+  ],
+  Action: Remove
+}

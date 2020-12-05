@@ -1,0 +1,17 @@
+{
+  Index: 2,
+  Current: [
+    1,
+    2,
+    6,
+    4,
+    5
+  ],
+  OldItems: [
+    3
+  ],
+  NewItems: [
+    6
+  ],
+  Action: Replace
+}
