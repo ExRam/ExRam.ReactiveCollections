@@ -5,31 +5,48 @@
 // file.
 
 using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Linq;
 
 namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source)
+        public static IReactiveCollection<SortedListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source)
         {
             return source.Sort(Comparer<TSource>.Default, EqualityComparer<TSource>.Default);
         }
 
-        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer)
+        public static IReactiveCollection<SortedListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer)
         {
             return source.Sort(comparer, EqualityComparer<TSource>.Default);
         }
 
-        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IEqualityComparer<TSource> equalityComparer)
+        public static IReactiveCollection<SortedListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IEqualityComparer<TSource> equalityComparer)
         {
             return source.Sort(Comparer<TSource>.Default, equalityComparer);
         }
 
-        public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer, IEqualityComparer<TSource> equalityComparer)
+        public static IReactiveCollection<SortedListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer, IEqualityComparer<TSource> equalityComparer)
         {
-            return source is ICanSortList<TSource> 
-                ? ((ICanSortList<TSource>)source).Sort(comparer)
-                : new SortedListTransformationReactiveCollection<TSource, TSource>(source, null, null, comparer, equalityComparer);
+            return source
+                .Changes
+                .Scan(
+                    new[] { SortedListChangedNotification<TSource>.Reset.WithComparer(comparer) },
+                    (currentTargetNotification, sourceNotification) =>
+                    {
+                        var newRet = currentTargetNotification[^1]
+                            .Sort(sourceNotification)
+                            .ToArray();
+
+                        return newRet.Length > 0 ? newRet :
+                            currentTargetNotification.Length > 0
+                                ? new[] { currentTargetNotification[0] }
+                                : currentTargetNotification;
+                    })
+                .SelectMany(x => x)
+                .DistinctUntilChanged()
+                .ToReactiveCollection();
         }
     }
 }

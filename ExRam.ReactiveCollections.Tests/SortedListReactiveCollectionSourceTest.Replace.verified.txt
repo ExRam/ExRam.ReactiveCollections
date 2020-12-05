@@ -1,0 +1,94 @@
+[
+  {
+    Comparer: {},
+    Action: Reset
+  },
+  {
+    Index: 0,
+    Comparer: {},
+    Current: [
+      1
+    ],
+    NewItems: [
+      1
+    ]
+  },
+  {
+    Index: 1,
+    Comparer: {},
+    Current: [
+      1,
+      2
+    ],
+    NewItems: [
+      2
+    ]
+  },
+  {
+    Index: 2,
+    Comparer: {},
+    Current: [
+      1,
+      2,
+      3
+    ],
+    NewItems: [
+      3
+    ]
+  },
+  {
+    Index: 3,
+    Comparer: {},
+    Current: [
+      1,
+      2,
+      3,
+      4
+    ],
+    NewItems: [
+      4
+    ]
+  },
+  {
+    Index: 1,
+    Comparer: {},
+    Current: [
+      1,
+      1,
+      2,
+      3,
+      4
+    ],
+    NewItems: [
+      1
+    ]
+  },
+  {
+    Index: 0,
+    Comparer: {},
+    Current: [
+      1,
+      2,
+      3,
+      4
+    ],
+    OldItems: [
+      1
+    ],
+    Action: Remove
+  },
+  {
+    Index: 4,
+    Comparer: {},
+    Current: [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    NewItems: [
+      5
+    ]
+  }
+]

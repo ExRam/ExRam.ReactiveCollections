@@ -11,63 +11,52 @@ using System.Linq;
 
 namespace ExRam.ReactiveCollections
 {
-    public class SortedListReactiveCollectionSource<T> : 
-        IReactiveCollectionSource<ListChangedNotification<T>>,
+    public class SortedListReactiveCollectionSource<T> :
+        ReactiveCollectionSource<SortedListChangedNotification<T>>,
         ICollection<T>,
-        ICollection,
-        ICanReplaceValue<T>,
-        ICanHandleRanges<T>
+        ICollection
     {
-        private readonly IComparer<T> _comparer;
-        private readonly ListReactiveCollectionSource<T> _innerList = new();
-
         public SortedListReactiveCollectionSource() : this(Comparer<T>.Default)
         {
         }
 
-        public SortedListReactiveCollectionSource(IComparer<T> comparer)
+        public SortedListReactiveCollectionSource(IComparer<T> comparer) : base(SortedListChangedNotification<T>.Reset.WithComparer(comparer))
         {
-            _comparer = comparer;
         }
 
-        public void Add(T item) => _innerList.Insert(FindInsertionIndex(item), item);
+        public void Add(T item) => TryUpdate(notification => notification.Add(item));
 
         public void AddRange(IEnumerable<T> items)
         {
-            if (_innerList.Count == 0)
-                _innerList.AddRange(items.OrderBy(x => x, _comparer));
-            else
+            foreach (var item in items)
             {
-                foreach (var item in items)
-                {
-                    Add(item);
-                }
+                Add(item);
             }
         }
 
-        public void Clear() => _innerList.Clear();
+        public void Clear() => TryUpdate(notification => notification.Clear());
 
-        public bool Contains(T item) => _innerList.Contains(item);
+        public bool Contains(T item) => CurrentNotification.Current.Contains(item);
 
-        public void CopyTo(T[] array, int arrayIndex) => _innerList.CopyTo(array, arrayIndex);
+        public void CopyTo(T[] array, int arrayIndex) => CurrentNotification.Current.CopyTo(array, arrayIndex);
 
-        public IEnumerator<T> GetEnumerator() => _innerList.GetEnumerator();
+        public IEnumerator<T> GetEnumerator() => CurrentNotification.Current.GetEnumerator();
 
-        public int IndexOf(T item) => _innerList.IndexOf(item);
+        public int IndexOf(T item) => CurrentNotification.Current.IndexOf(item);
 
         public bool Remove(T item) => Remove(item, EqualityComparer<T>.Default);
 
-        public bool Remove(T item, IEqualityComparer<T> equalityComparer) => _innerList.Remove(item, equalityComparer);
+        public bool Remove(T item, IEqualityComparer<T> equalityComparer) => TryUpdate(notification => notification.Remove(item, equalityComparer));
 
-        public void RemoveAll(Predicate<T> match) => _innerList.RemoveAll(match);
+        public void RemoveAll(Predicate<T> match) => TryUpdate(notification => notification.RemoveAll(match));
 
-        public void RemoveAt(int index) => _innerList.RemoveAt(index);
+        public void RemoveAt(int index) => TryUpdate(notification => notification.RemoveAt(index));
 
-        public void RemoveRange(int index, int count) => _innerList.RemoveRange(index, count);
+        public void RemoveRange(int index, int count) => TryUpdate(notification => notification.RemoveRange(index, count));
 
         public void RemoveRange(IEnumerable<T> items) => RemoveRange(items, EqualityComparer<T>.Default);
 
-        public void RemoveRange(IEnumerable<T> items, IEqualityComparer<T> itemsEqualityComparer) => _innerList.RemoveRange(items, itemsEqualityComparer);
+        public void RemoveRange(IEnumerable<T> items, IEqualityComparer<T> itemsEqualityComparer) => TryUpdate(notification => notification.RemoveRange(items, itemsEqualityComparer));
 
         public void Replace(T oldValue, T newValue) => Replace(oldValue, newValue, EqualityComparer<T>.Default);
 
@@ -77,23 +66,9 @@ namespace ExRam.ReactiveCollections
             Add(newValue);
         }
 
-        public int Count => _innerList.Count;
+        public int Count => CurrentNotification.Current.Count;
 
-        public T this[int index] => _innerList[index];
-
-        public IReactiveCollection<ListChangedNotification<T>> ReactiveCollection => _innerList.ReactiveCollection;
-
-        private int FindInsertionIndex(T item)
-        {
-            // TODO: Optimize, do a binary search or something.
-            for (var newInsertionIndex = 0; newInsertionIndex < _innerList.Count; newInsertionIndex++)
-            {
-                if (_comparer.Compare(item, _innerList[newInsertionIndex]) < 0)
-                    return newInsertionIndex;
-            }
-
-            return _innerList.Count;
-        }
+        public T this[int index] => CurrentNotification.Current[index];
 
         #region Explicit ICollection implementation
         bool ICollection<T>.IsReadOnly => false;
