@@ -18,6 +18,7 @@ namespace ExRam.ReactiveCollections
 
         public static IReactiveCollection<ListChangedNotification<TResult>> Select<TSource, TResult>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Func<TSource, TResult> selector, IEqualityComparer<TResult> equalityComparer)
         {
+            // ReSharper disable once SuspiciousTypeConversion.Global
             return source is ICanProjectList<TSource> canProject
                 ? canProject.Select(selector, equalityComparer)
                 : new ListTransformationReactiveCollection<TSource, TResult>(source, null, selector, equalityComparer);
@@ -26,6 +27,7 @@ namespace ExRam.ReactiveCollections
         public static IReactiveCollection<DictionaryChangedNotification<TKey, TResult>> Select<TKey, TSource, TResult>(this IReactiveCollection<DictionaryChangedNotification<TKey, TSource>> source, Func<TSource, TResult> selector)
             where TKey : notnull
         {
+            // ReSharper disable once SuspiciousTypeConversion.Global
             return source is ICanProjectDictionary<TKey, TSource> canProject
                 ? canProject.Select(selector)
                 : new DictionaryTransformationReactiveCollection<TKey, TSource, TResult>(source, null, kvp => new KeyValuePair<TKey, TResult>(kvp.Key, selector(kvp.Value)), EqualityComparer<KeyValuePair<TKey, TResult>>.Default);
