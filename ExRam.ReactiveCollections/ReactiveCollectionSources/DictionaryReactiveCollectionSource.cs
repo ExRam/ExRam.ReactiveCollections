@@ -20,9 +20,19 @@ namespace ExRam.ReactiveCollections
         IReadOnlyDictionary<TKey, TValue>,
         ICanHandleRanges<KeyValuePair<TKey, TValue>> where TKey : notnull
     {
-        public DictionaryReactiveCollectionSource() : base(
+        public DictionaryReactiveCollectionSource() : this(EqualityComparer<TKey>.Default, EqualityComparer<TValue>.Default)
+        {
+
+        }
+
+        public DictionaryReactiveCollectionSource(IEqualityComparer<TKey> keyComparer) : this(keyComparer, EqualityComparer<TValue>.Default)
+        {
+
+        }
+
+        public DictionaryReactiveCollectionSource(IEqualityComparer<TKey> keyComparer, IEqualityComparer<TValue> valueComparer) : base(
             new DictionaryChangedNotification<TKey, TValue>(
-                ImmutableDictionary<TKey, TValue>.Empty, 
+                ImmutableDictionary<TKey, TValue>.Empty.WithComparers(keyComparer, valueComparer), 
                 NotifyCollectionChangedAction.Reset, 
                 ImmutableList<KeyValuePair<TKey, TValue>>.Empty, 
                 ImmutableList<KeyValuePair<TKey, TValue>>.Empty))
