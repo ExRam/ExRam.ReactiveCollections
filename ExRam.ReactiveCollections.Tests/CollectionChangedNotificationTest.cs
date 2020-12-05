@@ -1,11 +1,12 @@
 ﻿using System.Collections.Immutable;
 using System.Collections.Specialized;
-using FluentAssertions;
+using System.Threading.Tasks;
+using VerifyXunit;
 using Xunit;
 
 namespace ExRam.ReactiveCollections.Tests
 {
-    public class CollectionChangedNotificationTest
+    public class CollectionChangedNotificationTest : VerifyBase
     {
         #region NotificationImpl
         private sealed class NotificationImpl : CollectionChangedNotification<int>
@@ -22,13 +23,18 @@ namespace ExRam.ReactiveCollections.Tests
         }
         #endregion
 
+        public CollectionChangedNotificationTest() : base()
+        {
+
+        }
+        
         [Fact]
-        public void Current_is_set()
+        public async Task Current_is_set()
         {
             var list = ImmutableList.Create(1, 2, 3);
             var notification = new NotificationImpl(list, NotifyCollectionChangedAction.Reset, ImmutableList<int>.Empty, ImmutableList<int>.Empty);
 
-            notification.Current.Should().Equal(list);
+            await Verify(notification.Current);
         }
     }
 }

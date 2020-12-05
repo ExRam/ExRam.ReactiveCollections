@@ -1,0 +1,20 @@
+{
+  Current: {
+    Key3: 3,
+    Key1: 1,
+    Key2: 3
+  },
+  OldItems: [
+    {
+      Key: Key2,
+      Value: 2
+    }
+  ],
+  NewItems: [
+    {
+      Key: Key2,
+      Value: 3
+    }
+  ],
+  Action: Replace
+}

@@ -5,25 +5,60 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using FluentAssertions;
+using VerifyXunit;
 using Xunit;
 
 namespace ExRam.ReactiveCollections.Tests
 {
-    public class DictionaryReactiveCollectionSourceTest
+    internal sealed class DeterministicStringKeyComparer : IEqualityComparer<string>
     {
+        public static readonly DeterministicStringKeyComparer Instance = new DeterministicStringKeyComparer();
+        
+        private DeterministicStringKeyComparer()
+        {
+            
+        }
+        
+        public bool Equals(string? x, string? y)
+        {
+            return StringComparer.Ordinal.Compare(x, y) == 0;
+        }
+
+        public int GetHashCode(string str)
+        {
+            unchecked
+            {
+                var hash1 = (5381 << 16) + 5381;
+                var hash2 = hash1;
+
+                for (var i = 0; i < str.Length; i += 2)
+                {
+                    hash1 = ((hash1 << 5) + hash1) ^ str[i];
+                    if (i == str.Length - 1)
+                        break;
+                    hash2 = ((hash2 << 5) + hash2) ^ str[i + 1];
+                }
+
+                return hash1 + hash2 * 1566083941;
+            }
+        }
+    }
+    
+    public class DictionaryReactiveCollectionSourceTest : VerifyBase
+    {
+        public DictionaryReactiveCollectionSourceTest() : base()
+        {
+
+        }
+        
         [Fact]
         public async Task First_notification_is_reset()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>();
 
-            var notification = await list.ReactiveCollection.Changes
+            await Verify(await list.ReactiveCollection.Changes
                 .FirstAsync()
-                .ToTask();
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notification.OldItems.Should().BeEmpty();
-            notification.NewItems.Should().BeEmpty();
-            notification.Current.Should().BeEmpty();
+                .ToTask());
         }
 
         [Fact]
@@ -38,12 +73,7 @@ namespace ExRam.ReactiveCollections.Tests
 
             list.Add("Key", 1);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.OldItems.Should().BeEmpty();
-            notification.NewItems.Should().Equal(new KeyValuePair<string, int>("Key", 1));
-            notification.Current.Should().Contain("Key", 1);
+            await Verify(notificationTask);
         }
 
         [Fact]
@@ -58,12 +88,7 @@ namespace ExRam.ReactiveCollections.Tests
 
             list.Add("Key", null);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.OldItems.Should().BeEmpty();
-            notification.NewItems.Should().Equal(new KeyValuePair<string, string?>("Key", null));
-            notification.Current.Should().Contain("Key", null);
+            await Verify(notificationTask);
         }
 
         [Fact]
@@ -85,7 +110,7 @@ namespace ExRam.ReactiveCollections.Tests
         [Fact]
         public async Task AddRange1()
         {
-            var list = new DictionaryReactiveCollectionSource<string, int>();
+            var list = new DictionaryReactiveCollectionSource<string, int>(DeterministicStringKeyComparer.Instance);
 
             var notificationTask = list.ReactiveCollection.Changes
                 .Skip(1)
@@ -101,12 +126,7 @@ namespace ExRam.ReactiveCollections.Tests
 
             list.AddRange(range);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.NewItems.Should().BeEquivalentTo(range);
-            notification.OldItems.Should().BeEmpty();
-            notification.Current.Should().Equal(range);
+            await Verify(notificationTask);
         }
 
         [Fact]
@@ -128,28 +148,20 @@ namespace ExRam.ReactiveCollections.Tests
 
             list.AddRange(range, x => x.Length);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.NewItems.Should().HaveCount(3);
-            notification.OldItems.Should().BeEmpty();
-            notification.Current.Should()
-                .Contain(1, "A").And
-                .Contain(2, "BB").And
-                .Contain(3, "CCC");
+            await Verify(notificationTask);
         }
 
         [Fact]
-        public void Count_reflects_actual_count()
+        public async Task Count_reflects_actual_count()
         {
-            var list = new DictionaryReactiveCollectionSource<string, int>
+            var list = new DictionaryReactiveCollectionSource<string, int>(DeterministicStringKeyComparer.Instance)
             {
                 { "Key1", 1 },
                 { "Key2", 2 },
                 { "Key3", 3 }
             };
 
-            list.Should().HaveCount(3);
+            await Verify(list);
         }
 
         [Fact]
@@ -165,24 +177,20 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add("Key", 1);
             list.Clear();
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notification.NewItems.Should().BeEmpty();
-            notification.OldItems.Should().BeEmpty();
-            notification.Current.Should().BeEmpty();
+            await Verify(notificationTask);
         }
 
         [Fact]
-        public void Contains()
+        public async Task Contains()
         {
             var dict = new DictionaryReactiveCollectionSource<string, int>
             {
                 { "Key", 1 }
             };
 
-            dict.Contains(new KeyValuePair<string, int>("Key", 1)).Should().BeTrue();
-            dict.Contains(new KeyValuePair<string, int>("Key1", 2)).Should().BeFalse();
+            await Verify((
+                dict.Contains(new KeyValuePair<string, int>("Key", 1)),
+                dict.Contains(new KeyValuePair<string, int>("Key1", 2))));
         }
 
         [Fact]
@@ -198,18 +206,13 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add("Key1", 1);
             list.Remove("Key1");
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.NewItems.Should().BeEmpty();
-            notification.OldItems.Should().Equal(new KeyValuePair<string, int>("Key1", 1));
-            notification.Current.Should().BeEmpty();
+            await Verify(notificationTask);
         }
 
         [Fact]
         public async Task RemoveRange()
         {
-            var list = new DictionaryReactiveCollectionSource<string, int>();
+            var list = new DictionaryReactiveCollectionSource<string, int>(DeterministicStringKeyComparer.Instance);
 
             var notificationsTask = list.ReactiveCollection.Changes
                 .Skip(2)
@@ -230,57 +233,34 @@ namespace ExRam.ReactiveCollections.Tests
                 "Key2"
             });
 
-            var notifications = await notificationsTask;
-
-            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notifications[0].OldItems.Should().Equal(new KeyValuePair<string, int>("Key1", 1));
-            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notifications[1].OldItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
-            notifications[1].Current.Should().Equal(new Dictionary<string, int>
-            {
-                { "Key3", 3 }
-            });
+            await Verify(notificationsTask);
         }
 
         [Fact]
         public async Task SetItem()
         {
-            var list = new DictionaryReactiveCollectionSource<string, int>();
+            var list = new DictionaryReactiveCollectionSource<string, int>(DeterministicStringKeyComparer.Instance);
 
             var notificationTask = list.ReactiveCollection.Changes
                 .Skip(2)
                 .FirstAsync()
                 .ToTask();
 
-            var range = new Dictionary<string, int>
+            list.AddRange(new Dictionary<string, int>
             {
                 { "Key1", 1 },
                 { "Key2", 2 },
                 { "Key3", 3 }
-            };
-
-            list.AddRange(range);
-
+            });
             list.SetItem("Key2", 3);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Replace);
-            notification.OldItems.Should().HaveCount(1);
-            notification.OldItems.Should().Contain(new KeyValuePair<string, int>("Key2", 2));
-            notification.NewItems.Should().Contain(new KeyValuePair<string, int>("Key2", 3));
-            notification.Current.Should().Equal(new Dictionary<string, int>
-            {
-                { "Key1", 1 },
-                { "Key2", 3 },
-                { "Key3", 3 }
-            });
+            await Verify(notificationTask);
         }
 
         [Fact]
         public async Task SetItems()
         {
-            var list = new DictionaryReactiveCollectionSource<string, int>();
+            var list = new DictionaryReactiveCollectionSource<string, int>(DeterministicStringKeyComparer.Instance);
 
             var notificationTask = list.ReactiveCollection.Changes
                 .Skip(2)
@@ -301,43 +281,36 @@ namespace ExRam.ReactiveCollections.Tests
                 new KeyValuePair<string, int>("Key3", 6)
             });
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notification.Current.Should().Equal(new Dictionary<string, int>
-            {
-                { "Key1", 4 },
-                { "Key2", 5 },
-                { "Key3", 6 }
-            });
+            await Verify(notificationTask);
         }
 
         [Fact]
-        public void TryGetValue()
+        public async Task TryGetValue()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>
             {
                 { "Key1", 1 }
             };
 
-            int value;
-
-            list.TryGetValue("Key1", out value).Should().BeTrue();
-            value.Should().Be(1);
-            list.TryGetValue("Key2", out value).Should().BeFalse();
+            await Verify((
+                list.TryGetValue("Key1", out var value),
+                value,
+                list.TryGetValue("Key2", out _)));
         }
 
         [Fact]
-        public void Item()
+        public async Task Item()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>
             {
                 { "Key1", 1 }
             };
 
-            list["Key1"].Should().Be(1);
+            var before = list["Key1"].Should().Be(1);
             list["Key1"] = 2;
-            list["Key1"].Should().Be(2);
+            var after = list["Key1"].Should().Be(2);
+
+            await Verify((before, after));
         }
 
         [Fact]
