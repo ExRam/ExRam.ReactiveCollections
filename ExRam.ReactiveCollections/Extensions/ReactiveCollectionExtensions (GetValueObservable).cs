@@ -11,7 +11,7 @@ namespace ExRam.ReactiveCollections
 {
     public static partial class ReactiveCollectionExtensions
     {
-        public static IObservable<TValue> GetValueObservable<TKey, TValue>( this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> reactiveCollection, TKey key)
+        public static IObservable<TValue> GetValues<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> reactiveCollection, TKey key)
             where TKey : notnull
         {
             return reactiveCollection.Changes

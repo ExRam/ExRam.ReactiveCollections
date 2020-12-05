@@ -33,7 +33,7 @@ namespace ExRam.ReactiveCollections
             var current = Current;
             var newSet = current.Add(value);
             if (newSet != current)
-                Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, ImmutableList.Create(value), newSet.IndexOf(value)));
+                OnNext(newSet, NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, ImmutableList.Create(value), newSet.IndexOf(value));
         }
 
         public void AddRange(IEnumerable<T> items)
@@ -57,7 +57,7 @@ namespace ExRam.ReactiveCollections
             var current = Current;
 
             if (!current.IsEmpty)
-                Subject.OnNext(new SortedSetChangedNotification<T>(current.Clear(), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+                OnNext(current.Clear(), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
         }
 
         public void Except(IEnumerable<T> other)
@@ -66,7 +66,7 @@ namespace ExRam.ReactiveCollections
             var newSet = current.Except(other);
 
             if (newSet != current)
-                Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+                OnNext(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
         }
 
         public void Intersect(IEnumerable<T> other)
@@ -75,7 +75,7 @@ namespace ExRam.ReactiveCollections
             var newSet = current.Intersect(other);
 
             if (newSet != current)
-                Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+                OnNext(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
         }
 
         public bool IsProperSubsetOf(IEnumerable<T> other) => Current.IsProperSubsetOf(other);
@@ -94,7 +94,7 @@ namespace ExRam.ReactiveCollections
             var newSet = current.Remove(value);
 
             if (newSet != current)
-                Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Remove, ImmutableList.Create(value), ImmutableList<T>.Empty, Current.IndexOf(value)));
+                OnNext(newSet, NotifyCollectionChangedAction.Remove, ImmutableList.Create(value), ImmutableList<T>.Empty, Current.IndexOf(value));
         }
 
         public bool SetEquals(IEnumerable<T> other) => Current.SetEquals(other);
@@ -105,7 +105,7 @@ namespace ExRam.ReactiveCollections
             var newSet = current.SymmetricExcept(other);
 
             if (newSet != current)
-                Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+                OnNext(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
         }
 
         public bool TryGetValue(T equalValue, out T actualValue) => Current.TryGetValue(equalValue, out actualValue);
@@ -116,7 +116,12 @@ namespace ExRam.ReactiveCollections
             var newSet = current.Union(other);
 
             if (newSet != current)
-                Subject.OnNext(new SortedSetChangedNotification<T>(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null));
+                OnNext(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
+        }
+
+        private void OnNext(ImmutableSortedSet<T> current, NotifyCollectionChangedAction action, IReadOnlyList<T> oldItems, IReadOnlyList<T> newItems, int? index)
+        {
+            Subject.OnNext(new SortedSetChangedNotification<T>(current, action, oldItems, newItems, index));
         }
 
         private ImmutableSortedSet<T> Current => Subject.Value.Current;
