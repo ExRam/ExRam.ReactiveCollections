@@ -30,10 +30,7 @@ namespace ExRam.ReactiveCollections
 
         public IReadOnlyCollection<T> Current { get; }
 
-        ICollectionChangedNotification ICollectionChangedNotification.ToResetNotification()
-        {
-            return ToResetNotification();
-        }
+        ICollectionChangedNotification ICollectionChangedNotification.ToResetNotification() => ToResetNotification();
 
         IEnumerable ICollectionChangedNotification.Current => Current;
 

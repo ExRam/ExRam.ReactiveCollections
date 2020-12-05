@@ -3,12 +3,18 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using FluentAssertions;
+using VerifyXunit;
 using Xunit;
 
 namespace ExRam.ReactiveCollections.Tests
 {
-    public class SortedListReactiveCollectionSourceTest
+    public class SortedListReactiveCollectionSourceTest : VerifyBase
     {
+        public SortedListReactiveCollectionSourceTest() : base()
+        {
+
+        }
+
         [Fact]
         public async Task First_notification_is_reset()
         {
@@ -49,20 +55,13 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new SortedListReactiveCollectionSource<int>();
 
             var notificationsTask = list.ReactiveCollection.Changes
-                .Skip(1)
-                .FirstAsync()
+                .Take(4)
+                .ToArray()
                 .ToTask();
 
-            var range = new[] { 3, 1, 2 };
-            list.AddRange(range);
+            list.AddRange(new[] { 3, 1, 2 });
 
-            var notification = await notificationsTask;
-
-            notification.Index.Should().Be(0);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.OldItems.Should().BeEmpty();
-            notification.NewItems.Should().Equal(1, 2, 3);
-            notification.Current.Should().Equal(1, 2, 3);
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -182,17 +181,14 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new SortedListReactiveCollectionSource<int>();
 
             var notificationTask = list.ReactiveCollection.Changes
-                .Skip(2)
-                .FirstAsync()
+                .Take(5)
+                .ToArray()
                 .ToTask();
 
             list.AddRange(new[] { 1, 2, 3 });
             list.RemoveAll(x => x % 2 == 0);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notification.Current.Should().Equal(1, 3);
+            await Verify(notificationTask);
         }
 
         [Fact]
@@ -224,42 +220,31 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new SortedListReactiveCollectionSource<int>();
 
             var notificationsTask = list.ReactiveCollection.Changes
-                .Skip(2)
-                .Take(1)
+                .Take(6)
                 .ToArray()
                 .ToTask();
 
             list.AddRange(new[] { 1, 2, 3, 4 });
             list.RemoveRange(new[] { 2, 4 });
 
-            var notifications = await notificationsTask;
-
-            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notifications[0].Current.Should().Equal(1, 3);
+            await Verify(notificationsTask);
         }
 
-        #region RemoveRange2
         [Fact]
         public async Task RemoveRange2()
         {
             var list = new SortedListReactiveCollectionSource<int>();
 
             var notificationTask = list.ReactiveCollection.Changes
-                .Skip(2)
-                .FirstAsync()
+                .Take(6)
+                .ToArray()
                 .ToTask();
 
             list.AddRange(new[] { 1, 2, 3, 4 });
             list.RemoveRange(2, 2);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.OldItems.Should().Equal(3, 4);
-            notification.NewItems.Should().BeEmpty();
-            notification.Current.Should().Equal(1, 2);
+            await Verify(notificationTask);
         }
-        #endregion
 
         [Fact]
         public async Task Replace()
@@ -267,21 +252,14 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new SortedListReactiveCollectionSource<int>();
 
             var notificationsTask = list.ReactiveCollection.Changes
-                .Skip(2)
-                .Take(2)
+                .Take(8)
                 .ToArray()
                 .ToTask();
 
             list.AddRange(new[] { 1, 2, 3, 4, 1 });
             list.Replace(1, 5);
 
-            var notifications = await notificationsTask;
-
-            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notifications[0].OldItems.Should().Equal(1);
-            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[1].NewItems.Should().Equal(5);
-            notifications[1].Current.Should().Equal(1, 2, 3, 4, 5);
+            await Verify(notificationsTask);
         }
     }
 }

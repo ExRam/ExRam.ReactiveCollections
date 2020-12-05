@@ -54,4 +54,30 @@ namespace ExRam.ReactiveCollections
             get;
         }
     }
+
+    //internal interface ICollectionChangedNotification<out TSelf, T> : ICollectionChangedNotification<T>
+    //    where TSelf : ICollectionChangedNotification<TSelf, T>
+    //{
+    //    TSelf InsertRange(int index, IEnumerable<T> items);
+
+    //    TSelf Sort(int index, int count, IComparer<T> comparer);
+
+    //    TSelf SetItem(int index, T value);
+
+    //    TSelf Reverse(int index, int count);
+
+    //    TSelf RemoveRange(IEnumerable<T> items, IEqualityComparer<T> equalityComparer);
+
+    //    TSelf RemoveRange(int index, int count);
+
+    //    TSelf RemoveAt(int index);
+
+    //    TSelf RemoveAll(Predicate<T> match);
+
+    //    TSelf Insert(int index, T item);
+
+    //    TSelf Clear();
+
+    //    TSelf Remove(T item, IEqualityComparer<T> equalityComparer);
+    //}
 }

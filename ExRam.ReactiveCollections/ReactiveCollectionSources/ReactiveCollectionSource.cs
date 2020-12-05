@@ -11,7 +11,7 @@ using System.Reactive.Subjects;
 namespace ExRam.ReactiveCollections
 {
     public abstract class ReactiveCollectionSource<TNotification> : IReactiveCollectionSource<TNotification>
-        where TNotification : ICollectionChangedNotification
+        where TNotification : class, ICollectionChangedNotification
     {
         #region ReactiveCollectionImpl
         private sealed class ReactiveCollectionImpl : IReactiveCollection<TNotification>
@@ -28,10 +28,12 @@ namespace ExRam.ReactiveCollections
         }
         #endregion
 
+        private readonly BehaviorSubject<TNotification> _subject;
+        
         protected ReactiveCollectionSource(TNotification initialNotification)
         {
-            Subject = new BehaviorSubject<TNotification>(initialNotification);
-            ReactiveCollection = new ReactiveCollectionImpl(Subject);
+            _subject = new (initialNotification);
+            ReactiveCollection = new ReactiveCollectionImpl(_subject);
         }
 
         protected static bool IsCompatibleObject<T>(object? value)
@@ -41,8 +43,22 @@ namespace ExRam.ReactiveCollections
             return value is T || value == null && default(T) == null;
         }
 
+        protected bool TryUpdate(Func<TNotification, TNotification> transformation)
+        {
+            var currentValue = _subject.Value;
+            var newNotification = transformation(currentValue);
+
+            if (!ReferenceEquals(currentValue, newNotification))
+            {
+                _subject.OnNext(newNotification);
+                return true;
+            }
+
+            return false;
+        }
+        
         public IReactiveCollection<TNotification> ReactiveCollection { get; }
 
-        protected BehaviorSubject<TNotification> Subject { get; }
+        protected TNotification CurrentNotification => _subject.Value;
     }
 }

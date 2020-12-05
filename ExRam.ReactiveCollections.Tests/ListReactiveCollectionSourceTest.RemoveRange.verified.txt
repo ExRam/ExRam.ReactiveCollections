@@ -3,5 +3,9 @@
     1,
     3
   ],
-  Action: Reset
+  OldItems: [
+    2,
+    4
+  ],
+  Action: Remove
 }

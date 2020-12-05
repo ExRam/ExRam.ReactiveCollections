@@ -1,0 +1,47 @@
+[
+  {
+    Comparer: {},
+    Action: Reset
+  },
+  {
+    Index: 0,
+    Comparer: {},
+    Current: [
+      1
+    ],
+    NewItems: [
+      1
+    ]
+  },
+  {
+    Index: 1,
+    Comparer: {},
+    Current: [
+      1,
+      2
+    ],
+    NewItems: [
+      2
+    ]
+  },
+  {
+    Index: 2,
+    Comparer: {},
+    Current: [
+      1,
+      2,
+      3
+    ],
+    NewItems: [
+      3
+    ]
+  },
+  {
+    Comparer: {},
+    Current: [
+      1,
+      3
+    ],
+    Action: Reset
+  }
+]

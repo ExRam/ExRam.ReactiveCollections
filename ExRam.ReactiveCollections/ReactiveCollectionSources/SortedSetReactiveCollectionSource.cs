@@ -16,8 +16,7 @@ namespace ExRam.ReactiveCollections
         ReactiveCollectionSource<SortedSetChangedNotification<T>>,
         IList<T>,
         IList,
-        ISet<T>,
-        ICanHandleRanges<T>
+        ISet<T>
     {
         public SortedSetReactiveCollectionSource() : this(Comparer<T>.Default)
         {
@@ -28,13 +27,7 @@ namespace ExRam.ReactiveCollections
             
         }
 
-        public void Add(T value)
-        {
-            var current = Current;
-            var newSet = current.Add(value);
-            if (newSet != current)
-                OnNext(newSet, NotifyCollectionChangedAction.Add, ImmutableList<T>.Empty, ImmutableList.Create(value), newSet.IndexOf(value));
-        }
+        public void Add(T value) => TryUpdate(notification => notification.Add(value));
 
         public void AddRange(IEnumerable<T> items)
         {
@@ -44,39 +37,11 @@ namespace ExRam.ReactiveCollections
             }
         }
 
-        void ICanHandleRanges<T>.RemoveRange(IEnumerable<T> items, IEqualityComparer<T> equalityComparer)
-        {
-            foreach (var item in items)
-            {
-                Remove(item);
-            }
-        }
+        public void Clear() => TryUpdate(notification => notification.Clear());
 
-        public void Clear()
-        {
-            var current = Current;
+        public void Except(IEnumerable<T> other) => TryUpdate(notification => notification.Except(other));
 
-            if (!current.IsEmpty)
-                OnNext(current.Clear(), NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
-        }
-
-        public void Except(IEnumerable<T> other)
-        {
-            var current = Current;
-            var newSet = current.Except(other);
-
-            if (newSet != current)
-                OnNext(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
-        }
-
-        public void Intersect(IEnumerable<T> other)
-        {
-            var current = Current;
-            var newSet = current.Intersect(other);
-
-            if (newSet != current)
-                OnNext(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
-        }
+        public void Intersect(IEnumerable<T> other) => TryUpdate(notification => notification.Intersect(other));
 
         public bool IsProperSubsetOf(IEnumerable<T> other) => Current.IsProperSubsetOf(other);
 
@@ -88,43 +53,17 @@ namespace ExRam.ReactiveCollections
 
         public bool Overlaps(IEnumerable<T> other) => Current.Overlaps(other);
 
-        public void Remove(T value)
-        {
-            var current = Current;
-            var newSet = current.Remove(value);
-
-            if (newSet != current)
-                OnNext(newSet, NotifyCollectionChangedAction.Remove, ImmutableList.Create(value), ImmutableList<T>.Empty, Current.IndexOf(value));
-        }
+        public void Remove(T value) => TryUpdate(notification => notification.Remove(value));
 
         public bool SetEquals(IEnumerable<T> other) => Current.SetEquals(other);
 
-        public void SymmetricExcept(IEnumerable<T> other)
-        {
-            var current = Current;
-            var newSet = current.SymmetricExcept(other);
-
-            if (newSet != current)
-                OnNext(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
-        }
+        public void SymmetricExcept(IEnumerable<T> other) => TryUpdate(notification => notification.SymmetricExcept(other));
 
         public bool TryGetValue(T equalValue, out T actualValue) => Current.TryGetValue(equalValue, out actualValue);
 
-        public void Union(IEnumerable<T> other)
-        {
-            var current = Current;
-            var newSet = current.Union(other);
+        public void Union(IEnumerable<T> other) => TryUpdate(notification => notification.Union(other));
 
-            if (newSet != current)
-                OnNext(newSet, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null);
-        }
-
-        private void OnNext(ImmutableSortedSet<T> current, NotifyCollectionChangedAction action, IReadOnlyList<T> oldItems, IReadOnlyList<T> newItems, int? index)
-        {
-            Subject.OnNext(new SortedSetChangedNotification<T>(current, action, oldItems, newItems, index));
-        }
-
-        private ImmutableSortedSet<T> Current => Subject.Value.Current;
+        private ImmutableSortedSet<T> Current => CurrentNotification.Current;
 
         #region IList<T> implementation
         public int IndexOf(T item) => Current.IndexOf(item);
