@@ -17,10 +17,9 @@ namespace ExRam.ReactiveCollections
 
         public static IReactiveCollection<SortedSetChangedNotification<TSource>> SortSet<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer)
         {
-            if (source is ICanSortSet<TSource>)
-                return ((ICanSortSet<TSource>)source).Sort(comparer);
-
-            return new SortedSetTransformationReactiveCollection<TSource, TSource>(source, null, null, comparer);
+            return source is ICanSortSet<TSource>
+                ? ((ICanSortSet<TSource>)source).Sort(comparer) 
+                : new SortedSetTransformationReactiveCollection<TSource, TSource>(source, null, null, comparer);
         }
     }
 }

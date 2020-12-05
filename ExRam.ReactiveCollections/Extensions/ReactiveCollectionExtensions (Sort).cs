@@ -27,10 +27,9 @@ namespace ExRam.ReactiveCollections
 
         public static IReactiveCollection<ListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer, IEqualityComparer<TSource> equalityComparer)
         {
-            if (source is ICanSortList<TSource>)
-                return ((ICanSortList<TSource>)source).Sort(comparer);
-
-            return new SortedListTransformationReactiveCollection<TSource, TSource>(source, null, null, comparer, equalityComparer);
+            return source is ICanSortList<TSource> 
+                ? ((ICanSortList<TSource>)source).Sort(comparer)
+                : new SortedListTransformationReactiveCollection<TSource, TSource>(source, null, null, comparer, equalityComparer);
         }
     }
 }

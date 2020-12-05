@@ -1419,7 +1419,7 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var dict = new DictionaryReactiveCollectionSource<int, int>();
 
-            var arrayTask = dict.ReactiveCollection.GetValueObservable(1)
+            var arrayTask = dict.ReactiveCollection.GetValues(1)
                 .Take(4)
                 .ToArray()
                 .ToTask();

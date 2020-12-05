@@ -205,11 +205,8 @@ namespace ExRam.ReactiveCollections
         object ICollection.SyncRoot => this;
         #endregion
 
-        void ICanHandleRanges<KeyValuePair<TKey, TValue>>.RemoveRange(IEnumerable<KeyValuePair<TKey, TValue>> items, IEqualityComparer<KeyValuePair<TKey, TValue>> equalityComparer)
-        {
-            RemoveRange(items.Select(x => x.Key));
-        }
-        
+        void ICanHandleRanges<KeyValuePair<TKey, TValue>>.RemoveRange(IEnumerable<KeyValuePair<TKey, TValue>> items, IEqualityComparer<KeyValuePair<TKey, TValue>> equalityComparer) => RemoveRange(items.Select(x => x.Key));
+
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => ((IDictionary<TKey, TValue>)this).Keys;
     }
 }

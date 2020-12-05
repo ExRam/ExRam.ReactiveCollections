@@ -116,22 +116,15 @@ namespace ExRam.ReactiveCollections
                     .ToNotifyPropertyChangedEventPattern(this);
             }
 
-            void ICollection<T>.Add(T item)
-            {
-                throw new NotSupportedException();
-            }
+            void ICollection<T>.Add(T item) => throw new NotSupportedException();
 
-            public void Clear()
-            {
-                throw new NotSupportedException();
-            }
+            public void Clear() => throw new NotSupportedException();
 
             bool ICollection<T>.Contains(T item)
             {
-                if (!(_currentList is ICollection<T> list))
-                    throw new InvalidOperationException();
-
-                return list.Contains(item);
+                return !(_currentList is ICollection<T> list)
+                    ? throw new InvalidOperationException()
+                    : list.Contains(item);
             }
 
             void ICollection<T>.CopyTo(T[] array, int arrayIndex)
@@ -146,85 +139,46 @@ namespace ExRam.ReactiveCollections
 
             public bool IsReadOnly => true;
 
-            bool ICollection<T>.Remove(T item)
-            {
-                throw new NotSupportedException();
-            }
+            bool ICollection<T>.Remove(T item) => throw new NotSupportedException();
 
-            IEnumerator<T> IEnumerable<T>.GetEnumerator()
-            {
-                return _currentList.GetEnumerator();
-            }
+            IEnumerator<T> IEnumerable<T>.GetEnumerator() => _currentList.GetEnumerator();
 
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return _currentList.GetEnumerator();
-            }
+            IEnumerator IEnumerable.GetEnumerator() => _currentList.GetEnumerator();
 
             int IList<T>.IndexOf(T item)
             {
-                var list = _currentList as IList<T>;
-                if (list == null)
-                    throw new InvalidOperationException();
-
-                return list.IndexOf(item);
+                return _currentList is IList<T> list
+                    ? list.IndexOf(item)
+                    : throw new InvalidOperationException();
             }
 
-            void IList<T>.Insert(int index, T item)
-            {
-                throw new NotSupportedException();
-            }
+            void IList<T>.Insert(int index, T item) => throw new NotSupportedException();
 
-            void IList<T>.RemoveAt(int index)
-            {
-                throw new NotSupportedException();
-            }
+            void IList<T>.RemoveAt(int index) => throw new NotSupportedException();
 
             T IList<T>.this[int index]
             {
-                get
-                {
-                    if (!(_currentList is IReadOnlyList<T> list))
-                        throw new InvalidOperationException();
-
-                    return list[index];
-                }
+                get => _currentList is IReadOnlyList<T> list
+                    ? list[index]
+                    : throw new InvalidOperationException();
                 set => throw new NotSupportedException();
             }
 
             T IReadOnlyList<T>.this[int index] => ((IList<T>)this)[index];
 
-            int IList.Add(object? value)
-            {
-                throw new NotSupportedException();
-            }
+            int IList.Add(object? value) => throw new NotSupportedException();
 
-            bool IList.Contains(object? value)
-            {
-                return ((IList)_currentList).Contains(value);
-            }
+            bool IList.Contains(object? value) => ((IList)_currentList).Contains(value);
 
-            int IList.IndexOf(object? value)
-            {
-                return ((IList)_currentList).IndexOf(value);
-            }
+            int IList.IndexOf(object? value) => ((IList)_currentList).IndexOf(value);
 
-            void IList.Insert(int index, object? value)
-            {
-                throw new NotSupportedException();
-            }
+            void IList.Insert(int index, object? value) => throw new NotSupportedException();
 
             bool IList.IsFixedSize => false;
 
-            void IList.Remove(object? value)
-            {
-                throw new NotSupportedException();
-            }
+            void IList.Remove(object? value) => throw new NotSupportedException();
 
-            void IList.RemoveAt(int index)
-            {
-                throw new NotSupportedException();
-            }
+            void IList.RemoveAt(int index) => throw new NotSupportedException();
 
             object? IList.this[int index]
             {
@@ -232,10 +186,7 @@ namespace ExRam.ReactiveCollections
                 set => throw new NotSupportedException();
             }
 
-            void ICollection.CopyTo(Array array, int index)
-            {
-                ((ICollection)_currentList).CopyTo(array, index);
-            }
+            void ICollection.CopyTo(Array array, int index) => ((ICollection)_currentList).CopyTo(array, index);
 
             bool ICollection.IsSynchronized => false;
 
