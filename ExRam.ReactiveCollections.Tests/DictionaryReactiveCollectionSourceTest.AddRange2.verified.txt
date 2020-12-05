@@ -1,0 +1,21 @@
+{
+  Current: {
+    1: A,
+    2: BB,
+    3: CCC
+  },
+  NewItems: [
+    {
+      Key: 1,
+      Value: A
+    },
+    {
+      Key: 2,
+      Value: BB
+    },
+    {
+      Key: 3,
+      Value: CCC
+    }
+  ]
+}

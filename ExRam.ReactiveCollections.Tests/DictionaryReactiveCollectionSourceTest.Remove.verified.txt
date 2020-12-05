@@ -1,0 +1,9 @@
+{
+  OldItems: [
+    {
+      Key: Key1,
+      Value: 1
+    }
+  ],
+  Action: Remove
+}

@@ -1,0 +1,27 @@
+[
+  {
+    Current: {
+      Key3: 3,
+      Key2: 2
+    },
+    OldItems: [
+      {
+        Key: Key1,
+        Value: 1
+      }
+    ],
+    Action: Remove
+  },
+  {
+    Current: {
+      Key3: 3
+    },
+    OldItems: [
+      {
+        Key: Key2,
+        Value: 2
+      }
+    ],
+    Action: Remove
+  }
+]

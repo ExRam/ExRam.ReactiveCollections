@@ -1,0 +1,12 @@
+{
+  Item1: {
+    And: {
+      Subject: 1
+    }
+  },
+  Item2: {
+    And: {
+      Subject: 2
+    }
+  }
+}
