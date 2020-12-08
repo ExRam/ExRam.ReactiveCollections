@@ -20,12 +20,12 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new SortedListReactiveCollectionSource<int>();
 
-            var notification = await list.ReactiveCollection.Changes.FirstAsync().ToTask();
+            var notificationsTask = await list.ReactiveCollection.Changes
+                .Take(1)
+                .ToArray()
+                .ToTask();
 
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notification.OldItems.Should().BeEmpty();
-            notification.NewItems.Should().BeEmpty();
-            notification.Current.Should().BeEmpty();
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -33,20 +33,14 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new SortedListReactiveCollectionSource<int>();
 
-            var notificationTask = list.ReactiveCollection.Changes
-                .Skip(1)
-                .FirstAsync()
+            var notificationsTask = list.ReactiveCollection.Changes
+                .Take(2)
+                .ToArray()
                 .ToTask();
 
             list.Add(1);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(0);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.NewItems.Should().Equal(1);
-            notification.OldItems.Should().BeEmpty();
-            notification.Current.Should().Equal(1);
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -69,21 +63,15 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new SortedListReactiveCollectionSource<int>();
 
-            var notificationTask = list.ReactiveCollection.Changes
-                .Skip(2)
-                .FirstAsync()
+            var notificationsTask = list.ReactiveCollection.Changes
+                .Take(3)
+                .ToArray()
                 .ToTask();
 
             list.Add(1);
             list.Clear();
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().NotHaveValue();
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notification.NewItems.Should().BeEmpty();
-            notification.OldItems.Should().BeEmpty();
-            notification.Current.Should().BeEmpty();
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -158,21 +146,15 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new SortedListReactiveCollectionSource<int>();
 
-            var notificationTask = list.ReactiveCollection.Changes
-                .Skip(2)
-                .FirstAsync()
+            var notificationsTask = list.ReactiveCollection.Changes
+                .Take(3)
+                .ToArray()
                 .ToTask();
 
             list.Add(1);
             list.Remove(1);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(0);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.NewItems.Should().BeEmpty();
-            notification.OldItems.Should().Equals(1);
-            notification.Current.Should().BeEmpty();
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -180,7 +162,7 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new SortedListReactiveCollectionSource<int>();
 
-            var notificationTask = list.ReactiveCollection.Changes
+            var notificationsTask = list.ReactiveCollection.Changes
                 .Take(5)
                 .ToArray()
                 .ToTask();
@@ -188,7 +170,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.AddRange(new[] { 1, 2, 3 });
             list.RemoveAll(x => x % 2 == 0);
 
-            await Verify(notificationTask);
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -196,8 +178,9 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new SortedListReactiveCollectionSource<int>();
 
-            var notificationTask = list.ReactiveCollection.Changes
-                .Skip(3)
+            var notificationsTask = list.ReactiveCollection.Changes
+                .Take(4)
+                .ToArray()
                 .FirstAsync()
                 .ToTask();
 
@@ -205,13 +188,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(2);
             list.RemoveAt(1);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(1);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.NewItems.Should().BeEmpty();
-            notification.OldItems.Should().Equal(2);
-            notification.Current.Should().Equal(1);
+            await Verify(notificationsTask);
         }
 
         [Fact]

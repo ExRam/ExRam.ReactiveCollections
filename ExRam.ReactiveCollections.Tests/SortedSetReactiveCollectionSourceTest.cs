@@ -4,13 +4,18 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using FluentAssertions;
+using VerifyXunit;
 using Xunit;
 
 namespace ExRam.ReactiveCollections.Tests
 {
-    public class SortedSetReactiveCollectionSourceTest
+    public class SortedSetReactiveCollectionSourceTest : VerifyBase
     {
+        public SortedSetReactiveCollectionSourceTest() : base()
+        {
+
+        }
+        
         private struct StructNotImplementingIComparable
         {
             public StructNotImplementingIComparable(int value)
@@ -26,12 +31,11 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new SortedSetReactiveCollectionSource<int>();
 
-            var notification = await list.ReactiveCollection.Changes.FirstAsync().ToTask();
+            var notificationsTask = await list.ReactiveCollection.Changes
+                .FirstAsync()
+                .ToTask();
 
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notification.OldItems.Should().BeEmpty();
-            notification.NewItems.Should().BeEmpty();
-            notification.Current.Should().BeEmpty();
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -39,19 +43,14 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new SortedSetReactiveCollectionSource<int>();
 
-            var notificationTask = list.ReactiveCollection.Changes
-                .Skip(1)
-                .FirstAsync()
+            var notificationsTask = list.ReactiveCollection.Changes
+                .Take(2)
+                .ToArray()
                 .ToTask();
 
             list.Add(1);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.Index.Should().Be(0);
-            notification.NewItems.Should().Equal(1);
-            notification.Current.Should().Equal(1);
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -59,9 +58,8 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new SortedSetReactiveCollectionSource<int>();
 
-            var notificationTask = list.ReactiveCollection.Changes
-                .Skip(1)
-                .Take(6)
+            var notificationsTask = list.ReactiveCollection.Changes
+                .Take(7)
                 .Select(x => x.Index)
                 .ToArray()
                 .ToTask();
@@ -73,9 +71,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(6); // 4
             list.Add(5); // 4
 
-            var notifications = await notificationTask;
-
-            notifications.Should().BeEquivalentTo(new[] { 0, 1, 1, 0, 4, 4 });
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -83,20 +79,15 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new SortedSetReactiveCollectionSource<int>();
 
-            var notificationTask = list.ReactiveCollection.Changes
-                .Skip(2)
+            var notificationsTask = list.ReactiveCollection.Changes
+                .Take(3)
                 .FirstAsync()
                 .ToTask();
 
             list.Add(1);
             list.Clear();
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notification.NewItems.Should().BeEmpty();
-            notification.OldItems.Should().BeEmpty();
-            notification.Current.Should().BeEmpty();
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -104,14 +95,17 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new SortedSetReactiveCollectionSource<StructNotImplementingIComparable>(new Comparison<StructNotImplementingIComparable>((x, y) => x.Value.CompareTo(y.Value)).ToComparer());
 
+            var notificationsTask = list.ReactiveCollection.Changes
+                .Take(5)
+                .ToArray()
+                .ToTask();
+            
             list.Add(new StructNotImplementingIComparable(1));
             list.Clear();
             list.Add(new StructNotImplementingIComparable(2));
             list.Add(new StructNotImplementingIComparable(1));
 
-            var current = (await list.ReactiveCollection.Changes.FirstAsync()).Current.Select(x => x.Value).ToArray();
-
-            current.Should().Equal(1, 2);
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -119,21 +113,15 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new SortedSetReactiveCollectionSource<int>();
 
-            var notificationTask = list.ReactiveCollection.Changes
-                .Skip(2)
-                .FirstAsync()
+            var notificationsTask = list.ReactiveCollection.Changes
+                .Take(3)
+                .ToArray()
                 .ToTask();
 
             list.Add(1);
             list.Remove(1);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.NewItems.Should().BeEmpty();
-            notification.OldItems.Should().Equal(1);
-            notification.Current.Should().BeEmpty();
-            notification.Index.Should().Be(0);
+            await Verify(notificationsTask);
         }
     }
 }

@@ -1,0 +1,6 @@
+[
+  {
+    Comparer: {},
+    Action: Reset
+  }
+]
