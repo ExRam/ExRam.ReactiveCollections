@@ -51,14 +51,7 @@ namespace ExRam.ReactiveCollections
 
         public void Remove(TKey key) => TryUpdate(notification => notification.Remove(key));
 
-        public void RemoveRange(IEnumerable<TKey> keys)
-        {
-            // TODO: Optimize!
-            foreach (var key in keys)
-            {
-                Remove(key);
-            }
-        }
+        public void RemoveRange(IEnumerable<TKey> keys) => TryUpdate(notification => notification.RemoveRange(keys));
 
         public void SetItem(TKey key, TValue value) => TryUpdate(notification => notification.SetItem(key, value));
 

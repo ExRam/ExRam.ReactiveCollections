@@ -1,22 +1,37 @@
 [
   {
+    Action: Reset
+  },
+  {
     Current: {
       Key3: 3,
+      Key1: 1,
       Key2: 2
     },
-    OldItems: [
+    NewItems: [
       {
         Key: Key1,
         Value: 1
+      },
+      {
+        Key: Key2,
+        Value: 2
+      },
+      {
+        Key: Key3,
+        Value: 3
       }
-    ],
-    Action: Remove
+    ]
   },
   {
     Current: {
       Key3: 3
     },
     OldItems: [
+      {
+        Key: Key1,
+        Value: 1
+      },
       {
         Key: Key2,
         Value: 2

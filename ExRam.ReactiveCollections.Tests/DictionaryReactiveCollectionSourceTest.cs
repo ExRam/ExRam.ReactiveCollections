@@ -215,8 +215,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new DictionaryReactiveCollectionSource<string, int>(DeterministicStringKeyComparer.Instance);
 
             var notificationsTask = list.ReactiveCollection.Changes
-                .Skip(2)
-                .Take(2)
+                .Take(3)
                 .ToArray()
                 .ToTask();
 
