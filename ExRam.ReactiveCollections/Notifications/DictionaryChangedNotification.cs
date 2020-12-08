@@ -26,18 +26,9 @@ namespace ExRam.ReactiveCollections
 
         public DictionaryChangedNotification<TKey, TValue> WithComparers(IEqualityComparer<TKey> keyComparer)
         {
-            if (ReferenceEquals(Current.KeyComparer, keyComparer))
-                return this;
-
-            return new(Current.WithComparers(keyComparer), Action, OldItems, NewItems);
-        }
-
-        public DictionaryChangedNotification<TKey, TValue> WithComparers(IEqualityComparer<TKey> keyComparer, IEqualityComparer<TValue> valueComparer)
-        {
-            if (ReferenceEquals(Current.KeyComparer, keyComparer))
-                return this;
-
-            return new(Current.WithComparers(keyComparer, valueComparer), Action, OldItems, NewItems);
+            return ReferenceEquals(Current.KeyComparer, keyComparer) 
+                ? this 
+                : new(Current.WithComparers(keyComparer), Action, OldItems, NewItems);
         }
 
         internal DictionaryChangedNotification<TKey, TValue> SetItems(IEnumerable<KeyValuePair<TKey, TValue>> items)
@@ -72,14 +63,11 @@ namespace ExRam.ReactiveCollections
         internal DictionaryChangedNotification<TKey, TValue> RemoveRange(IEnumerable<TKey> keys)
         {
             var newList = Current.RemoveRange(keys);
+            
             var removed = keys
-                .Select(key =>
-                {
-                    if (Current.TryGetValue(key, out var value))
-                        return new KeyValuePair<TKey, TValue>(key, value);
-
-                    return default(KeyValuePair<TKey, TValue>?);
-                })
+                .Select(key => Current.TryGetValue(key, out var value) 
+                    ? new KeyValuePair<TKey, TValue>(key, value) 
+                    : default(KeyValuePair<TKey, TValue>?))
                 .Where(x => x.HasValue)
                 .Select(x => x!.Value)
                 .ToImmutableList();
