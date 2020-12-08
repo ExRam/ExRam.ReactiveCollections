@@ -1,0 +1,47 @@
+[
+  {
+    Action: Reset
+  },
+  {
+    Index: 0,
+    Current: [
+      36
+    ],
+    NewItems: [
+      36
+    ]
+  },
+  {
+    Index: 0,
+    Current: [
+      35,
+      36
+    ],
+    NewItems: [
+      35
+    ]
+  },
+  {
+    Index: 0,
+    Current: [
+      34,
+      35,
+      36
+    ],
+    NewItems: [
+      34
+    ]
+  },
+  {
+    Index: 3,
+    Current: [
+      34,
+      35,
+      36,
+      37
+    ],
+    NewItems: [
+      37
+    ]
+  }
+]

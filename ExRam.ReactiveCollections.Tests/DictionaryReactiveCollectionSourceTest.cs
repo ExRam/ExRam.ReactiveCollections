@@ -12,7 +12,7 @@ namespace ExRam.ReactiveCollections.Tests
 {
     internal sealed class DeterministicStringKeyComparer : IEqualityComparer<string>
     {
-        public static readonly DeterministicStringKeyComparer Instance = new DeterministicStringKeyComparer();
+        public static readonly DeterministicStringKeyComparer Instance = new();
         
         private DeterministicStringKeyComparer()
         {

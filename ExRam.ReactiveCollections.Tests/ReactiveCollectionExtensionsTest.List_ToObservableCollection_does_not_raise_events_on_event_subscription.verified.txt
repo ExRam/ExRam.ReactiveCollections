@@ -1,0 +1,9 @@
+[
+  {
+    NewItems: [
+      4
+    ],
+    NewStartingIndex: 3,
+    OldStartingIndex: -1
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    NewItems: [
+      1
+    ],
+    OldStartingIndex: -1
+  },
+  {
+    NewItems: [
+      2
+    ],
+    NewStartingIndex: 1,
+    OldStartingIndex: -1
+  },
+  {
+    NewItems: [
+      3
+    ],
+    NewStartingIndex: 2,
+    OldStartingIndex: -1
+  }
+]

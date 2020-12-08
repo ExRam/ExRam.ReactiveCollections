@@ -1,0 +1,16 @@
+[
+  {
+    Action: Reset
+  },
+  {
+    Current: {
+      Key2: 2
+    },
+    NewItems: [
+      {
+        Key: Key2,
+        Value: 2
+      }
+    ]
+  }
+]

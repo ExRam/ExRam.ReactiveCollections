@@ -1,0 +1,21 @@
+[
+  {
+    Action: Reset
+  },
+  {
+    Index: 0,
+    Current: [
+      6
+    ],
+    NewItems: [
+      6
+    ]
+  },
+  {
+    Index: 0,
+    OldItems: [
+      6
+    ],
+    Action: Remove
+  }
+]
