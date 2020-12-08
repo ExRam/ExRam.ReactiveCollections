@@ -1,0 +1,50 @@
+[
+  {
+    Action: Reset
+  },
+  {
+    Index: 0,
+    Current: [
+      {
+        Value: 1
+      }
+    ],
+    NewItems: [
+      {
+        Value: 1
+      }
+    ]
+  },
+  {
+    Action: Reset
+  },
+  {
+    Index: 0,
+    Current: [
+      {
+        Value: 2
+      }
+    ],
+    NewItems: [
+      {
+        Value: 2
+      }
+    ]
+  },
+  {
+    Index: 0,
+    Current: [
+      {
+        Value: 1
+      },
+      {
+        Value: 2
+      }
+    ],
+    NewItems: [
+      {
+        Value: 1
+      }
+    ]
+  }
+]
