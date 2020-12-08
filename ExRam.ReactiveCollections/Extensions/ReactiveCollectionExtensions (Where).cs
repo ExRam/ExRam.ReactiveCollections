@@ -17,12 +17,6 @@ namespace ExRam.ReactiveCollections
         {
             return source.WhereSelect(filter, _ => _);
         }
-        
-        public static IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> Where<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> source, Predicate<TValue> filter, IEqualityComparer<TValue> valueEqualityComparer)
-            where TKey : notnull
-        {
-            return source.WhereSelect(filter, _ => _);
-        }
 
         internal static IReactiveCollection<ListChangedNotification<TResult>> WhereSelect<TSource, TResult>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource>? filter, Func<TSource, TResult> selector, IEqualityComparer<TResult>? equalityComparer = null)
         {
