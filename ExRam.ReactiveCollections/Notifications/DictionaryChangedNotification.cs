@@ -104,7 +104,7 @@ namespace ExRam.ReactiveCollections
             return new(Current.Add(kvp.Key, kvp.Value),  NotifyCollectionChangedAction.Add, ImmutableList<KeyValuePair<TKey, TValue>>.Empty, ImmutableList.Create(kvp));
         }
 
-        internal IEnumerable<DictionaryChangedNotification<TKey, TValue>> WhereSelect<TSourceValue>(DictionaryChangedNotification<TKey, TSourceValue> notification, Predicate<TSourceValue>? filter, Func<TSourceValue, TValue> selector)
+        internal IEnumerable<DictionaryChangedNotification<TKey, TValue>> WhereSelect<TSourceValue>(ICollectionChangedNotification<KeyValuePair<TKey, TSourceValue>> notification, Predicate<TSourceValue>? filter, Func<TSourceValue, TValue> selector)
         {
             switch (notification.Action)
             {
@@ -154,8 +154,10 @@ namespace ExRam.ReactiveCollections
                 #region default
                 default:
                 {
-                    var cleared = Clear()
-                        .WithComparers(notification.Current.KeyComparer);
+                    var cleared = Clear();
+                        
+                    if (notification is DictionaryChangedNotification<TKey, TSourceValue> dictionaryChangedNotification)
+                        cleared = cleared.WithComparers(dictionaryChangedNotification.Current.KeyComparer);
 
                     yield return cleared;
 
