@@ -15,12 +15,7 @@ namespace ExRam.ReactiveCollections
     {
         public static IReactiveCollection<ListChangedNotification<TSource>> Where<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter)
         {
-            return source.Where(filter, EqualityComparer<TSource>.Default);
-        }
-
-        public static IReactiveCollection<ListChangedNotification<TSource>> Where<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource> filter, IEqualityComparer<TSource> equalityComparer)
-        {
-            return source.WhereSelect(filter, _ => _, equalityComparer);
+            return source.WhereSelect(filter, _ => _, EqualityComparer<TSource>.Default);
         }
 
         public static IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> Where<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> source, Predicate<TValue> filter)
@@ -28,8 +23,14 @@ namespace ExRam.ReactiveCollections
         {
             return source.WhereSelect(filter, _ => _);
         }
+        
+        public static IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> Where<TKey, TValue>(this IReactiveCollection<DictionaryChangedNotification<TKey, TValue>> source, Predicate<TValue> filter, IEqualityComparer<TValue> valueEqualityComparer)
+            where TKey : notnull
+        {
+            return source.WhereSelect(filter, _ => _);
+        }
 
-        internal static IReactiveCollection<ListChangedNotification<TResult>> WhereSelect<TSource, TResult>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource>? filter, Func<TSource, TResult> selector, IEqualityComparer<TResult> equalityComparer)
+        internal static IReactiveCollection<ListChangedNotification<TResult>> WhereSelect<TSource, TResult>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, Predicate<TSource>? filter, Func<TSource, TResult> selector, IEqualityComparer<TResult>? equalityComparer = null)
         {
             return source
                 .Changes
@@ -38,7 +39,7 @@ namespace ExRam.ReactiveCollections
                     (currentTargetNotification, sourceNotification) =>
                     {
                         var newRet = currentTargetNotification[^1]
-                            .WhereSelect(sourceNotification, filter, selector)
+                            .WhereSelect(sourceNotification, filter, selector, equalityComparer)
                             .ToArray();
 
                         return newRet.Length > 0 ? newRet :
@@ -60,10 +61,7 @@ namespace ExRam.ReactiveCollections
                     new[] { DictionaryChangedNotification<TKey, TResult>.Reset },
                     (currentTargetNotification, sourceNotification) =>
                     {
-                        var latest = currentTargetNotification[^1]
-                            .WithComparers(sourceNotification.Current.KeyComparer);
-                        
-                        var newRet = latest
+                        var newRet = currentTargetNotification[^1]
                             .WhereSelect(sourceNotification, filter, selector)
                             .ToArray();
 

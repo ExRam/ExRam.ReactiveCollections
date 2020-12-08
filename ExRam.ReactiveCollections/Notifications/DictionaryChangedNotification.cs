@@ -87,7 +87,7 @@ namespace ExRam.ReactiveCollections
                     return default(KeyValuePair<TKey, TValue>?);
                 })
                 .Where(x => x.HasValue)
-                .Select(x => x.Value)
+                .Select(x => x!.Value)
                 .ToImmutableList();
             
             return Current != newList
@@ -172,7 +172,8 @@ namespace ExRam.ReactiveCollections
                 #region default
                 default:
                 {
-                    var cleared = Clear();
+                    var cleared = Clear()
+                        .WithComparers(notification.Current.KeyComparer);
 
                     yield return cleared;
 

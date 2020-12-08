@@ -139,8 +139,10 @@ namespace ExRam.ReactiveCollections
                 : this;
         }
 
-        internal IEnumerable<ListChangedNotification<T>> WhereSelect<TSource>(ICollectionChangedNotification<TSource> notification, Predicate<TSource>? filter, Func<TSource, T> selector)
+        internal IEnumerable<ListChangedNotification<T>> WhereSelect<TSource>(ICollectionChangedNotification<TSource> notification, Predicate<TSource>? filter, Func<TSource, T> selector, IEqualityComparer<T>? equalityComparer = null)
         {
+            equalityComparer ??= EqualityComparer<T>.Default;
+            
             switch (notification.Action)
             {
                 #region Add
@@ -172,7 +174,7 @@ namespace ExRam.ReactiveCollections
                             ? notification.OldItems.Where(x => filter(x))
                             : notification.OldItems;
 
-                        yield return RemoveRange(filtered.Select(selector), null);// TODO equalityComparer);
+                        yield return RemoveRange(filtered.Select(selector), equalityComparer);
                     }
 
                     break;
@@ -205,7 +207,7 @@ namespace ExRam.ReactiveCollections
                             }
                         }
                         else if (wasIn)
-                            yield return RemoveRange(notification.OldItems.Select(selector), null);//TODO equalityComparer);
+                            yield return RemoveRange(notification.OldItems.Select(selector), equalityComparer);
                         else if (getsIn)
                             yield return InsertRange(Current.Count, notification.NewItems.Select(selector));
                     }
@@ -229,7 +231,7 @@ namespace ExRam.ReactiveCollections
                                 ? notification.NewItems.Where(x => filter(x))
                                 : notification.NewItems;
 
-                            var removed = RemoveRange(removedItems.Select(selector), null /* TODO */);
+                            var removed = RemoveRange(removedItems.Select(selector), equalityComparer);
 
                             yield return removed;
                             yield return removed.InsertRange(removed.Current.Count, addedItems.Select(selector));
