@@ -1,0 +1,24 @@
+[
+  {
+    NewItems: [
+      1
+    ],
+    OldStartingIndex: -1
+  },
+  {
+    NewItems: [
+      2
+    ],
+    NewStartingIndex: 1,
+    OldStartingIndex: -1
+  },
+  {
+    Action: Replace,
+    NewItems: [
+      3
+    ],
+    OldItems: [
+      1
+    ]
+  }
+]

@@ -1,0 +1,54 @@
+[
+  {
+    Action: Reset
+  },
+  {
+    Current: {
+      Key1: 1
+    },
+    NewItems: [
+      {
+        Key: Key1,
+        Value: 1
+      }
+    ]
+  },
+  {
+    Current: {
+      Key1: 1,
+      Key2: 2
+    },
+    NewItems: [
+      {
+        Key: Key2,
+        Value: 2
+      }
+    ]
+  },
+  {
+    Current: {
+      Key3: 3,
+      Key1: 1,
+      Key2: 2
+    },
+    NewItems: [
+      {
+        Key: Key3,
+        Value: 3
+      }
+    ]
+  },
+  {
+    Current: {
+      Key3: 3,
+      Key1: 1
+    },
+    OldItems: [
+      {
+        Key: Key2,
+        Value: 2
+      }
+    ],
+    Action: Remove
+  }
+]

@@ -60,7 +60,10 @@ namespace ExRam.ReactiveCollections
                     new[] { DictionaryChangedNotification<TKey, TResult>.Reset },
                     (currentTargetNotification, sourceNotification) =>
                     {
-                        var newRet = currentTargetNotification[^1]
+                        var latest = currentTargetNotification[^1]
+                            .WithComparers(sourceNotification.Current.KeyComparer);
+                        
+                        var newRet = latest
                             .WhereSelect(sourceNotification, filter, selector)
                             .ToArray();
 

@@ -1,0 +1,33 @@
+[
+  {
+    Action: Reset
+  },
+  {
+    Index: 0,
+    Current: [
+      1,
+      2,
+      3
+    ],
+    NewItems: [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    Index: 1,
+    Current: [
+      1,
+      4,
+      3
+    ],
+    OldItems: [
+      2
+    ],
+    NewItems: [
+      4
+    ],
+    Action: Replace
+  }
+]

@@ -30,6 +30,22 @@ namespace ExRam.ReactiveCollections
 
         public new ImmutableDictionary<TKey, TValue> Current => (ImmutableDictionary<TKey, TValue>)base.Current;
 
+        public DictionaryChangedNotification<TKey, TValue> WithComparers(IEqualityComparer<TKey> keyComparer)
+        {
+            if (ReferenceEquals(Current.KeyComparer, keyComparer))
+                return this;
+
+            return new(Current.WithComparers(keyComparer), Action, OldItems, NewItems);
+        }
+
+        public DictionaryChangedNotification<TKey, TValue> WithComparers(IEqualityComparer<TKey> keyComparer, IEqualityComparer<TValue> valueComparer)
+        {
+            if (ReferenceEquals(Current.KeyComparer, keyComparer))
+                return this;
+
+            return new(Current.WithComparers(keyComparer, valueComparer), Action, OldItems, NewItems);
+        }
+
         internal DictionaryChangedNotification<TKey, TValue> SetItems(IEnumerable<KeyValuePair<TKey, TValue>> items)
         {
             var oldList = Current;

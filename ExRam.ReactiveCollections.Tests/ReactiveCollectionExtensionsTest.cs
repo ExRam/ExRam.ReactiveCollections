@@ -10,6 +10,7 @@ using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 using VerifyXunit;
 using Xunit;
 
@@ -39,20 +40,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(2);
             list.Add(3);
 
-            var notifications = await notificationsTask;
-
-            notifications[0].Index.Should().NotHaveValue();
-            notifications[1].Index.Should().Be(0);
-            notifications[2].Index.Should().Be(1);
-            notifications[3].Index.Should().Be(2);
-            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[2].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[3].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[0].NewItems.Should().BeEmpty();
-            notifications[1].NewItems.Should().Equal("1");
-            notifications[2].NewItems.Should().Equal("2");
-            notifications[3].NewItems.Should().Equal("3");
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -72,26 +60,13 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(2);
             list.Add(3);
 
-            var notifications = await notificationsTask;
-
-            notifications[0].Index.Should().NotHaveValue();
-            notifications[1].Index.Should().Be(0);
-            notifications[2].Index.Should().Be(1);
-            notifications[3].Index.Should().Be(2);
-            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[2].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[3].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[0].NewItems.Should().BeEmpty();
-            notifications[1].NewItems.Should().Equal("1");
-            notifications[2].NewItems.Should().Equal("2");
-            notifications[3].NewItems.Should().Equal("3");
+            await Verify(notificationsTask);
         }
 
         [Fact]
         public async Task Add_to_projected_dictionary()
         {
-            var list = new DictionaryReactiveCollectionSource<string, int>();
+            var list = new DictionaryReactiveCollectionSource<string, int>(DeterministicStringKeyComparer.Instance);
 
             var projectedList = list.ReactiveCollection
                 .Select(x => x.ToString(CultureInfo.InvariantCulture));
@@ -105,22 +80,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add("Key2", 2);
             list.Add("Key3", 3);
 
-            var notifications = await notificationsTask;
-
-            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[2].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[3].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[0].NewItems.Should().BeEmpty();
-            notifications[1].NewItems.Should().Equal(new KeyValuePair<string, string>("Key1", "1"));
-            notifications[2].NewItems.Should().Equal(new KeyValuePair<string, string>("Key2", "2"));
-            notifications[3].NewItems.Should().Equal(new KeyValuePair<string, string>("Key3", "3"));
-            notifications[3].Current.Should().Equal(new Dictionary<string, string>
-            {
-                { "Key1", "1" },
-                { "Key2", "2" },
-                { "Key3", "3" }
-            });
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -131,21 +91,15 @@ namespace ExRam.ReactiveCollections.Tests
             var projectedList = list.ReactiveCollection
                 .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
-            var notificationTask = projectedList.Changes
-                .Skip(2)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(3)
+                .ToArray()
                 .ToTask();
 
             list.AddRange(new[] { 1, 2, 3 });
             list.Remove(2);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(1);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.OldItems.Should().Equal("2");
-            notification.NewItems.Should().BeEmpty();
-            notification.Current.Should().Equal("1", "3");
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -156,9 +110,9 @@ namespace ExRam.ReactiveCollections.Tests
             var projectedList = list.ReactiveCollection
                 .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
-            var notificationTask = projectedList.Changes
-                .Skip(4)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(5)
+                .ToArray()
                 .ToTask();
 
             list.Add(1);
@@ -166,26 +120,20 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(3);
             list.Remove(2);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(1);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.NewItems.Should().BeEmpty();
-            notification.OldItems.Should().Equal("2");
-            notification.Current.Should().Equal("1", "3");
+            await Verify(notificationsTask);
         }
 
         [Fact]
         public async Task Remove_from_projected_dictionary()
         {
-            var list = new DictionaryReactiveCollectionSource<string, int>();
+            var list = new DictionaryReactiveCollectionSource<string, int>(DeterministicStringKeyComparer.Instance);
 
             var projectedList = list.ReactiveCollection
                 .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
-            var notificationTask = projectedList.Changes
-                .Skip(4)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(5)
+                .ToArray()
                 .ToTask();
 
             list.Add("Key1", 1);
@@ -193,12 +141,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add("Key3", 3);
             list.Remove("Key2");
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.OldItems.Should().Equal(new Dictionary<string, string> { { "Key2", "2" } });
-            notification.NewItems.Should().BeEmpty();
-            notification.Current.Should().Equal(new Dictionary<string, string> { { "Key1", "1" }, { "Key3", "3" }});
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -209,21 +152,15 @@ namespace ExRam.ReactiveCollections.Tests
             var projectedList = list.ReactiveCollection
                 .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
-            var notificationTask = projectedList.Changes
-                .Skip(2)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(3)
+                .ToArray()
                 .ToTask();
 
             list.AddRange(new[] { 1, 2, 3 });
             list.Replace(2, 4);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(1);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Replace);
-            notification.OldItems.Should().Equal("2");
-            notification.NewItems.Should().Equal("4");
-            notification.Current.Should().Equal("1", "4", "3");
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -242,22 +179,11 @@ namespace ExRam.ReactiveCollections.Tests
                 .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
             var notificationsTask = projectedList.Changes
-                .Skip(2)
-                .Take(3)
+                .Take(5)
                 .ToArray()
                 .ToTask();
 
-            var notifications = await notificationsTask;
-
-            notifications[0].Index.Should().Be(0);
-            notifications[0].NewItems.Should().BeEmpty();
-            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notifications[0].OldItems.Should().Equal("1", "2");
-            notifications[1].Index.Should().Be(0);
-            notifications[1].OldItems.Should().BeEmpty();
-            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[1].NewItems.Should().Equal("3", "4");
-            notifications[1].Current.Should().Equal("3", "4");
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -275,35 +201,23 @@ namespace ExRam.ReactiveCollections.Tests
             var projectedList = observable.Select(x => x.ToString(CultureInfo.InvariantCulture));
 
             var notificationsTask = projectedList.Changes
-                .Skip(2)
-                .Take(2)
+                .Take(4)
                 .ToArray()
                 .ToTask();
 
-            var notifications = await notificationsTask;
-
-            notifications[0].Index.Should().Be(0);
-            notifications[0].OldItems.Should().Equal("1", "2");
-            notifications[0].NewItems.Should().BeEmpty();
-            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notifications[1].Index.Should().Be(0);
-            notifications[1].OldItems.Should().BeEmpty();
-            notifications[1].NewItems.Should().Equal("3", "4");
-            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[1].Current.Should().Equal("3", "4");
+            await Verify(notificationsTask);
         }
 
         [Fact]
         public async Task Replace_in_projected_dictionary()
         {
-            var list = new DictionaryReactiveCollectionSource<string, int>();
+            var list = new DictionaryReactiveCollectionSource<string, int>(DeterministicStringKeyComparer.Instance);
 
             var projectedList = list.ReactiveCollection
                 .Select(x => x.ToString(CultureInfo.InvariantCulture));
 
             var notificationsTask = projectedList.Changes
-                .Skip(4)
-                .Take(2)
+                .Take(6)
                 .ToArray()
                 .ToTask();
 
@@ -313,17 +227,7 @@ namespace ExRam.ReactiveCollections.Tests
 
             list["Key2"] = 4;
 
-            var notifications = await notificationsTask;
-
-            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notifications[0].OldItems.Should().Equal(new KeyValuePair<string, string>("Key2", "2"));
-            notifications[1].NewItems.Should().Equal(new KeyValuePair<string, string>("Key2", "4"));
-            notifications[1].Current.Should().Equal(new Dictionary<string, string>
-            {
-                { "Key1", "1" },
-                { "Key2", "4" },
-                { "Key3", "3" }
-            });
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -335,20 +239,16 @@ namespace ExRam.ReactiveCollections.Tests
                 .ReactiveCollection
                 .Where(x => x % 2 == 0);
 
-            var notificationTask = projectedList.Changes
-                .Skip(1)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(2)
+                .ToArray()
                 .ToTask();
 
             list.Add(1);
             list.Add(3);           
             list.Add(2);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(0);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.NewItems.Should().Equal(2);
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -360,20 +260,16 @@ namespace ExRam.ReactiveCollections.Tests
                 .ReactiveCollection
                 .Where(x => x % 2 == 0);
 
-            var notificationTask = projectedList.Changes
-                .Skip(1)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(2)
+                .ToArray()
                 .ToTask();
 
             list.Add(1);
             list.Add(3);
             list.Add(2);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(0);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.NewItems.Should().Equal(2);
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -385,19 +281,16 @@ namespace ExRam.ReactiveCollections.Tests
                 .ReactiveCollection
                 .Where(x => x % 2 == 0);
 
-            var notificationTask = projectedList.Changes
-                .Skip(1)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(2)
+                .ToArray()
                 .ToTask();
 
             list.Add("Key1", 1);
             list.Add("Key3", 3);
             list.Add("Key2", 2);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.NewItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -409,21 +302,15 @@ namespace ExRam.ReactiveCollections.Tests
                 .ReactiveCollection
                 .Where(x => x % 2 == 0);
 
-            var notificationTask = projectedList.Changes
-                .Skip(2)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(3)
+                .ToArray()
                 .ToTask();
 
             list.AddRange(new[] { 1, 2, 3 });
             list.Remove(2);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(0);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.NewItems.Should().BeEmpty();
-            notification.OldItems.Should().Equal(2);
-            notification.Current.Should().BeEmpty();
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -435,9 +322,9 @@ namespace ExRam.ReactiveCollections.Tests
                 .ReactiveCollection
                 .Where(x => x % 2 == 0);
 
-            var notificationTask = projectedList.Changes
-                .Skip(2)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(3)
+                .ToArray()
                 .ToTask();
 
             list.Add(1);
@@ -445,13 +332,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(3);
             list.Remove(2);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(0);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.OldItems.Should().Equal(2);
-            notification.NewItems.Should().BeEmpty();
-            notification.Current.Should().BeEmpty();
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -462,9 +343,9 @@ namespace ExRam.ReactiveCollections.Tests
             var projectedList = list.ReactiveCollection
                 .Where(x => x % 2 == 0);
 
-            var notificationTask = projectedList.Changes
-                .Skip(2)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(3)
+                .ToArray()
                 .ToTask();
 
             list.Add("Key1", 1);
@@ -472,12 +353,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add("Key3", 3);
             list.Remove("Key2");
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.NewItems.Should().BeEmpty();
-            notification.OldItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
-            notification.Current.Should().BeEmpty();
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -488,21 +364,15 @@ namespace ExRam.ReactiveCollections.Tests
             var projectedList = list.ReactiveCollection
                 .Where(x => x % 2 == 0);
 
-            var notificationTask = projectedList.Changes
-                .Skip(2)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(3)
+                .ToArray()
                 .ToTask();
 
             list.AddRange(new[] { 1, 2, 3 });
             list.Replace(1, 4);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(1);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.OldItems.Should().BeEmpty();
-            notification.NewItems.Should().Equal(4);
-            notification.Current.Should().Equal(2, 4);
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -513,21 +383,15 @@ namespace ExRam.ReactiveCollections.Tests
             var projectedList = list.ReactiveCollection
                 .Where(x => x % 2 == 0);
 
-            var notificationTask = projectedList.Changes
-                .Skip(2)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(3)
+                .ToArray()
                 .ToTask();
 
             list.AddRange(new[] { 1, 2, 3 });
             list.Replace(2, 3);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(0);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.OldItems.Should().Equal(2);
-            notification.NewItems.Should().BeEmpty();
-            notification.Current.Should().BeEmpty();
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -538,21 +402,15 @@ namespace ExRam.ReactiveCollections.Tests
             var projectedList = list.ReactiveCollection
                 .Where(x => x % 2 == 0);
 
-            var notificationTask = projectedList.Changes
-                .Skip(2)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(3)
+                .ToArray()
                 .ToTask();
 
             list.AddRange(new[] { 1, 2, 3 });
             list.Replace(2, 4);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(0);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Replace);
-            notification.OldItems.Should().Equal(2);
-            notification.NewItems.Should().Equal(4);
-            notification.Current.Should().Equal(4);
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -563,34 +421,28 @@ namespace ExRam.ReactiveCollections.Tests
             var projectedList = list.ReactiveCollection
                 .Where(x => x % 2 == 0);
 
-            var notificationTask = projectedList.Changes
-                .Skip(1)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(2)
+                .ToArray()
                 .ToTask();
 
             list.Replace(1, 3);
             list.Replace(3, 4);
 
-            var notification = await notificationTask;
-
-            notification.Index.Should().Be(0);
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.OldItems.Should().BeEmpty();
-            notification.NewItems.Should().Equal(4);
-            notification.Current.Should().Equal(4);
+            await Verify(await notificationsTask);
         }
 
         [Fact]
         public async Task Replace_in_filtered_dictionary_addition()
         {
-            var list = new DictionaryReactiveCollectionSource<string, int>();
+            var list = new DictionaryReactiveCollectionSource<string, int>(DeterministicStringKeyComparer.Instance);
 
             var projectedList = list.ReactiveCollection
                 .Where(x => x % 2 == 0);
 
-            var notificationTask = projectedList.Changes
-                .Skip(2)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(3)
+                .ToArray()
                 .ToTask();
 
             list.Add("Key1", 1);
@@ -599,16 +451,7 @@ namespace ExRam.ReactiveCollections.Tests
 
             list["Key1"] = 4;
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.OldItems.Should().BeEmpty();
-            notification.NewItems.Should().Equal(new KeyValuePair<string, int>("Key1", 4));
-            notification.Current.Should().Equal(new Dictionary<string, int>
-            {
-                { "Key2", 2 },
-                { "Key1", 4 }
-            });
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -619,9 +462,9 @@ namespace ExRam.ReactiveCollections.Tests
             var projectedList = list.ReactiveCollection
                 .Where(x => x % 2 == 0);
 
-            var notificationTask = projectedList.Changes
-                .Skip(2)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(3)
+                .ToArray()
                 .ToTask();
 
             list.Add("Key1", 1);
@@ -630,11 +473,7 @@ namespace ExRam.ReactiveCollections.Tests
 
             list["Key2"] = 3;
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.OldItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
-            notification.NewItems.Should().BeEmpty();
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -646,8 +485,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .Where(x => x % 2 == 0);
 
             var notificationsTask = projectedList.Changes
-                .Skip(2)
-                .Take(2)
+                .Take(4)
                 .ToArray()
                 .ToTask();
 
@@ -657,16 +495,7 @@ namespace ExRam.ReactiveCollections.Tests
 
             list["Key2"] = 4;
 
-            var notifications = await notificationsTask;
-
-            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[0].OldItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
-            notifications[1].NewItems.Should().Equal(new KeyValuePair<string, int>("Key2", 4));
-            notifications[1].Current.Should().Equal(new Dictionary<string, int>
-            {
-                { "Key2", 4 }
-            });
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -684,22 +513,11 @@ namespace ExRam.ReactiveCollections.Tests
             var projectedList = observable.Where(x => x % 2 == 0);
 
             var notificationsTask = projectedList.Changes
-                .Skip(2)
-                .Take(2)
+                .Take(4)
                 .ToArray()
                 .ToTask();
 
-            var notifications = await notificationsTask;
-
-            notifications[0].Index.Should().Be(0);
-            notifications[0].NewItems.Should().BeEmpty();
-            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notifications[0].OldItems.Should().Equal(2);
-            notifications[1].Index.Should().Be(0);
-            notifications[1].OldItems.Should().BeEmpty();
-            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[1].NewItems.Should().Equal(4);
-            notifications[1].Current.Should().Equal(4);
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -711,20 +529,16 @@ namespace ExRam.ReactiveCollections.Tests
                 .ReactiveCollection
                 .Sort();
 
-            var notificationTask = projectedList.Changes
-                .Skip(3)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(4)
+                .ToArray()
                 .ToTask();
 
             list.Add(3);
             list.Add(1);
             list.Add(2);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.NewItems.Should().Equal(2);
-            notification.Current.Should().Equal(1, 2, 3);
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -736,20 +550,16 @@ namespace ExRam.ReactiveCollections.Tests
                 .ReactiveCollection
                 .Sort(Comparer<KeyValuePair<string, int>>.Create((x, y) => x.Value.CompareTo(y.Value)));
 
-            var notificationTask = projectedList.Changes
-                .Skip(3)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(4)
+                .ToArray()
                 .ToTask();
 
             list.Add("Key3", 3);
             list.Add("Key1", 1);
             list.Add("Key2", 2);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.NewItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
-            notification.Current.Should().Equal(new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key2", 2), new KeyValuePair<string, int>("Key3", 3));
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -761,20 +571,16 @@ namespace ExRam.ReactiveCollections.Tests
                 .ReactiveCollection
                 .SortSet(Comparer<KeyValuePair<string, int>>.Create((x, y) => x.Value.CompareTo(y.Value)));
 
-            var notificationTask = projectedList.Changes
-                .Skip(3)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(4)
+                .ToArray()
                 .ToTask();
 
             list.Add("Key3", 3);
             list.Add("Key1", 1);
             list.Add("Key2", 2);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.NewItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
-            notification.Current.Should().Equal(new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key2", 2), new KeyValuePair<string, int>("Key3", 3));
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -786,9 +592,9 @@ namespace ExRam.ReactiveCollections.Tests
                 .ReactiveCollection
                 .SortSet(Comparer<KeyValuePair<string, int>>.Create((x, y) => x.Value.CompareTo(y.Value)));
 
-            var notificationTask = projectedList.Changes
-                .Skip(3)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(4)
+                .ToArray()
                 .ToTask();
 
             list.Add("Key3", 3);
@@ -796,11 +602,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add("Key1", 1);
             list.Add("Key2", 2);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.NewItems.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
-            notification.Current.Should().Equal(new KeyValuePair<string, int>("Key1", 1), new KeyValuePair<string, int>("Key2", 2), new KeyValuePair<string, int>("Key3", 3));
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -812,20 +614,16 @@ namespace ExRam.ReactiveCollections.Tests
                 .ReactiveCollection
                 .Sort();
 
-            var notificationTask = projectedList.Changes
-                .Skip(3)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(4)
+                .ToArray()
                 .ToTask();
 
             list.Add(3);
             list.Add(1);
             list.Add(2);
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notification.NewItems.Should().Equal(2);
-            notification.Current.Should().Equal(1, 2, 3);
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -837,7 +635,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .ReactiveCollection
                 .Sort();
 
-            var notificationTask = projectedList.Changes
+            var notificationsTask = projectedList.Changes
                 .Take(5)
                 .ToArray()
                 .ToTask();
@@ -845,7 +643,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.AddRange(new[] { 3, 2, 1 });
             list.Remove(2);
 
-            await Verify(notificationTask);
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -856,21 +654,16 @@ namespace ExRam.ReactiveCollections.Tests
             var projectedList = list.ReactiveCollection
                 .Sort(Comparer<KeyValuePair<string, int>>.Create((x, y) => x.Value.CompareTo(y.Value)));
 
-            var notificationTask = projectedList.Changes
-                .Skip(3)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(4)
+                .ToArray()
                 .ToTask();
 
             list.Add("Key1", 1);
             list.Add("Key2", 2);
             list.Remove("Key1");
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.OldItems.Should().Equal(new KeyValuePair<string, int>("Key1", 1));
-            notification.Index.Should().Be(0);
-            notification.Current.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -881,20 +674,16 @@ namespace ExRam.ReactiveCollections.Tests
             var projectedList = list.ReactiveCollection
                 .SortSet(Comparer<KeyValuePair<string, int>>.Create((x, y) => x.Value.CompareTo(y.Value)));
 
-            var notificationTask = projectedList.Changes
-                .Skip(3)
-                .FirstAsync()
+            var notificationsTask = projectedList.Changes
+                .Take(4)
+                .ToArray()
                 .ToTask();
 
             list.Add("Key1", 1);
             list.Add("Key2", 2);
             list.Remove("Key1");
 
-            var notification = await notificationTask;
-
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notification.OldItems.Should().Equal(new KeyValuePair<string, int>("Key1", 1));
-            notification.Current.Should().Equal(new KeyValuePair<string, int>("Key2", 2));
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -906,7 +695,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .ReactiveCollection
                 .Sort();
 
-            var notificationTask = projectedList.Changes
+            var notificationsTask = projectedList.Changes
                 .Take(5)
                 .ToArray()
                 .ToTask();
@@ -914,7 +703,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.AddRange(new[] { 3, 2, 1 });
             list.Remove(2);
 
-            await Verify(notificationTask);
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -948,22 +737,14 @@ namespace ExRam.ReactiveCollections.Tests
                 .SortSet();
 
             var notificationsTask = projectedList.Changes
-                .Skip(4)
-                .Take(2)
+                .Take(6)
                 .ToArray()
                 .ToTask();
 
             list.AddRange(new[] { 3, 2, 1 });
             list.Replace(2, 4);
 
-            var notifications = await notificationsTask;
-
-            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notifications[0].OldItems.Should().Equal("2");
-            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[1].NewItems.Should().Equal("4");
-            notifications[0].Current.Should().Equal("1", "3");
-            notifications[1].Current.Should().Equal("1", "3", "4");
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -977,8 +758,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .SortSet();
 
             var notificationsTask = projectedList.Changes
-                .Skip(4)
-                .Take(2)
+                .Take(6)
                 .ToArray()
                 .ToTask();
 
@@ -987,14 +767,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(1, 10);
             list[2] = 40;
 
-            var notifications = await notificationsTask;
-
-            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notifications[0].OldItems.Should().Equal("20");
-            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[1].NewItems.Should().Equal("40");
-            notifications[0].Current.Should().Equal("10", "30");
-            notifications[1].Current.Should().Equal("10", "30", "40");
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1089,7 +862,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new ListReactiveCollectionSource<int>();
             var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
-            var eventsTask = Observable
+            var notificationsTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
                 .Take(3)
                 .Select(x => x.EventArgs)
@@ -1100,13 +873,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(2);
             list.Add(3);
 
-            var events = await eventsTask;
-
-            events.Should().HaveCount(3);
-            events[0].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            events[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            events[2].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            ((ICollection)observableCollection).Should().Equal(new[] { 1, 2, 3 });
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1133,7 +900,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new ListReactiveCollectionSource<int>();
             var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
-            var eventsTask = Observable
+            var notificationsTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
                 .Take(3)
                 .Select(x => x.EventArgs)
@@ -1144,11 +911,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(2);
             list.Remove(1);
 
-            var events = await eventsTask;
-
-            events[0].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            events[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            events[2].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1174,7 +937,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new ListReactiveCollectionSource<int>();
             var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
-            var eventsTask = Observable
+            var notificationsTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
                 .Take(3)
                 .Select(x => x.EventArgs)
@@ -1185,14 +948,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(2);
             list.Replace(1, 3);
 
-            var events = await eventsTask;
-
-            events[0].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            events[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            events[2].Action.Should().Be(NotifyCollectionChangedAction.Replace);
-            events[2].OldItems.Should().Equal(1);
-            events[2].NewItems.Should().Equal(3);
-            ((ICollection)observableCollection).Should().Equal(3, 2);
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1201,20 +957,17 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new ListReactiveCollectionSource<int>();
             var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
-            var eventTask = Observable
+            var notificationsTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
-                .Skip(1)
                 .Select(x => x.EventArgs)
-                .FirstAsync()
+                .Take(3)
+                .ToArray()
                 .ToTask();
 
             list.AddRange(new[] { 1, 2, 3, 4, 5 });
             list.RemoveAll(x => x > 2);
 
-            var ev = await eventTask;
-
-            ev.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            ((ICollection)observableCollection).Should().Equal(1, 2);
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1224,20 +977,17 @@ namespace ExRam.ReactiveCollections.Tests
 
             var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
-            var eventsTask = Observable
+            var notificationsTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
                 .Select(x => x.EventArgs)
-                .FirstAsync()
+                .Take(1)
+                .ToArray()
                 .ToTask();
 
             ((ICollection)observableCollection).Should().BeEquivalentTo(new[] { 1, 2, 3 });
             list.Add(4);
 
-            var ev = await eventsTask;
-
-            ev.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            ev.NewItems.Should().Equal(4);
-            ((ICollection)observableCollection).Should().Equal(1, 2, 3, 4);
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1246,7 +996,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new SortedSetReactiveCollectionSource<int>();
             var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
-            var eventsTask = Observable
+            var notificationsTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
                 .Take(3)
                 .Select(x => x.EventArgs)
@@ -1257,12 +1007,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(2);
             list.Add(3);
 
-            var events = await eventsTask;
-
-            events[0].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            events[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            events[2].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            ((ICollection)observableCollection).Should().Equal(1, 2, 3);
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1289,7 +1034,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new SortedSetReactiveCollectionSource<int>();
             var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
-            var eventsTask = Observable
+            var notificationsTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
                 .Take(3)
                 .Select(x => x.EventArgs)
@@ -1300,11 +1045,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(2);
             list.Remove(1);
 
-            var events = await eventsTask;
-
-            events[0].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            events[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            events[2].Action.Should().Be(NotifyCollectionChangedAction.Remove);
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1332,20 +1073,17 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new ListReactiveCollectionSource<int>();
             var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
-            var eventTask = Observable
+            var notificationsTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
-                .Skip(1)
+                .Take(3)
                 .Select(x => x.EventArgs)
-                .FirstAsync()
+                .ToArray()
                 .ToTask();
 
             list.AddRange(new[] { 1, 2, 3, 4, 5 });
             list.RemoveAll(x => x > 2);
 
-            var ev = await eventTask;
-
-            ev.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            ((ICollection)observableCollection).Should().Equal(new[] { 1, 2 });
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1355,20 +1093,17 @@ namespace ExRam.ReactiveCollections.Tests
 
             var observableCollection = (INotifyCollectionChanged)list.ReactiveCollection.ToObservableCollection();
 
-            var eventsTask = Observable
+            var notificationsTask = Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(eh => observableCollection.CollectionChanged += eh, eh => observableCollection.CollectionChanged -= eh)
                 .Select(x => x.EventArgs)
-                .FirstAsync()
+                .Take(1)
+                .ToArray()
                 .ToTask();
 
             ((ICollection)observableCollection).Should().Equal(1, 2, 3);
             list.Add(4);
 
-            var ev = await eventsTask;
-
-            ev.Action.Should().Be(NotifyCollectionChangedAction.Add);
-            ev.NewItems.Should().Equal(4);
-            ((ICollection)observableCollection).Should().Equal(1, 2, 3, 4);
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1408,17 +1143,7 @@ namespace ExRam.ReactiveCollections.Tests
             source1.Add(1);
             source2.Add(2);
 
-            var notifications = await notificationsTask;
-
-            notifications.Should().HaveCount(3);
-            notifications[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notifications[0].Current.Should().BeEmpty();
-            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[1].Index.Should().Be(0);
-            notifications[1].Current.Should().Equal(1);
-            notifications[2].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            notifications[2].Index.Should().Be(1);
-            notifications[2].Current.Should().Equal(1, 2);
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1430,8 +1155,7 @@ namespace ExRam.ReactiveCollections.Tests
             var concat = source1.ReactiveCollection.Concat(source2.ReactiveCollection);
 
             var notificationsTask = concat.Changes
-                .Skip(2)
-                .Take(3)
+                .Take(5)
                 .ToArray()
                 .ToTask();
 
@@ -1439,17 +1163,8 @@ namespace ExRam.ReactiveCollections.Tests
             source2.Add(2);
             source1.RemoveAt(0);
             source2.RemoveAt(0);
-
-            var notifications = await notificationsTask;
-
-            notifications.Should().HaveCount(3);
-            notifications[0].Current.Should().Equal(1, 2);
-            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notifications[1].Index.Should().Be(0);
-            notifications[1].Current.Should().Equal(2);
-            notifications[2].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notifications[2].Index.Should().Be(0);
-            notifications[2].Current.Should().BeEmpty();
+            
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1461,8 +1176,7 @@ namespace ExRam.ReactiveCollections.Tests
             var concat = source1.ReactiveCollection.Concat(source2.ReactiveCollection);
 
             var notificationsTask = concat.Changes
-                .Skip(2)
-                .Take(3)
+                .Take(5)
                 .ToArray()
                 .ToTask();
 
@@ -1471,18 +1185,7 @@ namespace ExRam.ReactiveCollections.Tests
             source1.Clear();
             source2.Clear();
 
-            var notifications = await notificationsTask;
-
-            notifications.Should().HaveCount(3);
-            notifications[0].Current.Should().Equal(1, 2);
-            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notifications[1].Index.Should().Be(0);
-            notifications[1].OldItems.Should().Equal(1);
-            notifications[1].Current.Should().Equal(2);
-            notifications[2].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            notifications[2].Index.Should().Be(0);
-            notifications[2].OldItems.Should().Equal(2);
-            notifications[2].Current.Should().BeEmpty();
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1494,8 +1197,7 @@ namespace ExRam.ReactiveCollections.Tests
             var concat = source1.ReactiveCollection.Concat(source2.ReactiveCollection);
 
             var notificationsTask = concat.Changes
-                .Skip(2)
-                .Take(3)
+                .Take(5)
                 .ToArray()
                 .ToTask();
 
@@ -1504,20 +1206,7 @@ namespace ExRam.ReactiveCollections.Tests
             source1.Replace(2, -2);
             source2.Replace(5, -5);
 
-            var notifications = await notificationsTask;
-
-            notifications.Should().HaveCount(3);
-            notifications[0].Current.Should().Equal(1, 2, 3, 4, 5, 6);
-            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Replace);
-            notifications[1].Index.Should().Be(1);
-            notifications[1].OldItems.Should().Equal(2);
-            notifications[1].NewItems.Should().Equal(-2);
-            notifications[1].Current.Should().Equal(1, -2, 3, 4, 5, 6);
-            notifications[2].Action.Should().Be(NotifyCollectionChangedAction.Replace);
-            notifications[2].Index.Should().Be(4);
-            notifications[2].OldItems.Should().Equal(5);
-            notifications[2].NewItems.Should().Equal(-5);
-            notifications[2].Current.Should().Equal(1, -2, 3, 4, -5, 6);
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1532,8 +1221,7 @@ namespace ExRam.ReactiveCollections.Tests
             var concat = reactiveCollection1.Concat(reactiveCollection2);
 
             var notificationsTask = concat.Changes
-                .Skip(2)
-                .Take(3)
+                .Take(5)
                 .ToArray()
                 .ToTask();
 
@@ -1546,21 +1234,7 @@ namespace ExRam.ReactiveCollections.Tests
             changesSubject1.OnNext(new ListChangedNotification<int>(new[] { 1, -2, -3 }.ToImmutableList(), NotifyCollectionChangedAction.Replace, new[] { 2, 3 }.ToImmutableList(), new[] { -2, -3 }.ToImmutableList(), 1));
             changesSubject2.OnNext(new ListChangedNotification<int>(new[] { 4, -5, -6 }.ToImmutableList(), NotifyCollectionChangedAction.Replace, new[] { 5, 6 }.ToImmutableList(), new[] { -5, -6 }.ToImmutableList(), 1));
 
-            var notifications = await notificationsTask;
-
-            notifications.Should().HaveCount(3);
-            notifications[0].Current.Should().Equal(1, 2, 3, 4, 5, 6);
-            notifications[1].Action.Should().Be(NotifyCollectionChangedAction.Replace);
-            notifications[1].Index.Should().Be(1);
-            notifications[1].OldItems.Should().Equal(2, 3);
-            notifications[1].NewItems.Should().Equal(-2, -3);
-            notifications[1].Current.Should().Equal(1, -2, -3, 4, 5, 6);
-
-            notifications[2].Action.Should().Be(NotifyCollectionChangedAction.Replace);
-            notifications[2].Index.Should().Be(4);
-            notifications[2].OldItems.Should().Equal(5, 6);
-            notifications[2].NewItems.Should().Equal(-5, -6);
-            notifications[2].Current.Should().Equal(1, -2, -3, 4, -5, -6);
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1574,12 +1248,12 @@ namespace ExRam.ReactiveCollections.Tests
 
             var concat = source1.ReactiveCollection.Concat(source2.ReactiveCollection);
 
-            var notification = await concat.Changes
-                .FirstAsync()
+            var notificationsTask = await concat.Changes
+                .Take(1)
+                .ToArray()
                 .ToTask();
 
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notification.Current.Should().Equal(1, 2);
+            await Verify(notificationsTask);
         }
 
         [Fact]
@@ -1596,12 +1270,12 @@ namespace ExRam.ReactiveCollections.Tests
 
             var concat = sources.Concat();
 
-            var notification = await concat.Changes
-                .FirstAsync()
+            var notificationsTask = await concat.Changes
+                .Take(1)
+                .ToArray()
                 .ToTask();
 
-            notification.Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            notification.Current.Should().Equal(0, 1, 2, 3, 4, 5, 6);
+            await Verify(notificationsTask);
         }
 
         [Fact(Skip = "x")]
@@ -1664,7 +1338,7 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new ListReactiveCollectionSource<int>();
 
-            var changesTask = list.ReactiveCollection
+            var notificationsTask = list.ReactiveCollection
                 .Where(x => x % 2 == 0)
                 .Select(x => x.ToString(CultureInfo.InvariantCulture))
                 .Changes
@@ -1680,21 +1354,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Insert(0, 2);
             list[0] = 3;
 
-            var changes = await changesTask;
-
-            changes[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            changes[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            changes[1].Current.Should().Equal("2");
-            changes[2].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            changes[3].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            changes[3].Current.Should().Equal("4");
-            changes[4].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            changes[4].Current.Should().Equal("4", "2");
-            changes[4].Index.Should().Be(1);
-            changes[5].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            changes[5].Index.Should().Be(1);
-            changes[5].Index.Should().Be(1);
-            changes[5].Current.Should().Equal("4");
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1702,7 +1362,7 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new ListReactiveCollectionSource<int>();
 
-            var changesTask = list.ReactiveCollection
+            var notificationsTask = list.ReactiveCollection
                 .Where(x => x % 2 == 0)
                 .Where(x => x % 3 == 0)
                 .Changes
@@ -1719,13 +1379,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Remove(3);
             list.Remove(6);
 
-            var changes = await changesTask;
-
-            changes[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            changes[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            changes[1].Current.Should().Equal(6);
-            changes[2].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            changes[2].Current.Should().BeEmpty();
+            await Verify(await notificationsTask);
         }
         
         [Fact(Skip= "x")]
@@ -1784,7 +1438,7 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new DictionaryReactiveCollectionSource<int, int>();
 
-            var changesTask = list.ReactiveCollection
+            var notificationsTask = list.ReactiveCollection
                 .Where(x => x % 2 == 0)
                 .Select(x => x.ToString(CultureInfo.InvariantCulture))
                 .Changes
@@ -1799,19 +1453,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(4, 38);
             list[4] = 39;
 
-            var changes = await changesTask;
-
-            changes[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            changes[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            changes[1].Current.Should().HaveCount(1);
-            changes[1].Current[1].Should().Be("36");
-            changes[2].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            changes[2].Current.Should().BeEmpty();
-            changes[3].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            changes[3].Current.Should().HaveCount(1);
-            changes[3].Current[4].Should().Be("38");
-            changes[4].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            changes[4].Current.Should().BeEmpty();
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1819,7 +1461,7 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new DictionaryReactiveCollectionSource<int, int>();
 
-            var changesTask = list.ReactiveCollection
+            var notificationsTask = list.ReactiveCollection
                 .Select(x => x.ToString(CultureInfo.InvariantCulture))
                 .Select(x => x + "!")
                 .Changes
@@ -1833,24 +1475,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Remove(1);
             list.Add(4, 38);
 
-            var changes = await changesTask;
-
-            changes[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            changes[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            changes[1].Current.Should().HaveCount(1);
-            changes[1].Current.Should().Contain(1, "36!");
-            changes[2].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            changes[2].Current.Should().HaveCount(2);
-            changes[2].Current.Should().Contain(1, "36!");
-            changes[2].Current.Should().Contain(2, "37!");
-            changes[3].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            changes[3].Current.Should().HaveCount(1);
-            changes[3].Current.Should().Contain(1, "36!");
-            changes[4].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            changes[4].Current.Should().BeEmpty();
-            changes[5].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            changes[5].Current.Should().HaveCount(1);
-            changes[5].Current.Should().Contain(4, "38!");
+            await Verify(await notificationsTask);
         }
 
         [Fact]
@@ -1858,7 +1483,7 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new DictionaryReactiveCollectionSource<int, int>();
 
-            var changesTask = list.ReactiveCollection
+            var notificationsTask = list.ReactiveCollection
                 .Where(x => x % 2 == 0)
                 .Where(x => x % 3 == 0)
                 .Changes
@@ -1875,15 +1500,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Remove(3);
             list.Remove(4);
 
-            var changes = await changesTask;
-
-            changes[0].Action.Should().Be(NotifyCollectionChangedAction.Reset);
-            changes[1].Action.Should().Be(NotifyCollectionChangedAction.Add);
-            changes[1].Current.Should()
-                .HaveCount(1).And
-                .Contain(4, 6);
-            changes[2].Action.Should().Be(NotifyCollectionChangedAction.Remove);
-            changes[2].Current.Should().BeEmpty();
+            await Verify(await notificationsTask);
         }
 
         [Fact(Skip = "x")]
@@ -1925,12 +1542,12 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = new DictionaryReactiveCollectionSource<int, int>();
 
-            var lastTask = list.ReactiveCollection
+            var notificationsTask = list.ReactiveCollection
                 .SortSet(new Comparison<KeyValuePair<int, int>>((x, y) => x.Value.CompareTo(y.Value)).ToComparer())
                 .Select(x => x.Value.ToString())
                 .Changes
-                .Skip(4)
-                .FirstAsync()
+                .Take(5)
+                .ToArray()
                 .ToTask();
 
             list.Add(1, 36);
@@ -1938,7 +1555,7 @@ namespace ExRam.ReactiveCollections.Tests
             list.Add(4, 34);
             list.Add(0, 37);
 
-            (await lastTask).Current.Should().Equal("34", "35", "36", "37");
+            await Verify(await notificationsTask);
         }
     }
 }

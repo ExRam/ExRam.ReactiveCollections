@@ -1,0 +1,22 @@
+[
+  {
+    NewItems: [
+      1
+    ],
+    OldStartingIndex: -1
+  },
+  {
+    NewItems: [
+      2
+    ],
+    NewStartingIndex: 1,
+    OldStartingIndex: -1
+  },
+  {
+    Action: Remove,
+    OldItems: [
+      1
+    ],
+    NewStartingIndex: -1
+  }
+]
