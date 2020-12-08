@@ -36,7 +36,7 @@ namespace ExRam.ReactiveCollections
                     (currentTargetNotification, sourceNotification) =>
                     {
                         var newRet = currentTargetNotification[^1]
-                            .Sort(sourceNotification)
+                            .Sort(sourceNotification, equalityComparer)
                             .ToArray();
 
                         return newRet.Length > 0 ? newRet :

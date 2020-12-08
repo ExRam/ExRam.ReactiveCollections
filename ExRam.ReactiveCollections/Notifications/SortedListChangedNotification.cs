@@ -101,7 +101,7 @@ namespace ExRam.ReactiveCollections
             return new (newList, NotifyCollectionChangedAction.Reset, ImmutableList<T>.Empty, ImmutableList<T>.Empty, null, Comparer);
         }
 
-        internal IEnumerable<SortedListChangedNotification<T>> Sort(ICollectionChangedNotification<T> notification)
+        internal IEnumerable<SortedListChangedNotification<T>> Sort(ICollectionChangedNotification<T> notification, IEqualityComparer<T> equalityComparer)
         {
             switch (notification.Action)
             {
@@ -127,7 +127,7 @@ namespace ExRam.ReactiveCollections
 
                     foreach (var oldItem in notification.OldItems)
                     {
-                        current = current.Remove(oldItem, null); //TODO
+                        current = current.Remove(oldItem, equalityComparer);
                         yield return current;
                     }
 
@@ -142,13 +142,13 @@ namespace ExRam.ReactiveCollections
 
                     foreach (var oldItem in notification.OldItems)
                     {
-                        current = current.Remove(oldItem, null); //TODO
+                        current = current.Remove(oldItem, equalityComparer);
                         yield return current;
                     }
 
                     foreach (var newItem in notification.NewItems)
                     {
-                        current = current.Add(newItem); //TODO
+                        current = current.Add(newItem);
                         yield return current;
                     }
 
