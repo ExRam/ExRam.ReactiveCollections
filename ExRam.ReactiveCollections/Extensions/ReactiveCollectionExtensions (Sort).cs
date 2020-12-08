@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reactive.Linq;
 
 namespace ExRam.ReactiveCollections
 {
@@ -24,23 +22,9 @@ namespace ExRam.ReactiveCollections
         public static IReactiveCollection<SortedListChangedNotification<TSource>> Sort<TSource>(this IReactiveCollection<ICollectionChangedNotification<TSource>> source, IComparer<TSource> comparer, IEqualityComparer<TSource> equalityComparer)
         {
             return source
-                .Changes
-                .Scan(
-                    new[] { SortedListChangedNotification<TSource>.Reset.WithComparer(comparer) },
-                    (currentTargetNotification, sourceNotification) =>
-                    {
-                        var newRet = currentTargetNotification[^1]
-                            .Sort(sourceNotification, equalityComparer)
-                            .ToArray();
-
-                        return newRet.Length > 0 ? newRet :
-                            currentTargetNotification.Length > 0
-                                ? new[] { currentTargetNotification[0] }
-                                : currentTargetNotification;
-                    })
-                .SelectMany(x => x)
-                .DistinctUntilChanged()
-                .ToReactiveCollection();
+                .Transform(
+                    SortedListChangedNotification<TSource>.Reset.WithComparer(comparer),
+                    (source, target) => target.Sort(source, equalityComparer));
         }
     }
 }
