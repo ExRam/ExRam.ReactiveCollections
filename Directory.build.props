@@ -14,8 +14,4 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>  
 
-  <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.0.50" />
-  </ItemGroup>
-
 </Project>
