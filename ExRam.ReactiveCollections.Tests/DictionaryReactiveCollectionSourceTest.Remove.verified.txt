@@ -1,8 +1,7 @@
-{
+﻿{
   OldItems: [
     {
-      Key: Key1,
-      Value: 1
+      Key1: 1
     }
   ],
   Action: Remove

@@ -3,16 +3,12 @@
     Action: Reset
   },
   {
-    Action: Reset
-  },
-  {
     Current: {
       Key2: 2
     },
     NewItems: [
       {
-        Key: Key2,
-        Value: 2
+        Key2: 2
       }
     ]
   },
@@ -23,8 +19,7 @@
     },
     NewItems: [
       {
-        Key: Key1,
-        Value: 4
+        Key1: 4
       }
     ]
   }

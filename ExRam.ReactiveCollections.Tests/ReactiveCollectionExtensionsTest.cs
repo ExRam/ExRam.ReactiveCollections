@@ -9,19 +9,13 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using FluentAssertions;
-using VerifyXunit;
+using static VerifyXunit.Verifier;
 using Xunit;
 
 namespace ExRam.ReactiveCollections.Tests
 {
-    public class ReactiveCollectionExtensionsTest : VerifyBase
+    public class ReactiveCollectionExtensionsTest
     {
-        public ReactiveCollectionExtensionsTest() : base()
-        {
-
-        }
-        
         [Fact]
         public async Task Add_to_projected_list()
         {
@@ -440,7 +434,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .Where(x => x % 2 == 0);
 
             var notificationsTask = projectedList.Changes
-                .Take(4)    //TODO: There's 2 Resets.
+                .Take(3)
                 .ToArray()
                 .ToTask();
 
@@ -886,10 +880,10 @@ namespace ExRam.ReactiveCollections.Tests
                 .Subscribe())
             {
                 list.AddRange(new[] { 1, 2, 3 });
-                ((ICollection)observableCollection).Should().Equal(new[] { 1, 2, 3 });
+                Assert.Equal(new[] { 1, 2, 3 }, observableCollection.Cast<int>());
 
                 list.InsertRange(2, new[] { 4, 5, 6 });
-                ((ICollection)observableCollection).Should().Equal(new[] { 1, 2, 4, 5, 6, 3 });
+                Assert.Equal(new[] { 1, 2, 4, 5, 6, 3 }, observableCollection.Cast<int>());
             }
         }
 
@@ -926,7 +920,7 @@ namespace ExRam.ReactiveCollections.Tests
                 list.AddRange(new[] { 1, 2, 3, 4, 5, 6, 7 });
                 list.RemoveRange(2, 3);
 
-                ((ICollection)observableCollection).Should().Equal(new[] { 1, 2, 6, 7 });
+                Assert.Equal(new[] { 1, 2, 6, 7 }, observableCollection.Cast<int>());
             }
         }
 
@@ -983,7 +977,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .ToArray()
                 .ToTask();
 
-            ((ICollection)observableCollection).Should().BeEquivalentTo(new[] { 1, 2, 3 });
+            Assert.Equal(new[] { 1, 2, 3 }, ((ICollection)observableCollection).Cast<int>());
             list.Add(4);
 
             await Verify(await notificationsTask);
@@ -1020,10 +1014,10 @@ namespace ExRam.ReactiveCollections.Tests
                 .Subscribe())
             {
                 list.AddRange(new[] { 2, 4, 6 });
-                ((ICollection)observableCollection).Should().Equal(2, 4, 6);
+                Assert.Equal(new[] { 2, 4, 6 }, observableCollection.Cast<int>());
 
                 list.AddRange(new[] { 1, 3, 5 });
-                ((ICollection)observableCollection).Should().Equal(1, 2, 3, 4, 5, 6);
+                Assert.Equal(new[] { 1, 2, 3, 4, 5, 6 }, observableCollection.Cast<int>());
             }
         }
 
@@ -1062,7 +1056,7 @@ namespace ExRam.ReactiveCollections.Tests
                 list.Remove(4);
                 list.Remove(5);
 
-                observableCollection.Should().Equal(1, 2, 6, 7);
+                Assert.Equal(new[] { 1, 2, 6, 7 }, observableCollection.Cast<int>());
             }
         }
 
@@ -1099,7 +1093,7 @@ namespace ExRam.ReactiveCollections.Tests
                 .ToArray()
                 .ToTask();
 
-            ((ICollection)observableCollection).Should().Equal(1, 2, 3);
+            Assert.Equal(new[] { 1, 2, 3 }, ((ICollection)observableCollection).Cast<int>());
             list.Add(4);
 
             await Verify(await notificationsTask);
@@ -1123,7 +1117,7 @@ namespace ExRam.ReactiveCollections.Tests
             dict.Add(1, 2);
             dict[1] = 3;
 
-            (await arrayTask).Should().Equal(1, 1, 2, 3);
+            Assert.Equal(new[] { 1, 1, 2, 3 }, await arrayTask);
         }
 
         [Fact]

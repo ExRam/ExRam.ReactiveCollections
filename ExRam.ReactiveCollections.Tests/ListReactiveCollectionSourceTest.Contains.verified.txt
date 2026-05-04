@@ -1,3 +1,4 @@
-{
-  Item1: true
+﻿{
+  Item1: true,
+  Item2: false
 }

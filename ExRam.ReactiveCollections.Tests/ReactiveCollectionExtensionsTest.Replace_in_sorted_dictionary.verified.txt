@@ -1,4 +1,4 @@
-[
+﻿[
   {
     Comparer: {},
     Action: Reset
@@ -8,14 +8,12 @@
     Comparer: {},
     Current: [
       {
-        Key: Key1,
-        Value: 3
+        Key1: 3
       }
     ],
     NewItems: [
       {
-        Key: Key1,
-        Value: 3
+        Key1: 3
       }
     ]
   },
@@ -24,18 +22,15 @@
     Comparer: {},
     Current: [
       {
-        Key: Key2,
-        Value: 1
+        Key2: 1
       },
       {
-        Key: Key1,
-        Value: 3
+        Key1: 3
       }
     ],
     NewItems: [
       {
-        Key: Key2,
-        Value: 1
+        Key2: 1
       }
     ]
   },
@@ -44,22 +39,18 @@
     Comparer: {},
     Current: [
       {
-        Key: Key2,
-        Value: 1
+        Key2: 1
       },
       {
-        Key: Key1,
-        Value: 3
+        Key1: 3
       },
       {
-        Key: Key3,
-        Value: 4
+        Key3: 4
       }
     ],
     NewItems: [
       {
-        Key: Key3,
-        Value: 4
+        Key3: 4
       }
     ]
   },
@@ -68,18 +59,15 @@
     Comparer: {},
     Current: [
       {
-        Key: Key1,
-        Value: 3
+        Key1: 3
       },
       {
-        Key: Key3,
-        Value: 4
+        Key3: 4
       }
     ],
     OldItems: [
       {
-        Key: Key2,
-        Value: 1
+        Key2: 1
       }
     ],
     Action: Remove
@@ -89,22 +77,18 @@
     Comparer: {},
     Current: [
       {
-        Key: Key2,
-        Value: 2
+        Key2: 2
       },
       {
-        Key: Key1,
-        Value: 3
+        Key1: 3
       },
       {
-        Key: Key3,
-        Value: 4
+        Key3: 4
       }
     ],
     NewItems: [
       {
-        Key: Key2,
-        Value: 2
+        Key2: 2
       }
     ]
   }

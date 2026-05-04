@@ -1,8 +1,8 @@
-{
+﻿{
   Current: {
-    Key3: 6,
     Key1: 4,
-    Key2: 5
+    Key2: 5,
+    Key3: 6
   },
   Action: Reset
 }

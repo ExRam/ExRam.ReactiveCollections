@@ -5,7 +5,7 @@
     <Authors>ExRam EDV GmbH &amp; Co. KG</Authors>
     <NoWarn>$(NoWarn);CS1998</NoWarn>
     <PublicRelease>true</PublicRelease>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>latest</LangVersion>
 	<Nullable>enable</Nullable>
     <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
   </PropertyGroup>

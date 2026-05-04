@@ -8,8 +8,7 @@
     },
     NewItems: [
       {
-        Key: Key2,
-        Value: 2
+        Key2: 2
       }
     ]
   }

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using FluentAssertions;
-using VerifyXunit;
+using static VerifyXunit.Verifier;
 using Xunit;
+
+using FluentAssertions;
 
 namespace ExRam.ReactiveCollections.Tests
 {
@@ -43,13 +44,8 @@ namespace ExRam.ReactiveCollections.Tests
         }
     }
     
-    public class DictionaryReactiveCollectionSourceTest : VerifyBase
+    public class DictionaryReactiveCollectionSourceTest
     {
-        public DictionaryReactiveCollectionSourceTest() : base()
-        {
-
-        }
-        
         [Fact]
         public async Task First_notification_is_reset()
         {

@@ -1,4 +1,4 @@
-[
+﻿[
   {
     Comparer: {},
     Action: Reset
@@ -8,14 +8,12 @@
     Comparer: {},
     Current: [
       {
-        Key: Key1,
-        Value: 1
+        Key1: 1
       }
     ],
     NewItems: [
       {
-        Key: Key1,
-        Value: 1
+        Key1: 1
       }
     ]
   },
@@ -24,18 +22,15 @@
     Comparer: {},
     Current: [
       {
-        Key: Key1,
-        Value: 1
+        Key1: 1
       },
       {
-        Key: Key2,
-        Value: 2
+        Key2: 2
       }
     ],
     NewItems: [
       {
-        Key: Key2,
-        Value: 2
+        Key2: 2
       }
     ]
   },
@@ -44,14 +39,12 @@
     Comparer: {},
     Current: [
       {
-        Key: Key2,
-        Value: 2
+        Key2: 2
       }
     ],
     OldItems: [
       {
-        Key: Key1,
-        Value: 1
+        Key1: 1
       }
     ],
     Action: Remove

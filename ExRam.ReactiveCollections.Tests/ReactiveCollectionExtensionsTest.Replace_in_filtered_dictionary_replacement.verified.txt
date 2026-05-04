@@ -8,16 +8,14 @@
     },
     NewItems: [
       {
-        Key: Key2,
-        Value: 2
+        Key2: 2
       }
     ]
   },
   {
     OldItems: [
       {
-        Key: Key2,
-        Value: 2
+        Key2: 2
       }
     ],
     Action: Remove
@@ -28,8 +26,7 @@
     },
     NewItems: [
       {
-        Key: Key2,
-        Value: 4
+        Key2: 4
       }
     ]
   }

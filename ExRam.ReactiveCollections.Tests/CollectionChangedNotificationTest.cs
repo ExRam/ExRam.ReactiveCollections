@@ -1,12 +1,12 @@
 ﻿using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
-using VerifyXunit;
+using static VerifyXunit.Verifier;
 using Xunit;
 
 namespace ExRam.ReactiveCollections.Tests
 {
-    public class CollectionChangedNotificationTest : VerifyBase
+    public class CollectionChangedNotificationTest
     {
         #region NotificationImpl
         private sealed class NotificationImpl : CollectionChangedNotification<int>
@@ -22,11 +22,6 @@ namespace ExRam.ReactiveCollections.Tests
             }
         }
         #endregion
-
-        public CollectionChangedNotificationTest() : base()
-        {
-
-        }
         
         [Fact]
         public async Task Current_is_set()

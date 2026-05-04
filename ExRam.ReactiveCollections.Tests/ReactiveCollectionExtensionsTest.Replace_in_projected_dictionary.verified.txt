@@ -1,4 +1,4 @@
-[
+﻿[
   {
     Action: Reset
   },
@@ -8,8 +8,7 @@
     },
     NewItems: [
       {
-        Key: Key1,
-        Value: 1
+        Key1: 1
       }
     ]
   },
@@ -20,47 +19,43 @@
     },
     NewItems: [
       {
-        Key: Key2,
-        Value: 2
+        Key2: 2
       }
     ]
   },
   {
     Current: {
-      Key3: 3,
       Key1: 1,
-      Key2: 2
+      Key2: 2,
+      Key3: 3
     },
     NewItems: [
       {
-        Key: Key3,
-        Value: 3
+        Key3: 3
       }
     ]
   },
   {
     Current: {
-      Key3: 3,
-      Key1: 1
+      Key1: 1,
+      Key3: 3
     },
     OldItems: [
       {
-        Key: Key2,
-        Value: 2
+        Key2: 2
       }
     ],
     Action: Remove
   },
   {
     Current: {
-      Key3: 3,
       Key1: 1,
-      Key2: 4
+      Key2: 4,
+      Key3: 3
     },
     NewItems: [
       {
-        Key: Key2,
-        Value: 4
+        Key2: 4
       }
     ]
   }

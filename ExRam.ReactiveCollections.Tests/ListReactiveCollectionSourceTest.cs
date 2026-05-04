@@ -3,19 +3,15 @@ using System.Collections;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using FluentAssertions;
-using VerifyXunit;
+using static VerifyXunit.Verifier;
 using Xunit;
+
+using FluentAssertions;
 
 namespace ExRam.ReactiveCollections.Tests
 {
-    public class ListReactiveCollectionSourceTest : VerifyBase
+    public class ListReactiveCollectionSourceTest
     {
-        public ListReactiveCollectionSourceTest() : base()
-        {
-            
-        }
-
         [Fact]
         public async Task First_notification_is_reset()
         {

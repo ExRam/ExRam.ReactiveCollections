@@ -1,19 +1,15 @@
 ﻿using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using FluentAssertions;
-using VerifyXunit;
+using static VerifyXunit.Verifier;
 using Xunit;
+
+using FluentAssertions;
 
 namespace ExRam.ReactiveCollections.Tests
 {
-    public class SortedListReactiveCollectionSourceTest : VerifyBase
+    public class SortedListReactiveCollectionSourceTest
     {
-        public SortedListReactiveCollectionSourceTest() : base()
-        {
-
-        }
-
         [Fact]
         public async Task First_notification_is_reset()
         {
@@ -81,8 +77,8 @@ namespace ExRam.ReactiveCollections.Tests
                 1
             };
 
-            list.Contains(1).Should().BeTrue();
-            list.Contains(2).Should().BeFalse();
+            Assert.True(list.Contains(1));
+            Assert.False(list.Contains(2));
         }
 
         [Fact]
@@ -96,7 +92,7 @@ namespace ExRam.ReactiveCollections.Tests
             var target = new int[5];
             list.CopyTo(target, 2);
 
-            target.Should().Equal(0, 0, 1, 2, 3);
+            Assert.Equal(new[] { 0, 0, 1, 2, 3 }, target);
         }
 
         [Fact]

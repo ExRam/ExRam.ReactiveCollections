@@ -2,18 +2,13 @@
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using VerifyXunit;
+using static VerifyXunit.Verifier;
 using Xunit;
 
 namespace ExRam.ReactiveCollections.Tests
 {
-    public class SortedSetReactiveCollectionSourceTest : VerifyBase
+    public class SortedSetReactiveCollectionSourceTest
     {
-        public SortedSetReactiveCollectionSourceTest() : base()
-        {
-
-        }
-        
         private struct StructNotImplementingIComparable
         {
             public StructNotImplementingIComparable(int value)

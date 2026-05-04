@@ -3,7 +3,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Xunit;
 
 namespace ExRam.ReactiveCollections.Tests
@@ -27,8 +26,8 @@ namespace ExRam.ReactiveCollections.Tests
 
                 sourceSubject.OnNext(36);
 
-                (await task1).Should().Be(36);
-                (await replayed.FirstAsync().ToTask()).Should().Be(36);
+                Assert.Equal(36, await task1);
+                Assert.Equal(36, await replayed.FirstAsync().ToTask());
             }
 
             var task2 = replayed
@@ -37,7 +36,7 @@ namespace ExRam.ReactiveCollections.Tests
 
             sourceSubject.OnNext(37);
 
-            (await task2).Should().Be(37);
+            Assert.Equal(37, await task2);
         }
     }
 }

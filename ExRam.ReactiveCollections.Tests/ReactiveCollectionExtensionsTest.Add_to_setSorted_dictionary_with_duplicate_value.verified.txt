@@ -6,14 +6,12 @@
     Index: 0,
     Current: [
       {
-        Key: Key3,
-        Value: 3
+        Key3: 3
       }
     ],
     NewItems: [
       {
-        Key: Key3,
-        Value: 3
+        Key3: 3
       }
     ]
   },
@@ -21,18 +19,15 @@
     Index: 0,
     Current: [
       {
-        Key: Key1,
-        Value: 1
+        Key1: 1
       },
       {
-        Key: Key3,
-        Value: 3
+        Key3: 3
       }
     ],
     NewItems: [
       {
-        Key: Key1,
-        Value: 1
+        Key1: 1
       }
     ]
   },
@@ -40,22 +35,18 @@
     Index: 1,
     Current: [
       {
-        Key: Key1,
-        Value: 1
+        Key1: 1
       },
       {
-        Key: Key2,
-        Value: 2
+        Key2: 2
       },
       {
-        Key: Key3,
-        Value: 3
+        Key3: 3
       }
     ],
     NewItems: [
       {
-        Key: Key2,
-        Value: 2
+        Key2: 2
       }
     ]
   }
