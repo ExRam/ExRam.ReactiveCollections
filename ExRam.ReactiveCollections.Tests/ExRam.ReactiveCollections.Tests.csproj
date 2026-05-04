@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="xunit.v3" Version="3.2.2" />
     <PackageReference Include="Verify.XunitV3" Version="31.16.2" />
-    <PackageReference Include="FluentAssertions" Version="7.0.0" />
+    <PackageReference Include="Shouldly" Version="4.3.0" />
   </ItemGroup>
 
 </Project>

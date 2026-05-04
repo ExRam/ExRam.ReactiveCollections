@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using static VerifyXunit.Verifier;
 using Xunit;
 
-using FluentAssertions;
+using Shouldly;
 
 namespace ExRam.ReactiveCollections.Tests
 {
@@ -106,16 +106,16 @@ namespace ExRam.ReactiveCollections.Tests
 
             using (var enumerator = list.GetEnumerator())
             {
-                enumerator.MoveNext().Should().BeTrue();
-                enumerator.Current.Should().Be(1);
+                enumerator.MoveNext().ShouldBeTrue();
+                enumerator.Current.ShouldBe(1);
 
-                enumerator.MoveNext().Should().BeTrue();
-                enumerator.Current.Should().Be(2);
+                enumerator.MoveNext().ShouldBeTrue();
+                enumerator.Current.ShouldBe(2);
 
-                enumerator.MoveNext().Should().BeTrue();
-                enumerator.Current.Should().Be(3);
+                enumerator.MoveNext().ShouldBeTrue();
+                enumerator.Current.ShouldBe(3);
 
-                enumerator.MoveNext().Should().BeFalse();
+                enumerator.MoveNext().ShouldBeFalse();
             }
         }
 
@@ -179,10 +179,7 @@ namespace ExRam.ReactiveCollections.Tests
         {
             var list = (IList)new ListReactiveCollectionSource<int>();
             
-            list
-                .Invoking(_ => _.Add(1))
-                .Should()
-                .Throw<NotSupportedException>();
+            Should.Throw<NotSupportedException>(() => list.Add(1));
         }
 
         [Fact]

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using static VerifyXunit.Verifier;
 using Xunit;
 
-using FluentAssertions;
+using Shouldly;
 
 namespace ExRam.ReactiveCollections.Tests
 {
@@ -105,13 +105,13 @@ namespace ExRam.ReactiveCollections.Tests
 
             using (var enumerator = list.GetEnumerator())
             {
-                enumerator.MoveNext().Should().BeTrue();
-                enumerator.Current.Should().Be(1);
-                enumerator.MoveNext().Should().BeTrue();
-                enumerator.Current.Should().Be(2);
-                enumerator.MoveNext().Should().BeTrue();
-                enumerator.Current.Should().Be(3);
-                enumerator.MoveNext().Should().BeFalse();
+                enumerator.MoveNext().ShouldBeTrue();
+                enumerator.Current.ShouldBe(1);
+                enumerator.MoveNext().ShouldBeTrue();
+                enumerator.Current.ShouldBe(2);
+                enumerator.MoveNext().ShouldBeTrue();
+                enumerator.Current.ShouldBe(3);
+                enumerator.MoveNext().ShouldBeFalse();
             }
         }
 
@@ -122,9 +122,9 @@ namespace ExRam.ReactiveCollections.Tests
 
             list.AddRange(new[] { 1, 2, 3 });
 
-            list.IndexOf(3).Should().Be(2);
-            list.IndexOf(2).Should().Be(1);
-            list.IndexOf(1).Should().Be(0);
+            list.IndexOf(3).ShouldBe(2);
+            list.IndexOf(2).ShouldBe(1);
+            list.IndexOf(1).ShouldBe(0);
         }
 
         [Fact]
@@ -133,7 +133,7 @@ namespace ExRam.ReactiveCollections.Tests
             var list = new SortedListReactiveCollectionSource<int>();
             list.Add(1);
 
-            list[0].Should().Be(1);
+            list[0].ShouldBe(1);
         }
 
         [Fact]

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using static VerifyXunit.Verifier;
 using Xunit;
 
-using FluentAssertions;
+using Shouldly;
 
 namespace ExRam.ReactiveCollections.Tests
 {
@@ -293,18 +293,16 @@ namespace ExRam.ReactiveCollections.Tests
         }
 
         [Fact]
-        public async Task Item()
+        public void Item()
         {
             var list = new DictionaryReactiveCollectionSource<string, int>
             {
                 { "Key1", 1 }
             };
 
-            var before = list["Key1"].Should().Be(1);
+            list["Key1"].ShouldBe(1);
             list["Key1"] = 2;
-            var after = list["Key1"].Should().Be(2);
-
-            await Verify((before, after));
+            list["Key1"].ShouldBe(2);
         }
 
         [Fact]
@@ -331,9 +329,9 @@ namespace ExRam.ReactiveCollections.Tests
 
             using (var enumerator = list.GetEnumerator())
             {
-                enumerator.MoveNext().Should().BeTrue();
-                enumerator.Current.Should().Be(new KeyValuePair<string, int>("Key1", 1));
-                enumerator.MoveNext().Should().BeFalse();
+                enumerator.MoveNext().ShouldBeTrue();
+                enumerator.Current.ShouldBe(new KeyValuePair<string, int>("Key1", 1));
+                enumerator.MoveNext().ShouldBeFalse();
             }
         }
     }
