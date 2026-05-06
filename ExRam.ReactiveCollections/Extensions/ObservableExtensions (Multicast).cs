@@ -1,5 +1,6 @@
-﻿using System.Reactive.Disposables;
+using System.Reactive.Disposables;
 using System.Reactive.Subjects;
+using System.Threading;
 
 namespace System.Reactive.Linq
 {
@@ -9,7 +10,7 @@ namespace System.Reactive.Linq
         internal sealed class MulticastConnectableObservable<T> : IConnectableObservable<T>
         {
             private readonly IObservable<T> _source;
-            private readonly object _syncRoot = new();
+            private readonly Lock _syncRoot = new();
             private readonly Func<ISubject<T>> _subjectFactory;
 
             private ISubject<T>? _currentSubject;
